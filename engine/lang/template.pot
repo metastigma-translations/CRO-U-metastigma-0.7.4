@@ -98,6 +98,18 @@ msgid ""
 msgstr ""
 
 #: src/app/scene_fx.cpp
+msgid "Text Outline"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "Fixed"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "Original: eight offset draws; Fixed: one antialiased pass."
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
 msgstr ""
 

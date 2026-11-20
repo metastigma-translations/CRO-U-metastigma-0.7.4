@@ -101,6 +101,18 @@ msgstr ""
 "Afficher l'aide aux commandes et l'état à l'écran. Sinon, l'aide WASD est masquée ; F3 pour basculer."
 
 #: src/app/scene_fx.cpp
+msgid "Text Outline"
+msgstr "Contour du texte"
+
+#: src/app/scene_fx.cpp
+msgid "Fixed"
+msgstr "Corrigé"
+
+#: src/app/scene_fx.cpp
+msgid "Original: eight offset draws; Fixed: one antialiased pass."
+msgstr "Original : huit dessins décalés ; corrigé : un seul passage anticrénelé."
+
+#: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
 msgstr "Importer sauv. Vita"
 

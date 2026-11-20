@@ -99,6 +99,18 @@ msgid ""
 msgstr "操作ヒントとステータス表示を出す。オフでWASDの説明を隠す。F3で切り替え"
 
 #: src/app/scene_fx.cpp
+msgid "Text Outline"
+msgstr "文字の縁取り"
+
+#: src/app/scene_fx.cpp
+msgid "Fixed"
+msgstr "修正版"
+
+#: src/app/scene_fx.cpp
+msgid "Original: eight offset draws; Fixed: one antialiased pass."
+msgstr "元の方式は8回ずらして描画し、修正版はアンチエイリアス付きで1回描画します。"
+
+#: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
 msgstr "Vitaセーブ取り込み"
 

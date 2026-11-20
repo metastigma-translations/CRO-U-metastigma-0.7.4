@@ -99,6 +99,18 @@ msgid ""
 msgstr "顯示操作提示與狀態資訊。關閉後隱藏WASD說明；快速鍵為F3。"
 
 #: src/app/scene_fx.cpp
+msgid "Text Outline"
+msgstr "文字外框"
+
+#: src/app/scene_fx.cpp
+msgid "Fixed"
+msgstr "已修正"
+
+#: src/app/scene_fx.cpp
+msgid "Original: eight offset draws; Fixed: one antialiased pass."
+msgstr "原始方式繪製八次偏移副本；修正方式只繪製一次抗鋸齒外框。"
+
+#: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
 msgstr "匯入Vita存檔"
 
