@@ -518,18 +518,6 @@ msgid "FSR's sharpening pass (RCAS); DLSS has none"
 msgstr "Pase de nitidez de FSR (RCAS); DLSS no lo tiene"
 
 #: src/app/scene_fx.cpp
-msgid "Quit the game?"
-msgstr "¿Salir del juego?"
-
-#: src/gfx/render_device.hpp
-msgid "needs the Vulkan renderer"
-msgstr "requiere el renderizador Vulkan"
-
-#: src/gfx/vk_device.cpp
-msgid "this GPU lacks what temporal upscaling needs"
-msgstr "esta GPU no tiene lo que requiere el escalado temporal"
-
-#: src/app/scene_fx.cpp
 msgid "Text Outline"
 msgstr "Contorno del texto"
 
@@ -540,6 +528,18 @@ msgstr "Corregido"
 #: src/app/scene_fx.cpp
 msgid "Original: eight offset draws; Fixed: one antialiased pass."
 msgstr "Original: ocho dibujos desplazados; corregido: un solo paso suavizado."
+
+#: src/app/scene_fx.cpp
+msgid "Quit the game?"
+msgstr "¿Salir del juego?"
+
+#: src/gfx/render_device.hpp
+msgid "needs the Vulkan renderer"
+msgstr "requiere el renderizador Vulkan"
+
+#: src/gfx/vk_device.cpp
+msgid "this GPU lacks what temporal upscaling needs"
+msgstr "esta GPU no tiene lo que requiere el escalado temporal"
 
 #: src/gfx/vk_device.cpp
 msgid "this GPU can't run FSR 3.1"

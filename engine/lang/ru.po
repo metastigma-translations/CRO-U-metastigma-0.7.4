@@ -517,6 +517,18 @@ msgid "FSR's sharpening pass (RCAS); DLSS has none"
 msgstr "Этап повышения резкости FSR (RCAS); в DLSS его нет"
 
 #: src/app/scene_fx.cpp
+msgid "Text Outline"
+msgstr "Обводка текста"
+
+#: src/app/scene_fx.cpp
+msgid "Fixed"
+msgstr "Исправленная"
+
+#: src/app/scene_fx.cpp
+msgid "Original: eight offset draws; Fixed: one antialiased pass."
+msgstr "Оригинал рисует обводку восемью смещёнными проходами; исправление использует один сглаженный проход."
+
+#: src/app/scene_fx.cpp
 msgid "Quit the game?"
 msgstr "Выйти из игры?"
 
@@ -528,18 +540,6 @@ msgstr "требуется рендерер Vulkan"
 msgid "this GPU lacks what temporal upscaling needs"
 msgstr ""
 "видеокарта не поддерживает функции, нужные для временного масштабирования"
-
-#: src/app/scene_fx.cpp
-msgid "Text Outline"
-msgstr "Обводка текста"
-
-#: src/app/scene_fx.cpp
-msgid "Fixed"
-msgstr "Исправленная"
-
-#: src/app/scene_fx.cpp
-msgid "Original: eight offset draws; Fixed: one antialiased pass."
-msgstr "Оригинал рисует обводку восемью смещёнными проходами; исправление использует один сглаженный проход."
 
 #: src/gfx/vk_device.cpp
 msgid "this GPU can't run FSR 3.1"

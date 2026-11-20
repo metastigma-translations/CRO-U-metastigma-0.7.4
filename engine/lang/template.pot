@@ -494,18 +494,6 @@ msgid "FSR's sharpening pass (RCAS); DLSS has none"
 msgstr ""
 
 #: src/app/scene_fx.cpp
-msgid "Quit the game?"
-msgstr ""
-
-#: src/gfx/render_device.hpp
-msgid "needs the Vulkan renderer"
-msgstr ""
-
-#: src/gfx/vk_device.cpp
-msgid "this GPU lacks what temporal upscaling needs"
-msgstr ""
-
-#: src/app/scene_fx.cpp
 msgid "Text Outline"
 msgstr ""
 
@@ -515,6 +503,18 @@ msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Original: eight offset draws; Fixed: one antialiased pass."
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "Quit the game?"
+msgstr ""
+
+#: src/gfx/render_device.hpp
+msgid "needs the Vulkan renderer"
+msgstr ""
+
+#: src/gfx/vk_device.cpp
+msgid "this GPU lacks what temporal upscaling needs"
 msgstr ""
 
 #: src/gfx/vk_device.cpp
