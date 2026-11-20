@@ -9,9 +9,9 @@ uint8_t alphaAt(const cr::Image& image, int x, int y) {
     return image.rgba[(size_t(y) * size_t(image.width) + size_t(x)) * 4 + 3];
 }
 
-int fail(const char* message) {
+bool fail(const char* message) {
     std::cerr << message << '\n';
-    return 1;
+    return false;
 }
 
 } // namespace
@@ -26,14 +26,17 @@ int main() {
     const size_t antialias = (3u * 7u + 4u) * 4u;
     glyph.rgba[antialias] = glyph.rgba[antialias + 1] = glyph.rgba[antialias + 2] = 255;
     glyph.rgba[antialias + 3] = 128;
+
     cr::Image edge;
-    if (!cr::makeGlyphOutline(glyph, 2, edge)) return fail("outline generation failed");
-    if (edge.width != glyph.width || edge.height != glyph.height) return fail("outline dimensions changed");
-    if (alphaAt(edge, 3, 3) != 0) return fail("outline filled the glyph interior");
-    if (alphaAt(edge, 4, 3) != 127) return fail("antialiased edge coverage was not preserved");
-    if (alphaAt(edge, 5, 3) != 255) return fail("outline did not reach the requested radius");
-    if (alphaAt(edge, 5, 5) != 0) return fail("outline exceeded its circular radius");
-    if (alphaAt(edge, 6, 3) != 128) return fail("antialiased coverage did not reach the outline radius");
-    if (alphaAt(edge, 6, 5) != 0) return fail("outline extended beyond its circular radius");
+    if (!cr::makeGlyphOutline(glyph, 2, edge)) return fail("outline generation failed") ? 0 : 1;
+    if (edge.width != glyph.width || edge.height != glyph.height) return fail("outline dimensions changed") ? 0 : 1;
+    if (alphaAt(edge, 3, 3) != 0) return fail("outline filled the glyph interior") ? 0 : 1;
+    if (alphaAt(edge, 4, 3) != 127) return fail("antialiased edge coverage was not preserved") ? 0 : 1;
+    if (alphaAt(edge, 5, 3) != 255) return fail("outline did not reach the requested radius") ? 0 : 1;
+    if (alphaAt(edge, 5, 5) != 0) return fail("outline exceeded its circular radius") ? 0 : 1;
+    // The antialiased source pixel at (4, 3) is exactly two pixels from (6, 3),
+    // so its 128 coverage must extend to that radius; the diagonal is outside it.
+    if (alphaAt(edge, 6, 3) != 128) return fail("antialiased coverage did not reach the outline radius") ? 0 : 1;
+    if (alphaAt(edge, 6, 5) != 0) return fail("outline extended beyond its circular radius") ? 0 : 1;
     return 0;
 }
