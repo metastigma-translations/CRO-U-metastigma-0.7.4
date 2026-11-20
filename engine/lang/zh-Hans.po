@@ -99,18 +99,6 @@ msgid ""
 msgstr "显示操作提示和状态信息。关闭后隐藏WASD说明；快捷键为F3。"
 
 #: src/app/scene_fx.cpp
-msgid "Text Outline"
-msgstr "文字描边"
-
-#: src/app/scene_fx.cpp
-msgid "Fixed"
-msgstr "已修复"
-
-#: src/app/scene_fx.cpp
-msgid "Original: eight offset draws; Fixed: one antialiased pass."
-msgstr "原始方式绘制八次偏移副本；修复方式只绘制一次抗锯齿描边。"
-
-#: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
 msgstr "导入Vita存档"
 
@@ -518,6 +506,18 @@ msgstr "需要Vulkan渲染器"
 #: src/gfx/vk_device.cpp
 msgid "this GPU lacks what temporal upscaling needs"
 msgstr "此GPU不具备时间性超分辨率所需的功能"
+
+#: src/app/scene_fx.cpp
+msgid "Text Outline"
+msgstr "文字描边"
+
+#: src/app/scene_fx.cpp
+msgid "Fixed"
+msgstr "已修复"
+
+#: src/app/scene_fx.cpp
+msgid "Original: eight offset draws; Fixed: one antialiased pass."
+msgstr "原始方式绘制八次偏移副本；修复方式只绘制一次抗锯齿描边。"
 
 #: src/gfx/vk_device.cpp
 msgid "this GPU can't run FSR 3.1"

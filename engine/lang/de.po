@@ -101,18 +101,6 @@ msgstr ""
 "Steuerungshinweise und Statusanzeige einblenden. Aus blendet die WASD-Hilfe aus; F3 schaltet direkt um."
 
 #: src/app/scene_fx.cpp
-msgid "Text Outline"
-msgstr "Textumrandung"
-
-#: src/app/scene_fx.cpp
-msgid "Fixed"
-msgstr "Korrigiert"
-
-#: src/app/scene_fx.cpp
-msgid "Original: eight offset draws; Fixed: one antialiased pass."
-msgstr "Original: acht versetzte Zeichnungen; korrigiert: ein geglätteter Durchgang."
-
-#: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
 msgstr "Vita-Saves importieren"
 
@@ -540,6 +528,18 @@ msgstr "benötigt den Vulkan-Renderer"
 #: src/gfx/vk_device.cpp
 msgid "this GPU lacks what temporal upscaling needs"
 msgstr "dieser GPU fehlt, was temporales Hochskalieren braucht"
+
+#: src/app/scene_fx.cpp
+msgid "Text Outline"
+msgstr "Textumrandung"
+
+#: src/app/scene_fx.cpp
+msgid "Fixed"
+msgstr "Korrigiert"
+
+#: src/app/scene_fx.cpp
+msgid "Original: eight offset draws; Fixed: one antialiased pass."
+msgstr "Original: acht versetzte Zeichnungen; korrigiert: ein geglätteter Durchgang."
 
 #: src/gfx/vk_device.cpp
 msgid "this GPU can't run FSR 3.1"

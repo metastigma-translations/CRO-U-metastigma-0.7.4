@@ -101,18 +101,6 @@ msgstr ""
 "Afficher l'aide aux commandes et l'état à l'écran. Sinon, l'aide WASD est masquée ; F3 pour basculer."
 
 #: src/app/scene_fx.cpp
-msgid "Text Outline"
-msgstr "Contour du texte"
-
-#: src/app/scene_fx.cpp
-msgid "Fixed"
-msgstr "Corrigé"
-
-#: src/app/scene_fx.cpp
-msgid "Original: eight offset draws; Fixed: one antialiased pass."
-msgstr "Original : huit dessins décalés ; corrigé : un seul passage anticrénelé."
-
-#: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
 msgstr "Importer sauv. Vita"
 
@@ -537,6 +525,18 @@ msgstr "nécessite le moteur de rendu Vulkan"
 #: src/gfx/vk_device.cpp
 msgid "this GPU lacks what temporal upscaling needs"
 msgstr "ce GPU n'a pas ce qu'exige la mise à l'échelle temporelle"
+
+#: src/app/scene_fx.cpp
+msgid "Text Outline"
+msgstr "Contour du texte"
+
+#: src/app/scene_fx.cpp
+msgid "Fixed"
+msgstr "Corrigé"
+
+#: src/app/scene_fx.cpp
+msgid "Original: eight offset draws; Fixed: one antialiased pass."
+msgstr "Original : huit dessins décalés ; corrigé : un seul passage anticrénelé."
 
 #: src/gfx/vk_device.cpp
 msgid "this GPU can't run FSR 3.1"
