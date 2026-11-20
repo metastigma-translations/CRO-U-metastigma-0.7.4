@@ -159,9 +159,11 @@ void MenuPainter::textTint(const std::string& s, float x, float y, float r, floa
     if (!c.tex.id) return;
     const float x0 = X(x) * kScale - c.pad, y0 = Y(y) * kScale - c.pad;
     const float w = c.w + 2 * c.pad, h = c.h + 2 * c.pad;
-    const float edge = r + g + b > 0.01f ? 0.0f : 1.0f;
-    if (outline_ && cleanOutline_ && c.edgeTex.id) r_->drawQuad(c.edgeTex, x0, y0, w, h, edge, edge, edge, alpha);
-    else if (!cleanOutline_) edge(c.tex, x, y, c.w, c.h, edge, alpha);
+    const float edgeColor = r + g + b > 0.01f ? 0.0f : 1.0f;
+    if (outline_ && cleanOutline_ && c.edgeTex.id)
+        r_->drawQuad(c.edgeTex, x0, y0, w, h, edgeColor, edgeColor, edgeColor, alpha);
+    else if (!cleanOutline_)
+        edge(c.tex, x, y, c.w, c.h, edgeColor, alpha);
     r_->drawQuad(c.tex, x0, y0, w, h, r, g, b, alpha);
 }
 
