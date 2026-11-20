@@ -15,11 +15,13 @@ inline bool makeGlyphOutline(const Image& glyph, int radius, Image& out) {
     if (glyph.width <= 0 || glyph.height <= 0 || radius <= 0 || radius > 64) return false;
     const size_t bytes = size_t(glyph.width) * size_t(glyph.height) * 4;
     if (glyph.rgba.size() < bytes) return false;
+
     out = {};
     out.width = glyph.width;
     out.height = glyph.height;
     out.rgba.assign(bytes, 0);
     const int r2 = radius * radius;
+
     for (int y = 0; y < glyph.height; ++y) {
         for (int x = 0; x < glyph.width; ++x) {
             const size_t dst = (size_t(y) * size_t(glyph.width) + size_t(x)) * 4;
