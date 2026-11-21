@@ -1029,7 +1029,7 @@ msgstr "Hineinkopiert..."
 msgid "An archive..."
 msgstr "Ein Archiv..."
 
-#: src/app/menus.cpp src/platform/setup.cpp
+#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
 msgid "Back"
 msgstr "Zurück"
 

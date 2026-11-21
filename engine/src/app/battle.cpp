@@ -4115,7 +4115,7 @@ void drawBattleHud(App& app, float W, float H) {
                 const bool held = !dim && v.menu == b.menu && battlePressIn(app, kButtonX, kButtonY + kButtonStep * float(i), 136, 40);
                 drawBattleButton(m, kButtonX, kButtonY + kButtonStep * float(i), kCmdIcon[i], kCmdWord[i], (v.cursor == i && cursorLit) || held, dim, a);
             }
-            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a); // (_cmd_back: lit while held)
+            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a, tr("Back")); // (_cmd_back: lit while held)
             break;
         case App::Battle::Targets: {
             const int n = int(v.picks.size());
@@ -4123,7 +4123,7 @@ void drawBattleHud(App& app, float W, float H) {
             const bool all = act && b.rules.isGroupScope(*act);
             for (int i = 0; i < n; ++i)
                 drawBattlePlate(app, m, kPlateX, kPlateBottom - 48.0f * float(n - i), v.picks[size_t(i)], all || v.pick == i, a);
-            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a);
+            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a, tr("Back"));
             break;
         }
         case App::Battle::Items: { // MuScrList: the battle items in the bag, how many of each
@@ -4135,7 +4135,7 @@ void drawBattleHud(App& app, float W, float H) {
                 const auto it = app.game.items.find(item);
                 drawCampRow(app, m, 232, y, item, it == app.game.items.end() ? 0 : it->second, index == v.pick, a);
             }
-            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a);
+            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a, tr("Back"));
             if (v.pick >= 0 && v.pick < n) helpBoard(v.picks[size_t(v.pick)]); // (MuScrList_SetIdInfo's help: the items' too)
             break;
         }
@@ -4150,7 +4150,7 @@ void drawBattleHud(App& app, float W, float H) {
                 m.picture(27, 232 + 188, y + 34, ra);
                 drawShopNumber(m, cost, 232 + 218, y + 30, 3, 10, ra, 2); // (ComUty_PictNumDraw: the field from 218, right-aligned)
             }
-            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a);
+            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a, tr("Back"));
             if (v.pick >= 0 && v.pick < n) helpBoard(v.picks[size_t(v.pick)]); // the gene's target and effect
             break;
         }

@@ -993,7 +993,7 @@ msgstr "복사해 둔 폴더..."
 msgid "An archive..."
 msgstr "압축 파일..."
 
-#: src/app/menus.cpp src/platform/setup.cpp
+#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
 msgid "Back"
 msgstr "뒤로"
 
