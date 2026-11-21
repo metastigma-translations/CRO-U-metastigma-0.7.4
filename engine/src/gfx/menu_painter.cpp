@@ -264,7 +264,7 @@ void MenuPainter::gauge(float x, float y, int value, float alpha, bool active, f
     piece(knob, y - 16, p[0], p[1], p[2], p[3], alpha);
 }
 
-void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha) {
+void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha, const std::string& label) {
     const float cyan[4] = {0x4B / 255.0f, 1, 0xEB / 255.0f, alpha}; // (tex2d's 0xEBFF4B is A B G R: cyan)
     const float white[4] = {1, 1, 1, alpha};
     // ComUty_CmdBack mode 2: the left arrow's box (24..51, faded in over 0..24), Back (56..176), the
@@ -281,7 +281,17 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
     quad(x + 208, y, 24, 24, r, clearR);
     piece(x + 24 + bob, y + 4, 336, 880, 16, 16, alpha);
     piece(x + 197 - bob, y + 4, 352, 880, 16, 16, alpha);
-    piece(x + 80, y, 0, 224, 76, 24, alpha);
+    if (label.empty()) {
+        piece(x + 80, y, 0, 224, 76, 24, alpha); // other menus retain the complete atlas label
+    } else {
+        // In the EXE Options screen, keep the atlas return mark and render only the word with the selected font.
+        piece(x + 80, y, 0, 224, 24, 24, alpha);
+        float size = 14.0f;
+        float width = textWidth(label, size);
+        if (width > 52.0f) size = std::max(8.0f, std::floor(size * 52.0f / width));
+        width = textWidth(label, size);
+        textCentred(label, x + 104 + (52.0f - width) / 2.0f, y + 12, false, alpha, size, true);
+    }
 }
 
 void MenuPainter::backBar(float x, float y, bool pressed, float alpha, const std::string& label) {
@@ -294,7 +304,7 @@ void MenuPainter::backBar(float x, float y, bool pressed, float alpha, const std
     quad(x + 208, y, 24, 24, c, clear);
 
     // Keep the original curved return mark from window_hd; only its "Back" lettering is replaced.
-    const float arrowWidth = 14.0f, gap = 5.0f, maxLabelWidth = 76.0f;
+    const float arrowWidth = 24.0f, gap = 5.0f, maxLabelWidth = 76.0f;
     float size = 14.0f;
     float labelWidth = textWidth(label, size);
     if (labelWidth > maxLabelWidth)
