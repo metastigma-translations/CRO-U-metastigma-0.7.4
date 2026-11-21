@@ -5415,7 +5415,7 @@ void drawTitleMenu(App& app) {
             const char* label = i == 0 ? tr("Start Game") : i == 1 ? tr("Scenarios") :
                                 i == 2 ? tr("Options") : tr("Quit");
             const int icon = i < 3 ? kTitleIcons[i] : 1; // the desktop's Quit uses its X icon
-            m.plate(328 + dx, titlePlateY(i), icon, -1, lit, pa, !titleChoiceReady(i), label, i < 3);
+            m.plate(328 + dx, titlePlateY(i), icon, -1, lit, pa, !titleChoiceReady(i), label, true);
         } // (lit: the keys' cursor, or a touch holding it - TitlePrc's DAT_000ecb60)
         app.renderer.setOrigin(wideLeft(app)); // (... and the pictures down the left to its left)
         if (!vita) { // (the Vita's TitlePut draws none of them)
