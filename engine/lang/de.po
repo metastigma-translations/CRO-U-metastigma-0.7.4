@@ -32,6 +32,10 @@ msgstr "Ultra-Leistung"
 msgid "Off"
 msgstr "Aus"
 
+#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
+msgid "Back"
+msgstr "Zurück"
+
 #: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Quit Game"
 msgstr "Spiel beenden"
@@ -1028,10 +1032,6 @@ msgstr "Hineinkopiert..."
 #: src/platform/setup.cpp
 msgid "An archive..."
 msgstr "Ein Archiv..."
-
-#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
-msgid "Back"
-msgstr "Zurück"
 
 #: src/platform/setup.cpp
 msgid "A folder - Vita3K's (or its ux0), the game's own, or a NoNpDrm dump's"

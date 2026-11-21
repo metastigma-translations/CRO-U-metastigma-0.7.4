@@ -32,6 +32,10 @@ msgstr "ウルトラ性能"
 msgid "Off"
 msgstr "オフ"
 
+#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
+msgid "Back"
+msgstr "戻る"
+
 #: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Quit Game"
 msgstr "ゲームを終了"
@@ -988,10 +992,6 @@ msgstr "コピー済み…"
 #: src/platform/setup.cpp
 msgid "An archive..."
 msgstr "アーカイブ…"
-
-#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
-msgid "Back"
-msgstr "戻る"
 
 #: src/platform/setup.cpp
 msgid "A folder - Vita3K's (or its ux0), the game's own, or a NoNpDrm dump's"

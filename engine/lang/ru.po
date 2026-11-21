@@ -32,6 +32,10 @@ msgstr "Ультра-произв."
 msgid "Off"
 msgstr "Выкл."
 
+#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
+msgid "Back"
+msgstr "Назад"
+
 #: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Quit Game"
 msgstr "Выйти из игры"
@@ -1021,10 +1025,6 @@ msgstr "Скопировано..."
 #: src/platform/setup.cpp
 msgid "An archive..."
 msgstr "Архив..."
-
-#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
-msgid "Back"
-msgstr "Назад"
 
 #: src/platform/setup.cpp
 msgid "A folder - Vita3K's (or its ux0), the game's own, or a NoNpDrm dump's"

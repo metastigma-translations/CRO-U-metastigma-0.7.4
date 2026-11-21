@@ -31,6 +31,10 @@ msgstr ""
 msgid "Off"
 msgstr ""
 
+#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
+msgid "Back"
+msgstr ""
+
 #: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Quit Game"
 msgstr ""
@@ -984,10 +988,6 @@ msgstr ""
 
 #: src/platform/setup.cpp
 msgid "An archive..."
-msgstr ""
-
-#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
-msgid "Back"
 msgstr ""
 
 #: src/platform/setup.cpp

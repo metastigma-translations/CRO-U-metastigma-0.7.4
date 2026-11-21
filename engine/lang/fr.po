@@ -32,6 +32,10 @@ msgstr "Ultra perf."
 msgid "Off"
 msgstr "Désactivé"
 
+#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
+msgid "Back"
+msgstr "Retour"
+
 #: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Quit Game"
 msgstr "Quitter le jeu"
@@ -1025,10 +1029,6 @@ msgstr "Déjà copié..."
 #: src/platform/setup.cpp
 msgid "An archive..."
 msgstr "Une archive..."
-
-#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
-msgid "Back"
-msgstr "Retour"
 
 #: src/platform/setup.cpp
 msgid "A folder - Vita3K's (or its ux0), the game's own, or a NoNpDrm dump's"
