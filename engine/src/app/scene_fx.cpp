@@ -1007,8 +1007,9 @@ std::vector<OptRow> optionRows(App& app, int page) {
         OptRow r;
         r.label = label;
         r.kind = OptControl::Pair;
-        r.words[0] = 33; // On
-        r.words[1] = 34; // Off
+        r.words[0] = r.words[1] = -1;
+        r.texts[0] = tr("On");
+        r.texts[1] = tr("Off");
         r.selected = *flag ? 0 : 1;
         r.act = [&app, flag, after](int i) {
             *flag = i == 0;
@@ -1156,8 +1157,9 @@ std::vector<OptRow> optionRows(App& app, int page) {
         OptRow swap; // the controller's ○ (east) / × (south): Off as on the Vita, ○ confirms
         swap.label = tr("Swap \u25cb and \u00d7");
         swap.kind = OptControl::Pair;
-        swap.words[0] = 33; // On
-        swap.words[1] = 34; // Off
+        swap.words[0] = swap.words[1] = -1;
+        swap.texts[0] = tr("On");
+        swap.texts[1] = tr("Off");
         swap.selected = app.padConfirmEast ? 1 : 0;
         swap.act = [&app](int i) {
             app.padConfirmEast = i == 1;
@@ -1535,7 +1537,7 @@ void drawOptions(App& app, float, float) {
     // The windows slide in: rows from the left, controls from the right (WinDispOn -240 / +240)
     const float t = std::min(1.0f, app.optionsAnim / 8.0f), ease = 1 - (1 - t) * (1 - t);
     const float rowsX = -240 * (1 - ease), ctrlX = 240 * (1 - ease), a = t;
-    m.picture(103, 8, 4); // "Options" (_stMuPictInfo_Option: Omega's 103, CR1's 102)
+    m.text(tr("Options"), 8, 4, false, 1, 14, true); // Options in the selected font
     const std::vector<OptRow> rows = optionRows(app, app.optionsPage);
     const int n = int(rows.size()), shown = std::min(n, kOptVisible);
     optionsScrollFix(app, n, false);
@@ -1562,7 +1564,9 @@ void drawOptions(App& app, float, float) {
         m.setScale(kOptCtrlX + ctrlX, mid, kOptCtrlScale);
         const float cx = kOptCtrlX + ctrlX;
         switch (row.kind) {
-        case OptControl::Check: m.button(cx + 120, y - 8, 23, "", false, dim, cursor && row.enabled); break;
+        case OptControl::Check:
+            m.button(cx + 120, y - 8, -1, menuWordText(23), false, dim, cursor && row.enabled, true);
+            break;
         case OptControl::Gauge: {
             App::GaugeEase& e = app.gaugeEase[row.gauge];
             if (e.to < 0) e.from = e.to = row.value;
@@ -1572,8 +1576,10 @@ void drawOptions(App& app, float, float) {
             break;
         }
         case OptControl::Pair:
-            for (int k = 0; k < 2; ++k)
-                m.button(cx + 120 * k, y - 8, row.words[k], row.texts[k], row.selected == k, a, false);
+            for (int k = 0; k < 2; ++k) {
+                const bool onOff = row.texts[k] == menuWordText(33) || row.texts[k] == menuWordText(34);
+                m.button(cx + 120 * k, y - 8, onOff ? -1 : row.words[k], row.texts[k], row.selected == k, a, false, onOff);
+            }
             break;
         case OptControl::Value: // our picker: the value on a button with the Back arrows either side
             m.button(cx + 60, y - 8, -1, row.valueTex ? std::string() : row.valueText, false, dim, cursor && row.enabled);
@@ -1617,8 +1623,8 @@ void drawOptions(App& app, float, float) {
         const auto lines = wrapText(m, message, 455, 13, 8);
         for (size_t l = 0; l < lines.size(); ++l) m.text(lines[l], 24, 234 + 16 * float(l), false, 1, 13);
         if (app.saveImport.state == vitaimport::Session::Confirm) {
-            m.plate(336, 104, 0, 0, app.saveImport.focus == 0, 1, false);
-            m.plate(336, 160, 1, 1, app.saveImport.focus == 1, 1, false);
+            m.plate(336, 104, 0, -1, app.saveImport.focus == 0, 1, false, tr("Yes"), true);
+            m.plate(336, 160, 1, -1, app.saveImport.focus == 1, 1, false, tr("No"), true);
         } else if (app.saveImport.state == vitaimport::Session::Result) {
             m.plate(336, 104, -1, -1, true, 1, false, "OK");
         }
@@ -1633,8 +1639,8 @@ void drawOptions(App& app, float, float) {
         m.picture(12, 0, 220, 1);
         if (!pages.empty())
             for (size_t l = 0; l < pages[0].size(); ++l) m.text(pages[0][l], 24, 234 + 16.0f * float(l), false, 1, 14);
-        m.plate(336, 104, 0, 0, app.resetConfirm == 0, 1, false);
-        m.plate(336, 160, 1, 1, app.resetConfirm == 1, 1, false);
+        m.plate(336, 104, 0, -1, app.resetConfirm == 0, 1, false, tr("Yes"), true);
+        m.plate(336, 160, 1, -1, app.resetConfirm == 1, 1, false, tr("No"), true);
     }
     r.setOrigin(r.uiX());
 }

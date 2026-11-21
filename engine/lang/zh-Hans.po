@@ -28,7 +28,7 @@ msgstr "性能"
 msgid "Ultra Perf."
 msgstr "极致性能"
 
-#: src/app/app.hpp src/app/scene_fx.cpp
+#: src/app/app.hpp src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Off"
 msgstr "关闭"
 
@@ -47,6 +47,110 @@ msgstr "民间翻译"
 #: src/app/field_puzzle.cpp
 msgid "{0} (fan translation)"
 msgstr "{0}（民间翻译）"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Yes"
+msgstr "是"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "No"
+msgstr "否"
+
+#: src/app/menus.cpp
+msgid "Start Game"
+msgstr "开始"
+
+#: src/app/menus.cpp
+msgid "Options"
+msgstr "选项"
+
+#: src/app/menus.cpp
+msgid "New"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Load"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Items"
+msgstr "道具"
+
+#: src/app/menus.cpp
+msgid "Equipment"
+msgstr "装备"
+
+#: src/app/menus.cpp
+msgid "Genes"
+msgstr "基因"
+
+#: src/app/menus.cpp
+msgid "Status"
+msgstr "状态"
+
+#: src/app/menus.cpp
+msgid "Extra"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Pair"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Solo"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Escape"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Check"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Attack"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Defend"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Talk"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Buy"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Sell"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Weapons"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Armor"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Jewel"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Scenarios"
+msgstr "剧情"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "On"
+msgstr "开启"
+
+#: src/app/menus.cpp
+msgid "Ohm"
+msgstr ""
 
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
@@ -1120,3 +1224,4 @@ msgstr "原有存档已备份。"
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "请在标题画面读取。"
+

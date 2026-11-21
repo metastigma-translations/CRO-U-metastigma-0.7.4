@@ -2329,6 +2329,7 @@ void drawMessageBox(App& app, const std::vector<std::string>& page, const std::s
 void drawWinPiece(App& app, const float* piece, float x, float y, float w, float h, float alpha = 1);
 int partyLevel(const App& app);
 std::string sysText(const App& app, int id, const std::string& name = std::string());
+std::string menuWordText(int word);
 int battleAction(const LoadedModel& lm, int slot);
 App::Battle::Actor* battleActor(App& app, int fighter);
 int realSlot(const LoadedModel& lm, int slot);

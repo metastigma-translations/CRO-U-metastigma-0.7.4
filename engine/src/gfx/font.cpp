@@ -193,7 +193,8 @@ bool Font::covers(const std::string& utf8) const {
     return true;
 }
 
-bool Font::rasterise(const std::vector<std::string>& lines, float em, float lineStep, int pad, Image& out) const {
+bool Font::rasterise(const std::vector<std::string>& lines, float em, float lineStep, int pad, Image& out,
+                     bool perGlyphVerticalGradient) const {
     if (!loaded() || lines.empty()) return false;
     const stbtt_fontinfo& info = face_->info;
     const float scale = stbtt_ScaleForMappingEmToPixels(&info, em);
@@ -218,6 +219,7 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
     bool cyrLooked = false;
     auto scaleOf = [&](const stbtt_fontinfo* f) { return f == &info ? scale : stbtt_ScaleForMappingEmToPixels(f, em); };
     float widest = 1;
+    int minGlyphX = 0, maxGlyphX = 0;
     for (size_t l = 0; l < lines.size(); ++l) {
         float x = 0;
         Glyph prev{nullptr, 0};
@@ -242,20 +244,31 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
             int adv = 0, lsb = 0;
             stbtt_GetGlyphHMetrics(gl.face, gl.g, &adv, &lsb);
             if (prev.g && prev.face == gl.face) x += float(stbtt_GetGlyphKernAdvance(gl.face, prev.g, gl.g)) * s;
+            const float fx = x - std::floor(x);
+            int x0, y0, x1, y1;
+            stbtt_GetGlyphBitmapBoxSubpixel(gl.face, gl.g, s, s, fx, 0, &x0, &y0, &x1, &y1);
+            const int bitmapLeft = int(std::floor(x)) + x0;
+            minGlyphX = std::min(minGlyphX, bitmapLeft);
+            maxGlyphX = std::max(maxGlyphX, bitmapLeft + (x1 - x0));
             x += float(adv) * s;
             glyphs[l].push_back(gl);
             prev = gl;
         }
         widest = std::max(widest, x);
     }
-    out.width = int(std::ceil(widest)) + 2 * pad + 1;
+    // Some italic glyphs (notably Cyrillic capital Д) overhang the line's origin. Include that
+    // negative side bearing in the cached line box and shift the rasterised run right, rather than
+    // clipping its first few pixels at the texture's left edge.
+    const int leftBearing = std::max(0, -minGlyphX);
+    const int contentRight = std::max(int(std::ceil(widest)), maxGlyphX);
+    out.width = contentRight + leftBearing + 2 * pad + 1;
     out.height = int(std::ceil(float(lines.size() - 1) * lineStep + float(ascent - descent) * scale)) + 2 * pad;
     out.alphaOnly = false;
     out.rgba.assign(size_t(out.width) * out.height * 4, 0);
     std::vector<unsigned char> bmp;
     for (size_t l = 0; l < lines.size(); ++l) {
         const float baseline = base0 + float(l) * lineStep;
-        float x = float(pad);
+        float x = float(pad + leftBearing);
         Glyph prev{nullptr, 0};
         for (const Glyph& gl : glyphs[l]) {
             const stbtt_fontinfo* face = gl.face;
@@ -280,8 +293,16 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
                         const int tx = ox + xx;
                         if (tx < 0 || tx >= out.width) continue;
                         uint8_t* p = &out.rgba[(size_t(ty) * out.width + tx) * 4];
-                        p[0] = p[1] = p[2] = 255;
-                        p[3] = std::max(p[3], bmp[size_t(y) * gw + xx]);
+                        const uint8_t coverage = bmp[size_t(y) * gw + xx];
+                        if (coverage > p[3]) {
+                            // Each character receives its own vertical ramp, based on its own bitmap.
+                            // Lowercase letters therefore get a complete ramp, not a leftover section
+                            // of the uppercase letter's taller shared line gradient.
+                            const float t = perGlyphVerticalGradient && gh > 1 ? float(y) / float(gh - 1) : 0.0f;
+                            const uint8_t shade = uint8_t(std::lround(255.0f + (85.0f - 255.0f) * t));
+                            p[0] = p[1] = p[2] = shade; // white -> dark grey (#555555)
+                            p[3] = coverage;
+                        }
                     }
                 }
             }

@@ -28,7 +28,7 @@ msgstr "Rendimiento"
 msgid "Ultra Perf."
 msgstr "Ultra rend."
 
-#: src/app/app.hpp src/app/scene_fx.cpp
+#: src/app/app.hpp src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Off"
 msgstr "Desactivado"
 
@@ -47,6 +47,110 @@ msgstr "Traducción de fans"
 #: src/app/field_puzzle.cpp
 msgid "{0} (fan translation)"
 msgstr "{0} (traducción de fans)"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Yes"
+msgstr "Sí"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "No"
+msgstr "No"
+
+#: src/app/menus.cpp
+msgid "Start Game"
+msgstr "Iniciar"
+
+#: src/app/menus.cpp
+msgid "Options"
+msgstr "Opciones"
+
+#: src/app/menus.cpp
+msgid "New"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Load"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Items"
+msgstr "Objetos"
+
+#: src/app/menus.cpp
+msgid "Equipment"
+msgstr "Equipo"
+
+#: src/app/menus.cpp
+msgid "Genes"
+msgstr "Genes"
+
+#: src/app/menus.cpp
+msgid "Status"
+msgstr "Estado"
+
+#: src/app/menus.cpp
+msgid "Extra"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Pair"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Solo"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Escape"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Check"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Attack"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Defend"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Talk"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Buy"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Sell"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Weapons"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Armor"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Jewel"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Scenarios"
+msgstr "Escenarios"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "On"
+msgstr "Activado"
+
+#: src/app/menus.cpp
+msgid "Ohm"
+msgstr ""
 
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
@@ -1173,3 +1277,4 @@ msgstr "Partidas anteriores respaldadas."
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "Carga desde la pantalla de título."
+

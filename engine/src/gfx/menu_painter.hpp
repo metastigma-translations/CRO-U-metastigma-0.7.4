@@ -71,13 +71,16 @@ public:
     void setOutline(bool on) { outline_ = on; }
     void setCleanOutline(bool on) { cleanOutline_ = on; }
     // Text with its top-left at (x, y), 14 units high; dark = black (style 1), else white
-    void text(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14);
+    void text(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
+              bool verticalGradient = false);
     float textWidth(const std::string& s, float size = 14);
     // ... in a colour (MuComFontPlateDisp's colours: the plates' yellow, grey)
-    void textTint(const std::string& s, float x, float y, float r, float g, float b, float alpha = 1, float size = 14);
+    void textTint(const std::string& s, float x, float y, float r, float g, float b, float alpha = 1, float size = 14,
+                  bool verticalGradient = false);
     // Text whose line box is centred on y (labels in bars and on buttons: this font's box is
     // taller than the iOS system font's, so a fixed top offset would sit low)
-    void textCentred(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14);
+    void textCentred(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
+                     bool verticalGradient = false);
 
     // ComUty_OptCategoryDraw: a 24-tall white bar (100 solid, 123 fading out, alpha up to
     // 0xB3) with the label in black at (x + 8, y + 5). `highlight` tints the bar (keyboard
@@ -86,12 +89,13 @@ public:
     void rowBar(float x, float y, const std::string& label, float alpha, bool highlight, float shade = 1, float cap = 179.0f / 255.0f);
     // ComUty_CmdBottom: a button at (x, y), 104 x 40 base, 112 x 32 face; the label is word
     // picture `word` (5 x 88 x 24 grid at (0, 512)) or, when word < 0, `text`
-    void button(float x, float y, int word, const std::string& text, bool selected, float alpha, bool highlight);
+    void button(float x, float y, int word, const std::string& text, bool selected, float alpha, bool highlight,
+                bool verticalGradient = false);
     // __ComUty_CmdBottom (ComUty_ChoicePlateDraw, the title menu): a 132-wide plate at (x, y),
     // a 32 x 32 icon (kanIconNoTbl - 1; 16 per row from (0, 376)) and word picture `word`
     // (no word picture for it: `text` instead)
     void plate(float x, float y, int icon, int word, bool selected, float alpha, bool dimmed,
-               const std::string& text = std::string());
+               const std::string& text = std::string(), bool gradientText = false);
     // ComUty_SideGuageDraw: the track at (x, y), the fill and knob for `value` 0..100
     // (active: the Vita's light cyan fill on the cursor's gauge; fill: where the fill ends, easing to the knob - < 0 at it)
     void gauge(float x, float y, int value, float alpha, bool active, float fill = -1);
@@ -127,7 +131,7 @@ private:
     };
     std::map<std::string, Cached> text_;
     Texture white_;
-    Cached& rasterise(const std::string& s, float size);
+    Cached& rasterise(const std::string& s, float size, bool perGlyphVerticalGradient = false);
 };
 
 } // namespace cr
