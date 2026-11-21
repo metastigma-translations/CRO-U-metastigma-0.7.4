@@ -60,7 +60,7 @@ msgstr "아니요"
 msgid "Start Game"
 msgstr "시작"
 
-#: src/app/menus.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Options"
 msgstr "옵션"
 

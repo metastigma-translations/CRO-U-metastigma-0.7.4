@@ -60,7 +60,7 @@ msgstr "No"
 msgid "Start Game"
 msgstr "Iniciar"
 
-#: src/app/menus.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Options"
 msgstr "Opciones"
 

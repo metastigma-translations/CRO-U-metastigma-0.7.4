@@ -60,7 +60,7 @@ msgstr "いいえ"
 msgid "Start Game"
 msgstr "開始"
 
-#: src/app/menus.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Options"
 msgstr "オプション"
 

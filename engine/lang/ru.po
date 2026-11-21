@@ -60,7 +60,7 @@ msgstr "Нет"
 msgid "Start Game"
 msgstr "Начать"
 
-#: src/app/menus.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Options"
 msgstr "Настройки"
 
