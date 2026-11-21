@@ -284,13 +284,16 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
     if (label.empty()) {
         piece(x + 80, y, 0, 224, 76, 24, alpha); // other menus retain the complete atlas label
     } else {
-        // In the EXE Options screen, keep the atlas return mark and render only the word with the selected font.
-        piece(x + 80, y, 0, 224, 24, 24, alpha);
+        // Keep the original atlas return glyph; replace only its English lettering with the selected font.
+        constexpr float glyphWidth = 20.0f, gap = 5.0f, labelMaxWidth = 92.0f;
         float size = 14.0f;
         float width = textWidth(label, size);
-        if (width > 52.0f) size = std::max(8.0f, std::floor(size * 52.0f / width));
+        if (width > labelMaxWidth) size = std::max(8.0f, std::floor(size * labelMaxWidth / width));
         width = textWidth(label, size);
-        textCentred(label, x + 104 + (52.0f - width) / 2.0f, y + 12, false, alpha, size, true);
+        const float total = glyphWidth + gap + width;
+        const float start = x + 56.0f + (120.0f - total) / 2.0f;
+        piece(start, y, 0, 224, glyphWidth, 24, alpha);
+        textCentred(label, start + glyphWidth + gap, y + 12, false, alpha, size, true);
     }
 }
 
@@ -304,7 +307,7 @@ void MenuPainter::backBar(float x, float y, bool pressed, float alpha, const std
     quad(x + 208, y, 24, 24, c, clear);
 
     // Keep the original curved return mark from window_hd; only its "Back" lettering is replaced.
-    const float arrowWidth = 24.0f, gap = 5.0f, maxLabelWidth = 76.0f;
+    const float arrowWidth = 20.0f, gap = 5.0f, maxLabelWidth = 76.0f;
     float size = 14.0f;
     float labelWidth = textWidth(label, size);
     if (labelWidth > maxLabelWidth)
