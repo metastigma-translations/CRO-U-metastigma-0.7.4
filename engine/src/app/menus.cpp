@@ -545,7 +545,7 @@ void drawSaveScreen(App& app) {
         } // (window 3; the icon is the word's: ComUty_ChoicePlateDraw; lit while held: DAT_000ecca0)
         const float bo = app.renderer.uiX() + 2 * vitaEdge43(app);
         r.setOrigin(bo);
-        m.backBar(192, 288, pressIn(app, kPressSave, bo, 192, 288, 232, 24), a); // (Omega's ComUty_BackButtonDraw mode 1: CmdBack at (192, 288), no arrows; lit while held)
+        m.backBar(192, 288, pressIn(app, kPressSave, bo, 192, 288, 232, 24), a, tr("Back")); // (Omega's ComUty_BackButtonDraw mode 1: CmdBack at (192, 288), no arrows; lit while held)
         r.setOrigin(r.uiX());
     } else { // SaveLoadPut, in every layout (Omega's iPad screen is the iPhone's doubled): the message
         // board (ComUty_MsgBoardDraw, picture 12) at (0, 220), lines from (24, 234); Yes / No the
@@ -969,7 +969,7 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     const float white[4] = {1, 1, 1, a};
     m.quad(bx + 12, by, 143, 16, white, white); // the name
     const std::string name = sysText(app, 58000 + charNameId(app, c)); // (ComUty_StateBoardChrName)
-    m.textCentred(name, bx + 12 + (143 - m.textWidth(name, 14)) / 2, by + 8, true, a, 14);
+    m.textCentred(name, bx + 12 + (143 - m.textWidth(name, 14)) / 2, by + 5, true, a, 14);
     if (record) m.picture(148 + std::clamp(c, 0, cr::kCharacters - 1), bx - 8, by - 32, a); // ComUty_StateBoardDraw: 0x94 + record
     m.quad(bx + 12, by + 32, 143, 15, white, white); // LV
     m.picture(82, bx + 50, by + 36, a);
@@ -1247,7 +1247,7 @@ void drawShop(App& app) {
         m.backButton(kBackX + v, kBackY, shopPressIn(app, false, kBackX + 51, kBackY, 130, 24, v) ? 1 : shopPressIn(app, false, kBackX + 181, kBackY, 51, 24, v) ? 2
                                      : shopPressIn(app, false, kBackX, kBackY, 51, 24, v) ? 3 : 0, s.bob, a); // ComUty_CmdBack 2: < Back >
     } else {
-        m.backBar(kBackX + v, kBackY, shopPressIn(app, false, kBackX, kBackY, 232, 24, v), a); // (lit while held: DAT_000ec80c)
+        m.backBar(kBackX + v, kBackY, shopPressIn(app, false, kBackX, kBackY, 232, 24, v), a, tr("Back")); // (lit while held: DAT_000ec80c)
     }
     const char* help = s.phase == App::Shop::Count     ? "Left/Right: 1  Shift: 10  Up/Down: Yes / No  Enter  Esc"
                        : s.phase == App::Shop::EquipAsk ? "Up/Down  Enter  Esc: no"
@@ -3348,7 +3348,7 @@ void drawWorldSelect(App& app) {
         ownPlace(false);
         const bool ph = app.renderer.phoneLayout(); // (lit while held: the box worldSelectClick tests)
         m.backBar(wldsel::kBackX + dx(w), wldsel::kBackY,
-                  pressIn(app, kPressWorld, vitaRight(app), wldsel::kBackX - (ph ? 16 : 0), wldsel::kBackY - (ph ? 32 : 0), 232, 24), a);
+                  pressIn(app, kPressWorld, vitaRight(app), wldsel::kBackX - (ph ? 16 : 0), wldsel::kBackY - (ph ? 32 : 0), 232, 24), a, tr("Back"));
     };
     r.setOrigin(vitaRight(app)); // (the Vita: its list table's x 235 and Back 235 - 43 to the right; Yes / No not)
     if (ws.win[6] > 0) // the gates
@@ -3758,9 +3758,9 @@ void drawCamp(App& app) {
         else if (campArrows(app))
             m.backButton(kBackX, by, campPressIn(app, ux, 0xf8, by, 0x78, 34) ? 1 : campPressIn(app, ux, 0x175, by, 0x33, 34) ? 2
                                      : campPressIn(app, ux, 0xc0, by, 0x33, 34) ? 3 : 0, 0, barA);
-        else m.backBar(kBackX, by, campPressIn(app, ux, kBackX, by, 256, 34), barA);
+        else m.backBar(kBackX, by, campPressIn(app, ux, kBackX, by, 256, 34), barA, tr("Back"));
     }
-    if (items && !c.pageOut && ease <= 0) m.backBar(kBackX, campBackY(app), false, 1 - outA); // (the main page's going)
+    if (items && !c.pageOut && ease <= 0) m.backBar(kBackX, campBackY(app), false, 1 - outA, tr("Back")); // (the main page's going)
     centre();
 
     // The title and section lines over everything else of the page: the section's line runs over the HELP
@@ -4467,7 +4467,7 @@ void drawScenarios(App& app) {
         }
         { // (the Vita's at 0xeb = 235)
             const float v = vitaEdge43(app);
-            m.backBar(192 + v, 288, pressIn(app, kPressScenarios, app.renderer.uiX(), 192 + v, 286, 256, 34), a); // (lit while held: DAT_000ed27c)
+            m.backBar(192 + v, 288, pressIn(app, kPressScenarios, app.renderer.uiX(), 192 + v, 286, 256, 34), a, tr("Back")); // (lit while held: DAT_000ed27c)
         }
         sideMasks();
         return;
@@ -4776,7 +4776,7 @@ void drawCollection(App& app) {
         pict(14, 444 + dx, 240, t);
     }
     const float v = vitaEdge43(app); // (the Vita's Back at 0xeb = 235)
-    m.backBar(192 + v, 288, pressIn(app, kPressCollection, app.renderer.uiX(), 192 + v, 286, 256, 34), t); // (lit while held: DAT_000ed638)
+    m.backBar(192 + v, 288, pressIn(app, kPressCollection, app.renderer.uiX(), 192 + v, 286, 256, 34), t, tr("Back")); // (lit while held: DAT_000ed638)
 }
 
 void collectionKey(App& app, SDL_Keycode key) {
@@ -5269,7 +5269,7 @@ void drawCharSelect(App& app) {
             outPicture(m, app.charSelectArt2, 32, -16, sp.y + 352, t);
         }
     }
-    m.backBar(124, 288, pressIn(app, kPressCharSelect, app.renderer.uiX(), 124, 288, 232, 24), t); // ComUty_BackButtonPosSetXYDraw(124, 288), mode 1; lit while held
+    m.backBar(124, 288, pressIn(app, kPressCharSelect, app.renderer.uiX(), 124, 288, 232, 24), t, tr("Back")); // ComUty_BackButtonPosSetXYDraw(124, 288), mode 1; lit while held
     const int word = kScenarioWord[app.charSelectPage & 1];
     // The first scenario's Vieg label is word 12 in the raster atlas; use the same system-font
     // entry as the Camp member names instead. Keep the atlas-derived button icon unchanged.
@@ -5725,7 +5725,7 @@ void drawAchievementList(App& app) {
     // (the knob as ComUty_GuageBarDraw's: 3876 s, scrolled 683.5, its top at 280; at the end 544 - as here)
     const int n = int(a.listRows.size());
     if (n > 1) drawScrGauge(m, 460, 34, 244, n, -a.listScroll, kRowH, 0, t);
-    m.backBar(192, 288, pressIn(app, kPressCollection, app.renderer.uiX(), 192, 286, 256, 34), t); // (lit while held: DAT_000ed638)
+    m.backBar(192, 288, pressIn(app, kPressCollection, app.renderer.uiX(), 192, 286, 256, 34), t, tr("Back")); // (lit while held: DAT_000ed638)
     if (keyHints(app)) m.text("Up/Down  Esc: back", 8, 300, false, t * 0.8f, 9); // (our key hints)
     r.setOrigin(r.uiX());
 }

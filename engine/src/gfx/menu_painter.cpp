@@ -284,7 +284,7 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
     piece(x + 80, y, 0, 224, 76, 24, alpha);
 }
 
-void MenuPainter::backBar(float x, float y, bool pressed, float alpha) {
+void MenuPainter::backBar(float x, float y, bool pressed, float alpha, const std::string& label) {
     const float cyan[4] = {0x4B / 255.0f, 1, 0xEB / 255.0f, alpha}; // (tex2d's 0xEBFF4B is A B G R: cyan)
     const float white[4] = {1, 1, 1, alpha};
     const float* c = pressed ? cyan : white;
@@ -292,7 +292,44 @@ void MenuPainter::backBar(float x, float y, bool pressed, float alpha) {
     quad(x, y, 24, 24, clear, c);
     quad(x + 24, y, 184, 24, c, c);
     quad(x + 208, y, 24, 24, c, clear);
-    piece(x + 82, y, 0, 224, 76, 24, alpha);
+
+    // A font-independent Enter/return arrow, built from outlined vector strokes.
+    const float black[4] = {0, 0, 0, alpha};
+    const float arrowWidth = 17.0f, gap = 5.0f, maxLabelWidth = 76.0f;
+    float size = 14.0f;
+    float labelWidth = textWidth(label, size);
+    if (labelWidth > maxLabelWidth)
+        size = std::max(10.0f, std::floor(size * maxLabelWidth / labelWidth));
+    labelWidth = textWidth(label, size);
+    const float totalWidth = arrowWidth + gap + labelWidth;
+    const float ax = x + (232.0f - totalWidth) * 0.5f;
+    const float ay = y + 3.5f;
+
+    const auto stroke = [&](float x0, float y0, float x1, float y1, float thickness, const float* colour) {
+        const float dx = x1 - x0, dy = y1 - y0;
+        const float length = std::hypot(dx, dy);
+        if (length <= 0.0f) return;
+        const float nx = -dy * thickness / (2.0f * length);
+        const float ny =  dx * thickness / (2.0f * length);
+        const float vertices[8] = {
+            X(x0 + nx) * kScale, Y(y0 + ny) * kScale,
+            X(x1 + nx) * kScale, Y(y1 + ny) * kScale,
+            X(x1 - nx) * kScale, Y(y1 - ny) * kScale,
+            X(x0 - nx) * kScale, Y(y0 - ny) * kScale
+        };
+        r_->fillQuad(vertices, colour[0], colour[1], colour[2], colour[3]);
+    };
+    const auto arrow = [&](float thickness, const float* colour) {
+        stroke(ax + 3, ay + 2, ax + 14, ay + 2, thickness, colour);
+        stroke(ax + 14, ay + 2, ax + 14, ay + 11, thickness, colour);
+        stroke(ax + 14, ay + 11, ax + 5, ay + 11, thickness, colour);
+        stroke(ax + 5, ay + 11, ax + 9, ay + 7, thickness, colour);
+        stroke(ax + 5, ay + 11, ax + 9, ay + 15, thickness, colour);
+    };
+    if (!r_) return;
+    arrow(3.6f, black);
+    arrow(1.7f, white);
+    textCentred(label, ax + arrowWidth + gap, y + 12, false, alpha, size, true);
 }
 
 void MenuPainter::backOkBar(float x, float y, int pressed, float alpha) {

@@ -1029,7 +1029,7 @@ msgstr "Ya copiado..."
 msgid "An archive..."
 msgstr "Archivo comprimido..."
 
-#: src/platform/setup.cpp
+#: src/app/menus.cpp src/platform/setup.cpp
 msgid "Back"
 msgstr "Atrás"
 

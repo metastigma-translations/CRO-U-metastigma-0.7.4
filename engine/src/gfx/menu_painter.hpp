@@ -101,9 +101,8 @@ public:
     void gauge(float x, float y, int value, float alpha, bool active, float fill = -1);
     // ComUty_CmdBack type 2: the Back bar at (x, y), `pressed` lights it, `bob` 0..5 moves the arrows
     void backButton(float x, float y, int pressed, int bob, float alpha); // pressed: 0 none, 1 Back, 2 right, 3 left
-    // ComUty_CmdBack type 1 (the shop's): a plain 232-wide bar, white fading in over 24 at each end,
-    // "Back" at x + 82
-    void backBar(float x, float y, bool pressed, float alpha);
+    // ComUty_CmdBack type 1 (the shop's): a 232-wide fading bar with a vector Enter arrow and a font-rendered label
+    void backBar(float x, float y, bool pressed, float alpha, const std::string& label);
     // ComUty_CmdBack type 3: Back (x .. x + 114, faded in over 24, the word at + 36) and OK (x + 118 .. x + 208,
     // fading out to 232, its word (sheet (76, 224) 64 x 20) at (+126, +2)); `pressed` 1 lights Back, 5 OK
     void backOkBar(float x, float y, int pressed, float alpha);

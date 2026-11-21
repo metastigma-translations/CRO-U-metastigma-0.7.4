@@ -1022,7 +1022,7 @@ msgstr "Скопировано..."
 msgid "An archive..."
 msgstr "Архив..."
 
-#: src/platform/setup.cpp
+#: src/app/menus.cpp src/platform/setup.cpp
 msgid "Back"
 msgstr "Назад"
 
