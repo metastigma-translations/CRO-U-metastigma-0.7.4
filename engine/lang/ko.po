@@ -1230,4 +1230,3 @@ msgstr "이전 세이브를 백업했습니다."
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "타이틀 화면에서 불러오세요."
-

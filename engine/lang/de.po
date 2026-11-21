@@ -1278,4 +1278,3 @@ msgstr "Bisherige Spielstände wurden gesichert."
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "Im Titelbildschirm laden."
-

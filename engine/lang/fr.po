@@ -1275,4 +1275,3 @@ msgstr "Anciennes sauvegardes mises de côté."
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "Charger depuis l'écran titre."
-
