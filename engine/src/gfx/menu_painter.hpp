@@ -100,7 +100,7 @@ public:
     // (active: the Vita's light cyan fill on the cursor's gauge; fill: where the fill ends, easing to the knob - < 0 at it)
     void gauge(float x, float y, int value, float alpha, bool active, float fill = -1);
     // ComUty_CmdBack type 2: the Back bar at (x, y), `pressed` lights it, `bob` 0..5 moves the arrows
-    void backButton(float x, float y, int pressed, int bob, float alpha); // pressed: 0 none, 1 Back, 2 right, 3 left
+    void backButton(float x, float y, int pressed, int bob, float alpha, const std::string& label = std::string()); // pressed: 0 none, 1 Back, 2 right, 3 left; optional font label
     // ComUty_CmdBack type 1 (the shop's): a 232-wide fading bar with a vector Enter arrow and a font-rendered label
     void backBar(float x, float y, bool pressed, float alpha, const std::string& label);
     // ComUty_CmdBack type 3: Back (x .. x + 114, faded in over 24, the word at + 36) and OK (x + 118 .. x + 208,
