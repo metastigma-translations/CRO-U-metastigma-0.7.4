@@ -3737,7 +3737,8 @@ void drawBattleButton(cr::MenuPainter& m, float x, float y, int icon, int word, 
         float wide = m.textWidth(label, size);
         if (wide > 88) size = std::max(8.0f, std::floor(size * 88 / wide));
         wide = m.textWidth(label, size);
-        m.textCentred(label, x + 40 + (88 - wide) / 2, y + 20, false, a * c, size, true);
+        // Match the main menu plate: centre in the 88-unit label area and use its vertical anchor.
+        m.textCentred(label, x + 40 + (88 - wide) / 2, y + 17, false, a * c, size, true);
     }
 }
 

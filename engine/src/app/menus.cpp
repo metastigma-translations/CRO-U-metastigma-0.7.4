@@ -3523,8 +3523,9 @@ void drawCamp(App& app) {
             // (__MuCommon_CharChoiceProc: the plate - or the member's face board - held lights it)
             const bool held = lit && (campPressIn(app, vitaRight(app), kPlateX, kMemberY + kMemberStep * float(k), 136, 40) ||
                                       campPressIn(app, wideLeft(app), 8, 0x30 + 0x58 * float(k), 0xfc, 0x50));
+            const bool gradientName = c.page == App::Camp::Equip || c.page == App::Camp::Status;
             m.plate(kPlateX + 360 * (1 - e), kMemberY + kMemberStep * float(k), plateIcon(word), -1,
-                    (lit && c.member == k && !app.pointerLast) || held, e, false, name, false);
+                    (lit && c.member == k && !app.pointerLast) || held, e, false, name, gradientName);
         }
         left();
     };
