@@ -299,8 +299,8 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
                             // Lowercase letters therefore get a complete ramp, not a leftover section
                             // of the uppercase letter's taller shared line gradient.
                             const float position = perGlyphVerticalGradient && gh > 1 ? float(y) / float(gh - 1) : 0.0f;
-                            // Keep the upper 75% white; fade to dark grey only through the lower 25%.
-                            const float t = std::clamp((position - 0.75f) / 0.25f, 0.0f, 1.0f);
+                            // Keep the upper 50% white; fade to dark grey through the lower 50%.
+                            const float t = std::clamp((position - 0.50f) / 0.50f, 0.0f, 1.0f);
                             const uint8_t shade = uint8_t(std::lround(255.0f + (85.0f - 255.0f) * t));
                             p[0] = p[1] = p[2] = shade; // white -> dark grey (#555555)
                             p[3] = coverage;
