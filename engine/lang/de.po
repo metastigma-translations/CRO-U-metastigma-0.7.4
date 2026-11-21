@@ -527,7 +527,8 @@ msgstr "Korrigiert"
 
 #: src/app/scene_fx.cpp
 msgid "Original: eight offset draws; Fixed: one antialiased pass."
-msgstr "Original: acht versetzte Zeichnungen; korrigiert: ein geglätteter Durchgang."
+msgstr ""
+"Original: acht versetzte Zeichnungen; korrigiert: ein geglätteter Durchgang."
 
 #: src/app/scene_fx.cpp
 msgid "Quit the game?"

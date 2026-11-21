@@ -526,7 +526,8 @@ msgstr "Исправленная"
 
 #: src/app/scene_fx.cpp
 msgid "Original: eight offset draws; Fixed: one antialiased pass."
-msgstr "Оригинал рисует обводку восемью смещёнными проходами; исправление использует один сглаженный проход."
+msgstr ""
+"Оригинал рисует обводку восемью смещёнными проходами; исправление использует один сглаженный проход."
 
 #: src/app/scene_fx.cpp
 msgid "Quit the game?"
