@@ -218,6 +218,7 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
     bool cyrLooked = false;
     auto scaleOf = [&](const stbtt_fontinfo* f) { return f == &info ? scale : stbtt_ScaleForMappingEmToPixels(f, em); };
     float widest = 1;
+    int minGlyphX = 0, maxGlyphX = 0;
     for (size_t l = 0; l < lines.size(); ++l) {
         float x = 0;
         Glyph prev{nullptr, 0};
@@ -242,20 +243,31 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
             int adv = 0, lsb = 0;
             stbtt_GetGlyphHMetrics(gl.face, gl.g, &adv, &lsb);
             if (prev.g && prev.face == gl.face) x += float(stbtt_GetGlyphKernAdvance(gl.face, prev.g, gl.g)) * s;
+            const float fx = x - std::floor(x);
+            int x0, y0, x1, y1;
+            stbtt_GetGlyphBitmapBoxSubpixel(gl.face, gl.g, s, s, fx, 0, &x0, &y0, &x1, &y1);
+            const int bitmapLeft = int(std::floor(x)) + x0;
+            minGlyphX = std::min(minGlyphX, bitmapLeft);
+            maxGlyphX = std::max(maxGlyphX, bitmapLeft + (x1 - x0));
             x += float(adv) * s;
             glyphs[l].push_back(gl);
             prev = gl;
         }
         widest = std::max(widest, x);
     }
-    out.width = int(std::ceil(widest)) + 2 * pad + 1;
+    // Some italic glyphs (notably Cyrillic capital Д) overhang the line's origin. Include that
+    // negative side bearing in the cached line box and shift the rasterised run right, rather than
+    // clipping its first few pixels at the texture's left edge.
+    const int leftBearing = std::max(0, -minGlyphX);
+    const int contentRight = std::max(int(std::ceil(widest)), maxGlyphX);
+    out.width = contentRight + leftBearing + 2 * pad + 1;
     out.height = int(std::ceil(float(lines.size() - 1) * lineStep + float(ascent - descent) * scale)) + 2 * pad;
     out.alphaOnly = false;
     out.rgba.assign(size_t(out.width) * out.height * 4, 0);
     std::vector<unsigned char> bmp;
     for (size_t l = 0; l < lines.size(); ++l) {
         const float baseline = base0 + float(l) * lineStep;
-        float x = float(pad);
+        float x = float(pad + leftBearing);
         Glyph prev{nullptr, 0};
         for (const Glyph& gl : glyphs[l]) {
             const stbtt_fontinfo* face = gl.face;

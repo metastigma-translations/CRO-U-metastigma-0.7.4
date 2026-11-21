@@ -48,6 +48,42 @@ msgstr "Фанатский перевод"
 msgid "{0} (fan translation)"
 msgstr "{0} (фанатский перевод)"
 
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Yes"
+msgstr "Да"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "No"
+msgstr "Нет"
+
+#: src/app/menus.cpp
+msgid "Items"
+msgstr "Предметы"
+
+#: src/app/menus.cpp
+msgid "Equipment"
+msgstr "Одежда"
+
+#: src/app/menus.cpp
+msgid "Genes"
+msgstr "Гены"
+
+#: src/app/menus.cpp
+msgid "Status"
+msgstr "Статус"
+
+#: src/app/menus.cpp
+msgid "Options"
+msgstr "Настройки"
+
+#: src/app/menus.cpp
+msgid "Start Game"
+msgstr "Начать"
+
+#: src/app/menus.cpp
+msgid "Scenarios"
+msgstr "Сценарии"
+
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
 msgstr "Выход"
@@ -75,6 +111,10 @@ msgstr "Читы"
 #: src/app/scene_fx.cpp
 msgid "Graphics"
 msgstr "Графика"
+
+#: src/app/scene_fx.cpp
+msgid "On"
+msgstr "Вкл."
 
 #: src/app/scene_fx.cpp
 msgid "Text Language"

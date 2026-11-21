@@ -48,6 +48,42 @@ msgstr "팬 번역"
 msgid "{0} (fan translation)"
 msgstr "{0} (팬 번역)"
 
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Yes"
+msgstr "예"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "No"
+msgstr "아니요"
+
+#: src/app/menus.cpp
+msgid "Items"
+msgstr "아이템"
+
+#: src/app/menus.cpp
+msgid "Equipment"
+msgstr "장비"
+
+#: src/app/menus.cpp
+msgid "Genes"
+msgstr "유전자"
+
+#: src/app/menus.cpp
+msgid "Status"
+msgstr "상태"
+
+#: src/app/menus.cpp
+msgid "Options"
+msgstr "옵션"
+
+#: src/app/menus.cpp
+msgid "Start Game"
+msgstr "시작"
+
+#: src/app/menus.cpp
+msgid "Scenarios"
+msgstr "시나리오"
+
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
 msgstr "종료"
@@ -75,6 +111,10 @@ msgstr "치트"
 #: src/app/scene_fx.cpp
 msgid "Graphics"
 msgstr "그래픽"
+
+#: src/app/scene_fx.cpp
+msgid "On"
+msgstr "켜기"
 
 #: src/app/scene_fx.cpp
 msgid "Text Language"

@@ -180,12 +180,6 @@ const cr::Texture* charSheet(App& app) {
 // 3.1.0's Options and boards: the data's eight languages and its window_char sheet
 bool languageSheet(App& app) { return app.systemText.hasLanguage(2) && charSheet(app); }
 
-int boardNameIndex(const App& app, int c) {
-    if (c == 0 && viegIsOlgar(app)) return 1;
-    if (c == 1 && olgarIsDante(app)) return 3;
-    return c;
-}
-
 std::string playTimeText(double seconds) {
     const long t = long(seconds);
     char b[32];
@@ -530,8 +524,8 @@ void drawSaveScreen(App& app) {
             if (l > 0) m.text(sysText(app, l), 24, 234 + 16.0f * float(++extra), false, a, 13);
         if (ss.phase == 1) {
             const bool hy = pressIn(app, kPressSave, wideRight(app), 336, 104, 136, 40), hn = pressIn(app, kPressSave, wideRight(app), 336, 160, 136, 40);
-            m.plate(336, 104, 0, 0, hy || (!hn && ss.confirm == 0), a, false); // (a held plate takes the cursor)
-            m.plate(336, 160, 1, 1, hn || (!hy && ss.confirm == 1), a, false);
+            m.plate(336, 104, 0, -1, hy || (!hn && ss.confirm == 0), a, false, tr("Yes")); // (a held plate takes the cursor)
+            m.plate(336, 160, 1, -1, hn || (!hy && ss.confirm == 1), a, false, tr("No"));
         }
     }
     r.setOrigin(wideLeft(app));
@@ -1122,9 +1116,12 @@ void drawShop(App& app) {
         }
     if (s.phase == App::Shop::Member) // __CharChoiceDraw: window 9, the pair at (328, 176 + 56k) (Part 8 3475 s)
         for (int k = 0; k < campMembers(app); ++k) {
-            const int word = memberWord(app, campCharacter(app, k));
-            m.plate(328 + 240 * slide, 176 + 56.0f * float(k), plateIcon(word), word,
-                    (s.member == k && !app.pointerLast) || shopPressIn(app, true, 328, 176 + 56.0f * float(k), 136, 40, v), a, false);
+            const int character = campCharacter(app, k);
+            const int word = memberWord(app, character); // keep its original member icon
+            const std::string name = sysText(app, 58000 + charNameId(app, character));
+            m.plate(328 + 240 * slide, 176 + 56.0f * float(k), plateIcon(word), -1,
+                    (s.member == k && !app.pointerLast) || shopPressIn(app, true, 328, 176 + 56.0f * float(k), 136, 40, v), a,
+                    false, name, true);
         }
     if (list) {
         const int n = int(s.list.size());
@@ -1186,8 +1183,8 @@ void drawShop(App& app) {
         }
         // (a held plate takes the cursor: __ComUty_YesNoChoiceProc)
         const bool hy = shopPressIn(app, true, 336, 104, 136, 40), hn = shopPressIn(app, true, 336, 160, 136, 40);
-        m.plate(336, 104, 0, 0, hy || (!hn && s.confirm == 0), 1, false); // Yes
-        m.plate(336, 160, 1, 1, hn || (!hy && s.confirm == 1), 1, false); // No
+        m.plate(336, 104, 0, -1, hy || (!hn && s.confirm == 0), 1, false, tr("Yes")); // Yes
+        m.plate(336, 160, 1, -1, hn || (!hy && s.confirm == 1), 1, false, tr("No")); // No
     }
 
     // Centre: Back (with ◀ ▶ for equipment lists) and the message board
@@ -1440,11 +1437,27 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     const cr::PartyMember& pm = (gs ? *gs : app.game).party[size_t(c)];
     m.picture(28, x + 8, y + 24, a);
     m.picture(37 + c, x + 136, y + 24, a);
-    if (languageSheet(app)) // 3.1.0 (FUN_000509fc): window_char's name, row c (Olgar's / Dante's for 0 / 1 when
-        // the story has made them so) in the language's column - MuComPictTexNoDraw(0x30, table 8, c + 9 x language)
-        m.imagePieceTo(app.charSheet, x + 96, y + 24, 92, 20, 92.0f * float(std::clamp(app.language, 0, 7)),
-                       32.0f + 20.0f * float(boardNameIndex(app, c)), 92, 20, a);
-    else m.picture((app.language == 0 ? 45 : 53) + boardNameIndex(app, c), x + 96, y + 24, a);
+    // The original's raster name row is localised per character; use the same system-text ID
+    // as the status board, but render it in the selected font with the menu bubbles' soft gradient.
+    const std::string name = sysText(app, 58000 + charNameId(app, c));
+    const float nameWidth = m.textWidth(name, 13);
+    const float nameSize = nameWidth > 92 ? std::max(8.0f, std::floor(13.0f * 92 / nameWidth)) : 13.0f;
+    const float fittedWidth = m.textWidth(name, nameSize);
+    const float nameX = x + 96 + (92 - fittedWidth) / 2;
+    // The underline sits behind the name: let the outlined glyphs cover its centre,
+    // leaving a short visible extension at both ends, as in the original name strip.
+    const float underlineWidth = std::min(92.0f, fittedWidth + 6.0f);
+    const float underlineX = x + 96 + (92 - underlineWidth) / 2;
+    const float underlineY = y + 42; // keep the original baseline; the text is drawn over it
+    const float underlineBlack[4] = {0, 0, 0, a};
+    const float underlineWhite[4] = {1, 1, 1, a};
+    // Full black perimeter: top/bottom horizontal strokes plus left/right end caps.
+    m.quad(underlineX - 0.5f, underlineY - 0.5f, underlineWidth + 1.0f, 0.5f, underlineBlack, underlineBlack);
+    m.quad(underlineX - 0.5f, underlineY, 0.5f, 1.0f, underlineBlack, underlineBlack);
+    m.quad(underlineX, underlineY, underlineWidth, 1.0f, underlineWhite, underlineWhite);
+    m.quad(underlineX + underlineWidth, underlineY, 0.5f, 1.0f, underlineBlack, underlineBlack);
+    m.quad(underlineX - 0.5f, underlineY + 1.0f, underlineWidth + 1.0f, 0.5f, underlineBlack, underlineBlack);
+    m.textCentred(name, nameX, y + 34, false, a, nameSize);
     m.picture(facePicture(app, c), x, y, a);
     const cr::GameState& g = gs ? *gs : app.game;
     if (g.scenario == 1 && c == g.leaders[1]) m.picture(164, x + 238, y + 26, a); // the leader's mark
@@ -2959,8 +2972,8 @@ void drawLastBattle(App& app) {
         const float dx = 360 * (1 - ease(lb.win[6]));
         r.setOrigin(wideRight(app));
         const bool hy = pressIn(app, kPressLastBattle, wideRight(app), 336, 104, 136, 40), hn = pressIn(app, kPressLastBattle, wideRight(app), 336, 160, 136, 40);
-        m.plate(336 + dx, 104, 0, 0, hy || (!hn && lb.confirm == 0), lb.win[6], false); // (a held plate takes the cursor)
-        m.plate(336 + dx, 160, 1, 1, hn || (!hy && lb.confirm == 1), lb.win[6], false);
+        m.plate(336 + dx, 104, 0, -1, hy || (!hn && lb.confirm == 0), lb.win[6], false, tr("Yes")); // (a held plate takes the cursor)
+        m.plate(336 + dx, 160, 1, -1, hn || (!hy && lb.confirm == 1), lb.win[6], false, tr("No"));
     }
     r.setOrigin(r.uiX());
 }
@@ -3319,8 +3332,8 @@ void drawWorldSelect(App& app) {
         // both dark; keys and pads keep the cursor's lit)
         const bool lit = !app.pointerLast;
         const bool hy = pressIn(app, kPressWorld, wideRight(app), 336, 104, 136, 40), hn = pressIn(app, kPressWorld, wideRight(app), 336, 160, 136, 40);
-        m.plate(336 + dx(8), 104, 0, 0, hy || (!hn && lit && ws.confirm == 0), ws.win[8], false); // (a held plate takes the cursor)
-        m.plate(336 + dx(8), 160, 1, 1, hn || (!hy && lit && ws.confirm == 1), ws.win[8], false);
+        m.plate(336 + dx(8), 104, 0, -1, hy || (!hn && lit && ws.confirm == 0), ws.win[8], false, tr("Yes")); // (a held plate takes the cursor)
+        m.plate(336 + dx(8), 160, 1, -1, hn || (!hy && lit && ws.confirm == 1), ws.win[8], false, tr("No"));
     }
     ownPlace(false);
     r.setOrigin(r.uiX());
@@ -3438,8 +3451,10 @@ void drawCamp(App& app) {
         const bool save = i == 5;
         // (lit: the keys' cursor - touch play none -, or a touch holding it: FUN_0006c548's DAT_000ec590)
         const bool held = main && campPressIn(app, vitaRight(app), kPlateX, kPlateY + kPlateStep * float(i), 136, 40);
-        m.plate(kPlateX + 360 * out, kPlateY + kPlateStep * float(i), save ? 6 : plateIcon(kWords[i]), save ? -1 : kWords[i],
-                (main && c.cursor == i && c.btnRow < 0 && !app.pointerLast) || held, 1 - outA, !save && !kReady[i], save ? "Save" : "");
+        const char* label = save ? "Save" : i == 0 ? tr("Items") : i == 1 ? tr("Equipment") :
+                            i == 2 ? tr("Genes") : i == 3 ? tr("Status") : tr("Options");
+        m.plate(kPlateX + 360 * out, kPlateY + kPlateStep * float(i), save ? 6 : plateIcon(kWords[i]), -1,
+                (main && c.cursor == i && c.btnRow < 0 && !app.pointerLast) || held, 1 - outA, !save && !kReady[i], label);
     }
     centre();
     left();
@@ -3457,13 +3472,15 @@ void drawCamp(App& app) {
     auto memberPlates = [&](bool lit, float e) {
         rightV();
         for (int k = 0; k < campMembers(app); ++k) {
-            const int word = memberWord(app, campCharacter(app, k));
+            const int character = campCharacter(app, k);
+            const int word = memberWord(app, character); // keep its original member icon
+            const std::string name = sysText(app, 58000 + charNameId(app, character));
             // (window 8: WinDispOn(8, 0x168) - in from 360 to the right, as the main plates go out)
             // (__MuCommon_CharChoiceProc: the plate - or the member's face board - held lights it)
             const bool held = lit && (campPressIn(app, vitaRight(app), kPlateX, kMemberY + kMemberStep * float(k), 136, 40) ||
                                       campPressIn(app, wideLeft(app), 8, 0x30 + 0x58 * float(k), 0xfc, 0x50));
-            m.plate(kPlateX + 360 * (1 - e), kMemberY + kMemberStep * float(k), plateIcon(word), word,
-                    (lit && c.member == k && !app.pointerLast) || held, e, false);
+            m.plate(kPlateX + 360 * (1 - e), kMemberY + kMemberStep * float(k), plateIcon(word), -1,
+                    (lit && c.member == k && !app.pointerLast) || held, e, false, name, true);
         }
         left();
     };
@@ -3535,8 +3552,8 @@ void drawCamp(App& app) {
                                        current && campPressIn(app, wr, 436, 60, 36, 31));
                 // (a held plate takes the cursor: __ComUty_YesNoChoiceProc)
                 const bool hy = current && campPressIn(app, wr, 336, 104, 136, 40), hn = current && campPressIn(app, wr, 336, 160, 136, 40);
-                m.plate(336 + dx, 104, plateIcon(0), 0, hy || (!hn && current && c.confirm == 0), e, false); // Yes
-                m.plate(336 + dx, 160, plateIcon(1), 1, hn || (!hy && current && c.confirm == 1), e, false); // No
+                m.plate(336 + dx, 104, plateIcon(0), -1, hy || (!hn && current && c.confirm == 0), e, false, tr("Yes")); // Yes
+                m.plate(336 + dx, 160, plateIcon(1), -1, hn || (!hy && current && c.confirm == 1), e, false, tr("No")); // No
                 centre();
                 // ComUty_MsgBoardDraw(0, 0xdc, .., 0, font 3): picture 12, the mark (picture 13, PictAnimInit(1 tick, 4
                 // frames, 20 px, out and back)) at (458, 298), the line at (24, 234) in the menu font (Part 13 2946 s:
@@ -3918,8 +3935,8 @@ void drawResumePrompt(App& app) {
     r.setOrigin(wideRight(app)); // (... the date and Yes / No to its right)
     drawSaveDate(app, m, app.resumeData, a, 360 * out);                    // window 5
     const bool hy = pressIn(app, kPressResume, wideRight(app), 336, 126, 136, 40), hn = pressIn(app, kPressResume, wideRight(app), 336, 176, 136, 40);
-    m.plate(336 + 360 * out, 126, 0, 0, hy || (!hn && app.resumeCursor == 0), a, false); // window 4: Yes (a held plate takes the cursor)
-    m.plate(336 + 360 * out, 176, 1, 1, hn || (!hy && app.resumeCursor == 1), a, false); // No
+    m.plate(336 + 360 * out, 126, 0, -1, hy || (!hn && app.resumeCursor == 0), a, false, tr("Yes")); // window 4: Yes (a held plate takes the cursor)
+    m.plate(336 + 360 * out, 176, 1, -1, hn || (!hy && app.resumeCursor == 1), a, false, tr("No")); // No
     r.setOrigin(r.uiX());
     drawMsgBoard(app, m, 220 + 160 * out, pictAnimFrame(app.resumeMark, 1, 4), a, w >= 1, {57092, 57093}); // window 7
     r.setOrigin(wideLeft(app));
@@ -5268,10 +5285,8 @@ void charSelectClick(App& app, float px, float py) {
 // own art from TitleSet's two sheets - title1 (slot 0x11) and chaos (0x12), group-1 pictures
 // (kOutReadPicture): on the iPad chaos's 6 (the logo) at (0, -32), title1's 9 at (184, 252) and
 // 10 at (0, 312); on the iPhone 6 at (0, 0), 7 at (184, 220), 8 at (0, 280) - then three plates
-// (ComUty_ChoicePlateDraw) at (328, 114 + 56k): Start, Scenarios, Options (words 2, 32, 3,
-// gnPlateNameTbl), and down the left pictures 125 / 126 at (8, 16) / (8, 96) (127 at (8, 176)
-// only with Game Center)
-constexpr int kTitleWords[3] = {2, 32, 3};
+// (ComUty_ChoicePlateDraw) at (328, 114 + 56k): Start, Scenarios and Options; their icons
+// are retained, while every label is drawn by the port's selected font (as the desktop's Quit is)
 constexpr int kTitleIcons[3] = {2, 27, 3};
 
 bool titleChoiceReady(int) { return true; }
@@ -5348,17 +5363,10 @@ void drawTitleMenu(App& app) {
         app.renderer.setOrigin(vitaRight(app)); // (widescreen: the plates to the screen's right)
         for (int i = 0; i < kTitlePlates; ++i) {
             const bool lit = (app.titleCursor == i && !app.pointerLast) || pressIn(app, kPressTitle, vitaRight(app), 328, titlePlateY(i), 136, 40);
-            if (i == 3) { // (the sheet's x; "Exit" in its lettering - Extra's "Ex" and "t", Vieg's "i" - while the sheet is
-                          // the English one and so is the port's text, else our word)
-                const bool english = !app.vita.isOpen() && !(app.fanText && app.fan.isOpen()) && uitext::language() == "en";
-                m.plate(328 + dx, titlePlateY(i), 1, -1, lit, pa, false, english ? std::string() : std::string(tr("Quit")));
-                if (english) {
-                    const float x = 328 + dx + 84 - 18.25f, y = titlePlateY(i) + 8; // (36.5 wide, centred on the word's 88)
-                    m.piece(x, y, 196, 584, 24.5f, 24, pa);           // "Ex" (Extra, word 17)
-                    m.piece(x + 24.5f, y, 216, 560, 5, 24, pa);       // "i" (Vieg, word 12)
-                    m.piece(x + 29.5f, y, 220.5f, 584, 7, 24, pa);    // "t" (Extra)
-                }
-            } else m.plate(328 + dx, titlePlateY(i), kTitleIcons[i], kTitleWords[i], lit, pa, !titleChoiceReady(i));
+            const char* label = i == 0 ? tr("Start Game") : i == 1 ? tr("Scenarios") :
+                                i == 2 ? tr("Options") : tr("Quit");
+            const int icon = i < 3 ? kTitleIcons[i] : 1; // the desktop's Quit uses its X icon
+            m.plate(328 + dx, titlePlateY(i), icon, -1, lit, pa, !titleChoiceReady(i), label);
         } // (lit: the keys' cursor, or a touch holding it - TitlePrc's DAT_000ecb60)
         app.renderer.setOrigin(wideLeft(app)); // (... and the pictures down the left to its left)
         if (!vita) { // (the Vita's TitlePut draws none of them)

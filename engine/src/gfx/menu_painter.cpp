@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 
 #include "core/text.hpp"
 #include "game/stage_tables.hpp"
@@ -137,7 +138,7 @@ void MenuPainter::edge(const Texture& tex, float x, float y, float w, float h, f
             if (dx || dy) r_->drawQuad(tex, X(x + float(dx)) * kScale, Y(y + float(dy)) * kScale, w, h, k, k, k, alpha);
 }
 
-void MenuPainter::text(const std::string& s, float x, float y, bool dark, float alpha, float size) {
+void MenuPainter::text(const std::string& s, float x, float y, bool dark, float alpha, float size, bool verticalGradient) {
     if (!r_ || s.empty() || alpha <= 0.001f) return;
     Cached& c = rasterise(s, menuSize(size) * K());
     if (!c.tex.id) return;
@@ -150,7 +151,31 @@ void MenuPainter::text(const std::string& s, float x, float y, bool dark, float 
     } else if (!cleanOutline_) {
         edge(c.tex, x, y, c.w, c.h, 1 - k, alpha);
     }
-    r_->drawQuad(c.tex, x0, y0, w, h, k, k, k, alpha);
+    if (verticalGradient && !dark && c.tex.height > 0) {
+        const int padPixels = std::clamp(int(std::lround(c.pad * c.density)), 0, c.tex.height / 2);
+        const int top = padPixels;
+        const int glyphHeight = std::max(0, c.tex.height - 2 * padPixels);
+        if (glyphHeight > 1) {
+            // Split the white glyph mask into horizontal bands and tint each band at draw time.
+            // This keeps the alpha mask and outline untouched while producing a real GPU-side ramp.
+            const int strips = std::clamp(glyphHeight, 2, 64); // one colour band per glyph-mask row
+            for (int i = 0; i < strips; ++i) {
+                const int sy0 = top + glyphHeight * i / strips;
+                const int sy1 = top + glyphHeight * (i + 1) / strips;
+                if (sy1 <= sy0) continue;
+                const float t = strips > 1 ? float(i) / float(strips - 1) : 0.0f;
+                const float shade = 1.0f - t; // diagnostic ramp: #FFFFFF at top -> pure black at bottom
+                const float bandY = y0 + float(sy0) / float(c.tex.height) * h;
+                const float bandH = float(sy1 - sy0) / float(c.tex.height) * h;
+                r_->drawQuadUV(c.tex, x0, bandY, w, bandH, 0, float(sy0),
+                               float(c.tex.width), float(sy1 - sy0), shade, shade, shade, alpha);
+            }
+        } else {
+            r_->drawQuad(c.tex, x0, y0, w, h, k, k, k, alpha);
+        }
+    } else {
+        r_->drawQuad(c.tex, x0, y0, w, h, k, k, k, alpha);
+    }
 }
 
 void MenuPainter::textTint(const std::string& s, float x, float y, float r, float g, float b, float alpha, float size) {
@@ -167,10 +192,11 @@ void MenuPainter::textTint(const std::string& s, float x, float y, float r, floa
     r_->drawQuad(c.tex, x0, y0, w, h, r, g, b, alpha);
 }
 
-void MenuPainter::textCentred(const std::string& s, float x, float y, bool dark, float alpha, float size) {
+void MenuPainter::textCentred(const std::string& s, float x, float y, bool dark, float alpha, float size,
+                                bool verticalGradient) {
     if (!r_ || s.empty()) return;
     const Cached& c = rasterise(s, menuSize(size) * K());
-    text(s, x, y - c.h / kScale / K() / 2, dark, alpha, size);
+    text(s, x, y - c.h / kScale / K() / 2, dark, alpha, size, verticalGradient);
 }
 
 float MenuPainter::textWidth(const std::string& s, float size) {
@@ -204,13 +230,13 @@ void MenuPainter::button(float x, float y, int word, const std::string& label, b
     } else if (!label.empty()) { // our labels: the game's font, centred on the face
         // (13, smaller to fit the face's 84: a long value - a fan translation's name - inside its button, #19)
         const float wide = textWidth(label, 13), size = wide > 84 ? std::max(8.0f, std::floor(13.0f * 84 / wide)) : 13.0f;
-        // light like the game's words; dark on the cyan cursor face
-        textCentred(label, x + 56 - textWidth(label, size) / 2, y + 20, highlight, alpha, size);
+        // The original's words stay white with a black outline, also on a selected cyan face.
+        textCentred(label, x + 56 - textWidth(label, size) / 2, y + 20, false, alpha, size);
     }
 }
 
 void MenuPainter::plate(float x, float y, int icon, int word, bool selected, float alpha, bool dimmed,
-                        const std::string& text) {
+                        const std::string& text, bool gradientText) {
     const float a = dimmed ? alpha * 0.45f : alpha;
     piece(x, y, 0, 184, 24, 40, a);
     for (int k = 0; k < 21; ++k) piece(x + 24 + 4 * k, y, 28, 184, 4, 40, a);
@@ -220,7 +246,14 @@ void MenuPainter::plate(float x, float y, int icon, int word, bool selected, flo
     piece(x + 120, y, selected ? 124.0f : 80.0f, 184, 16, 40, a);
     if (icon >= 0) piece(x + 8, y + 4, float(icon % 16) * 32, 376 + float(icon / 16) * 32, 32, 32, a);
     if (word >= 0) piece(x + 40, y + 8, float(word % 5) * 88, 512 + float(word / 5) * 24, 88, 24, a);
-    else if (!text.empty()) textCentred(text, x + 40 + (88 - textWidth(text, 15)) / 2, y + 20, true, a, 15);
+    else if (!text.empty()) {
+        float size = 15;
+        float wide = textWidth(text, size);
+        if (gradientText && wide > 88) size = std::max(8.0f, std::floor(size * 88 / wide));
+        wide = textWidth(text, size);
+        // Align the capital glyph's midpoint with the light/dark seam across the oval face.
+        textCentred(text, x + 40 + (88 - wide) / 2, y + 17, false, a, size, gradientText);
+    }
 }
 
 void MenuPainter::gauge(float x, float y, int value, float alpha, bool active, float fillTo) {

@@ -48,6 +48,42 @@ msgstr "Fan-Übersetzung"
 msgid "{0} (fan translation)"
 msgstr "{0} (Fan-Übersetzung)"
 
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Yes"
+msgstr "Ja"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "No"
+msgstr "Nein"
+
+#: src/app/menus.cpp
+msgid "Items"
+msgstr "Gegenstände"
+
+#: src/app/menus.cpp
+msgid "Equipment"
+msgstr "Ausrüstung"
+
+#: src/app/menus.cpp
+msgid "Genes"
+msgstr "Gene"
+
+#: src/app/menus.cpp
+msgid "Status"
+msgstr "Status"
+
+#: src/app/menus.cpp
+msgid "Options"
+msgstr "Optionen"
+
+#: src/app/menus.cpp
+msgid "Start Game"
+msgstr "Starten"
+
+#: src/app/menus.cpp
+msgid "Scenarios"
+msgstr "Szenarien"
+
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
 msgstr "Beenden"
@@ -75,6 +111,10 @@ msgstr "Cheats"
 #: src/app/scene_fx.cpp
 msgid "Graphics"
 msgstr "Grafik"
+
+#: src/app/scene_fx.cpp
+msgid "On"
+msgstr "Ein"
 
 #: src/app/scene_fx.cpp
 msgid "Text Language"

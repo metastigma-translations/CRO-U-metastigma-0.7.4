@@ -48,6 +48,42 @@ msgstr "ファン翻訳"
 msgid "{0} (fan translation)"
 msgstr "{0}（ファン翻訳）"
 
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Yes"
+msgstr "はい"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "No"
+msgstr "いいえ"
+
+#: src/app/menus.cpp
+msgid "Items"
+msgstr "アイテム"
+
+#: src/app/menus.cpp
+msgid "Equipment"
+msgstr "装備"
+
+#: src/app/menus.cpp
+msgid "Genes"
+msgstr "遺伝子"
+
+#: src/app/menus.cpp
+msgid "Status"
+msgstr "ステータス"
+
+#: src/app/menus.cpp
+msgid "Options"
+msgstr "オプション"
+
+#: src/app/menus.cpp
+msgid "Start Game"
+msgstr "開始"
+
+#: src/app/menus.cpp
+msgid "Scenarios"
+msgstr "シナリオ"
+
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
 msgstr "終了"
@@ -75,6 +111,10 @@ msgstr "チート"
 #: src/app/scene_fx.cpp
 msgid "Graphics"
 msgstr "グラフィック"
+
+#: src/app/scene_fx.cpp
+msgid "On"
+msgstr "オン"
 
 #: src/app/scene_fx.cpp
 msgid "Text Language"
