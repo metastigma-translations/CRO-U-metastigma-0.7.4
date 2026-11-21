@@ -1,0 +1,28 @@
+name: Regenerate UI string catalogs (temporary)
+
+on:
+  push:
+    branches:
+      - fix/title-menu-font-labels
+    paths:
+      - .github/workflows/regenerate-ui-catalogs.yml
+
+permissions:
+  contents: read
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: fix/title-menu-font-labels
+      - name: Run the repository's exact catalog generator
+        run: |
+          python3 engine/tools/ui_strings.py
+          python3 engine/tools/ui_strings.py --check
+      - name: Upload the regenerated catalog files
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-catalogs-generated
+          path: engine/lang/
