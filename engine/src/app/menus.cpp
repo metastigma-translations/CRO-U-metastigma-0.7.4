@@ -1165,7 +1165,7 @@ void drawShop(App& app) {
             const std::string name = sysText(app, 58000 + charNameId(app, character));
             m.plate(328 + 240 * slide, 176 + 56.0f * float(k), plateIcon(word), -1,
                     (s.member == k && !app.pointerLast) || shopPressIn(app, true, 328, 176 + 56.0f * float(k), 136, 40, v), a,
-                    false, name, true);
+                    false, name, false);
         }
     if (list) {
         const int n = int(s.list.size());
@@ -3524,7 +3524,7 @@ void drawCamp(App& app) {
             const bool held = lit && (campPressIn(app, vitaRight(app), kPlateX, kMemberY + kMemberStep * float(k), 136, 40) ||
                                       campPressIn(app, wideLeft(app), 8, 0x30 + 0x58 * float(k), 0xfc, 0x50));
             m.plate(kPlateX + 360 * (1 - e), kMemberY + kMemberStep * float(k), plateIcon(word), -1,
-                    (lit && c.member == k && !app.pointerLast) || held, e, false, name, true);
+                    (lit && c.member == k && !app.pointerLast) || held, e, false, name, false);
         }
         left();
     };

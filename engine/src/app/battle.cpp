@@ -3788,7 +3788,7 @@ void drawBattlePlate(App& app, cr::MenuPainter& m, float x, float y, int fighter
     for (const App::Battle::Actor& ac : b.actors)
         if (ac.fighter == fighter) name = ac.name;
     // menub_mainPut: _drawfont_center(i, x + 0x92, y + 10) - the 16-pixel name btlord_make_select set, white
-    m.text(name, x + 146 - m.textWidth(name, 16) / 2, y + 10, false, a, 16, true);
+    m.text(name, x + 146 - m.textWidth(name, 16) / 2, y + 10, false, a, 16, f.character < 0);
     drawBattleStatus(m, f, x + 56, y - 8, a);
 }
 
