@@ -1482,7 +1482,7 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     m.picture(28, x + 8, y + 24, a);
     m.picture(37 + c, x + 136, y + 24, a);
     // The original's raster name row is localised per character; use the same system-text ID
-    // as the status board, but render it in the selected font with the menu bubbles' soft gradient.
+    // as the status board, but keep its underlined white-name treatment (no menu gradient).
     const std::string name = sysText(app, 58000 + charNameId(app, c));
     const float nameWidth = m.textWidth(name, 13);
     const float nameSize = nameWidth > 92 ? std::max(8.0f, std::floor(13.0f * 92 / nameWidth)) : 13.0f;
@@ -1501,7 +1501,7 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     m.quad(underlineX, underlineY, underlineWidth, 1.0f, underlineWhite, underlineWhite);
     m.quad(underlineX + underlineWidth, underlineY, 1.0f, 1.0f, underlineBlack, underlineBlack);
     m.quad(underlineX - 1.0f, underlineY + 1.0f, underlineWidth + 2.0f, 1.0f, underlineBlack, underlineBlack);
-    m.textCentred(name, nameX, y + 34, false, a, nameSize, true);
+    m.textCentred(name, nameX, y + 34, false, a, nameSize, false);
     m.picture(facePicture(app, c), x, y, a);
     const cr::GameState& g = gs ? *gs : app.game;
     if (g.scenario == 1 && c == g.leaders[1]) m.picture(164, x + 238, y + 26, a); // the leader's mark
