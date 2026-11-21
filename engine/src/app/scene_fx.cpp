@@ -1605,7 +1605,7 @@ void drawOptions(App& app, float, float) {
     m.digit(app.optionsPage + 1, 20, kOptPageY, a);
     m.digit(-1, 34, kOptPageY, a);
     m.digit(kOptionPages, 48, kOptPageY, a);
-    m.backButton(192, kOptBackY, app.optionsRow == kOptionsBackRow, app.optionsBob, a);
+    m.backButton(192, kOptBackY, app.optionsRow == kOptionsBackRow, app.optionsBob, a, tr("Back")); // EXE Options: atlas return glyph, selected-font label
     if (app.optionsRow >= 0 && app.optionsRow < n && !rows[size_t(app.optionsRow)].hint.empty()) { // (under the rows shown, clear of Back)
         const std::vector<std::string> lines = wrapText(m, rows[size_t(app.optionsRow)].hint, 470, 11, 2);
         for (size_t l = 0; l < lines.size(); ++l) m.text(lines[l], 20, optRowY(shown) + 2 + 13 * float(l), false, a, 11);
