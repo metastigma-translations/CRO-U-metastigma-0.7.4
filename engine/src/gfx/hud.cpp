@@ -73,6 +73,7 @@ bool Hud::update(Renderer& r, const std::vector<std::string>& lines, float scale
                                            int(std::lround(kPad * scale * density)), img)
                         : rasterise(lines, img);
     if (!ok) return false;
+
     r.destroy(tex_);
     tex_ = r.upload(img);
     cached_ = lines;
