@@ -32,7 +32,7 @@ msgstr "極致效能"
 msgid "Off"
 msgstr "關閉"
 
-#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
+#: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
 msgid "Back"
 msgstr "返回"
 

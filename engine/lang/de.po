@@ -32,7 +32,7 @@ msgstr "Ultra-Leistung"
 msgid "Off"
 msgstr "Aus"
 
-#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
+#: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
 msgid "Back"
 msgstr "Zurück"
 

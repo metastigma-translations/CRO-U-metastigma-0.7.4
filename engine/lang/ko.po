@@ -32,7 +32,7 @@ msgstr "울트라 성능"
 msgid "Off"
 msgstr "끄기"
 
-#: src/app/battle.cpp src/app/menus.cpp src/platform/setup.cpp
+#: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
 msgid "Back"
 msgstr "뒤로"
 
