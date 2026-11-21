@@ -3506,7 +3506,7 @@ void drawCamp(App& app) {
         // second scenario only (window 0x15), Collection (161) under the boards
         // (the one lit - the pad's place on them; 3.1.0 a touch held - picture 163 under it: 0xd3770 / 0xd37d0)
         if (main && (c.btnRow == 0 || campButtonHeld(app, 0))) m.picture(163, 12 - 120 * out, 236, 1 - outA);
-        m.text(tr("Scenarios"), 12 - 120 * out, 236, false, 1 - outA, 14, true); // Scenarios in the selected font
+        m.picture(162, 12 - 120 * out, 236, 1 - outA); // Original drawn Scenarios icon (keep separate from the title-menu text button)
         if (campScenariosNew(app)) m.picture(128, 12 - 120 * out, 236, 1 - outA);
         if (app.game.scenario != 0 && main && (c.btnRow == 1 || campButtonHeld(app, 1))) m.picture(163, 84 - 120 * out, 236, 1 - outA);
         if (app.game.scenario != 0) m.picture(161, 84 - 120 * out, 236, 1 - outA);
