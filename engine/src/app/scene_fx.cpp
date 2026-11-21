@@ -1526,7 +1526,7 @@ void drawOptions(App& app, float, float) {
     cr::Renderer& r = app.renderer;
     cr::MenuPainter& m = app.menu;
     if (optionsAbout(app)) return; // (OptionPrc 0..2: the message window alone - drawManual)
-    m.begin(r, app.windowTex, &app.font);
+    m.begin(r, app.windowTex, &app.font, app.cleanTextOutline);
     // (a translation the font can't draw - a menu language other than the text's - shown in English)
     uitext::setCoverage([&app](const std::string& s) { return app.font.covers(s); }, app.font.generation());
     const PhoneFit phoneFit(app, m); // the iPhone layout: its screen's menu coordinates
@@ -1982,7 +1982,7 @@ void drawPadArt(App& app) {
     if (!app.windowTex.id) return;
     cr::Renderer& r = app.renderer;
     cr::MenuPainter& m = app.menu;
-    m.begin(r, app.windowTex, &app.font);
+    m.begin(r, app.windowTex, &app.font, app.cleanTextOutline);
     r.setOrigin(r.uiX());
     // Uty_DrawController_Put (2.2.0's too): tex2d_add(0x2a, 32, 192, (928, 796) 96 x 96) - the grey
     // ring - and (48, 208, (944, 724) 64 x 64) - the black button; the screen's (96, 448) and (128, 480)

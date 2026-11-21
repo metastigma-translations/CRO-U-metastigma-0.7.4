@@ -15,7 +15,7 @@ class Font;
 
 class MenuPainter {
 public:
-    void begin(Renderer& r, const Texture& sheet, const Font* font, bool cleanOutline = true) {
+    void begin(Renderer& r, const Texture& sheet, const Font* font, bool cleanOutline) {
         r_ = &r;
         sheet_ = &sheet;
         font_ = font;
