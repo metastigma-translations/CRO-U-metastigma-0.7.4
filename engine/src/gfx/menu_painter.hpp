@@ -74,15 +74,16 @@ public:
     void setCleanOutline(bool on) { cleanOutline_ = on; }
     // Text with its top-left at (x, y), 14 units high; dark = black (style 1), else white
     void text(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
-              bool verticalGradient = false, bool darkGradient = false, bool noOutline = false);
-    float textWidth(const std::string& s, float size = 14);
+              bool verticalGradient = false, bool darkGradient = false, bool noOutline = false, float letterSpacing = 0);
+    float textWidth(const std::string& s, float size = 14, float letterSpacing = 0);
     // ... in a colour (MuComFontPlateDisp's colours: the plates' yellow, grey)
     void textTint(const std::string& s, float x, float y, float r, float g, float b, float alpha = 1, float size = 14,
                   bool verticalGradient = false);
     // Text whose line box is centred on y (labels in bars and on buttons: this font's box is
     // taller than the iOS system font's, so a fixed top offset would sit low)
     void textCentred(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
-                     bool verticalGradient = false, bool darkGradient = false, bool noOutline = false);
+                     bool verticalGradient = false, bool darkGradient = false, bool noOutline = false,
+                     float letterSpacing = 0);
 
     // Rebuild a window_hd section's fading white strip and draw its label with the selected font.
     void headingStrip(float x, float y, const std::string& label, float alpha = 1, float width = 216, float textSize = 20, float textOffset = 20);
@@ -135,7 +136,7 @@ private:
     std::map<std::string, Cached> text_;
     std::map<std::array<uint8_t, 8>, Texture> gradients_;
     Cached& rasterise(const std::string& s, float size, bool perGlyphVerticalGradient = false,
-                      bool darkVerticalGradient = false);
+                      bool darkVerticalGradient = false, float letterSpacing = 0);
 };
 
 } // namespace cr

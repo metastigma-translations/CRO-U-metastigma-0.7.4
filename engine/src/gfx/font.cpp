@@ -194,7 +194,7 @@ bool Font::covers(const std::string& utf8) const {
 }
 
 bool Font::rasterise(const std::vector<std::string>& lines, float em, float lineStep, int pad, Image& out,
-                     bool perGlyphVerticalGradient, bool darkVerticalGradient) const {
+                     bool perGlyphVerticalGradient, bool darkVerticalGradient, float letterSpacing) const {
     if (!loaded() || lines.empty()) return false;
     const stbtt_fontinfo& info = face_->info;
     const float scale = stbtt_ScaleForMappingEmToPixels(&info, em);
@@ -233,6 +233,7 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
         for (size_t i = 0; i < lines[l].size();) {
             const uint32_t c = nextUtf8(lines[l], i);
             if (c < 0x20) continue; // (a message's marks, such as the centred line's \x01: not drawn)
+            if (!glyphs[l].empty()) x += letterSpacing;
             Glyph gl{&info, 0};
             if (isCyrillic(c) && !cjkLine) {
                 if (!cyrLooked) cyrLooked = true, cyr = cyrillicFromFallback() ? cyrillicFallback(boldFace(info)) : nullptr;
@@ -270,7 +271,10 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
         const float baseline = base0 + float(l) * lineStep;
         float x = float(pad + leftBearing);
         Glyph prev{nullptr, 0};
+        bool firstGlyph = true;
         for (const Glyph& gl : glyphs[l]) {
+            if (!firstGlyph) x += letterSpacing;
+            firstGlyph = false;
             const stbtt_fontinfo* face = gl.face;
             const int g = gl.g;
             const float s = scaleOf(face);
