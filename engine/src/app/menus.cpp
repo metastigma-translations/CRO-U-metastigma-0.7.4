@@ -967,30 +967,41 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     cr::MenuPainter& m = app.menu;
     const cr::PartyMember& pm = app.game.party[size_t(c)];
     const float white[4] = {1, 1, 1, a};
-    // Fit the re-rendered labels into the atlas cells they replace. dark means black
-    // lettering; noOutline preserves the clean black-on-white stat-chip style.
+    // One common font size for every Status-board label. Pick the largest size that
+    // fits the narrowest label cell, and reserve the number column beside NEXT.
+    const std::string statusLabels[9] = {
+        tr("LV"), tr("HP"), tr("MP"), tr("NEXT"),
+        tr("EXP"), tr("ATTACK"), tr("DEFENSE"), tr("SPEED"), tr("LUCK")
+    };
+    const float statusLabelWidths[9] = {22, 20, 20, 80, 50, 50, 50, 50, 50};
+    constexpr float kStatusLabelBaseSize = 14.0f;
+    float statusLabelSize = kStatusLabelBaseSize;
+    for (int i = 0; i < 9; ++i) {
+        const float measured = m.textWidth(statusLabels[i], kStatusLabelBaseSize);
+        if (measured > statusLabelWidths[i] && measured > 0.0f)
+            statusLabelSize = std::min(statusLabelSize,
+                kStatusLabelBaseSize * statusLabelWidths[i] / measured);
+    }
+    statusLabelSize = std::max(8.0f, statusLabelSize);
     auto boardLabel = [&](const std::string& label, float x, float y, float w, float h,
-                          float maxSize, bool dark, bool noOutline) {
-        float size = maxSize;
-        float width = m.textWidth(label, size);
-        if (width > w - 2.0f && width > 0.0f)
-            size = std::max(8.0f, size * (w - 2.0f) / width);
-        width = m.textWidth(label, size);
-        m.textCentred(label, x + (w - width) * 0.5f, y + h * 0.5f, dark, a, size, false, false, noOutline);
+                          bool dark, bool noOutline, float verticalOffset = 0.0f) {
+        const float width = m.textWidth(label, statusLabelSize);
+        m.textCentred(label, x + (w - width) * 0.5f,
+                      y + h * 0.5f + verticalOffset,
+                      dark, a, statusLabelSize, false, false, noOutline);
     };
     m.quad(bx + 12, by, 143, 16, white, white); // the name
     const std::string name = sysText(app, 58000 + charNameId(app, c)); // (ComUty_StateBoardChrName)
     m.textCentred(name, bx + 12 + (143 - m.textWidth(name, 14)) / 2, by + 5, true, a, 14);
     if (record) m.picture(148 + std::clamp(c, 0, cr::kCharacters - 1), bx - 8, by - 32, a); // ComUty_StateBoardDraw: 0x94 + record
     m.quad(bx + 12, by + 32, 143, 15, white, white); // level
-    boardLabel(tr("LV"), bx + 50, by + 36, 24, 10, 12, true, true);
+    boardLabel(statusLabels[0], bx + 50, by + 36, 24, 10, true, true, -1.5f);
     drawShopNumber(m, pm.level, bx + 80, by + 33, 3, 12, a, 2, true);
     const int hpMax = cr::memberStat(app.game, c, cr::kHp, app.itemTable), mpMax = cr::memberStat(app.game, c, cr::kMp, app.itemTable);
     const int hp = pm.hp < 0 ? hpMax : pm.hp, mp = pm.mp < 0 ? mpMax : pm.mp;
-    const std::string hpLabel = tr("HP"), mpLabel = tr("MP");
     for (int k = 0; k < 2; ++k) { // __ComUty_FaceBoardHpMp
         const float x = bx - 1, y = by + 56 + 20 * k;
-        boardLabel(k ? mpLabel : hpLabel, x, y, 22, 10, 12, false, false);
+        boardLabel(statusLabels[k ? 2 : 1], x, y, 22, 10, false, false);
         drawShopNumber(m, k ? mp : hp, x + 22, y - 4, 5, 12, a);
         m.picture(k ? 65 : 66, x + 82, y - 4, a); // the slash remains the atlas glyph
         drawShopNumber(m, k ? mpMax : hpMax, x + 94, y - 4, 5, 12, a);
@@ -1000,19 +1011,19 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     { // __ComUty_FaceBoardNextExp
         const float x = bx - 2, y = by + 96;
         const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
-        boardLabel(tr("NEXT"), x, y, 76, 10, 14, false, false);
+        boardLabel(statusLabels[3], x, y - 5.0f, 82, 10, false, false);
         drawShopNumber(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), x + 82, y - 4, 6, 12, a);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
     }
     // Rebuild the five white atlas label chips without their baked English lettering.
-    const std::string kBoardStatLabel[5] = {tr("EXP"), tr("ATTACK"), tr("DEFENSE"), tr("SPEED"), tr("LUCK")};
+    const std::string* kBoardStatLabel = statusLabels + 4;
     const int values[5] = {pm.exp, cr::memberStat(app.game, c, cr::kAttack, app.itemTable), cr::memberStat(app.game, c, cr::kDefense, app.itemTable),
                            cr::memberStat(app.game, c, cr::kSpeed, app.itemTable), cr::memberStat(app.game, c, cr::kLuck, app.itemTable)};
     for (int k = 0; k < 5; ++k) {
         const float y = by + 116 + 20 * k;
         m.quad(bx + 12, y, 52, 12, white, white); // same size and position as atlas pictures 83..87
-        boardLabel(kBoardStatLabel[k], bx + 12, y, 52, 12, 14, true, true);
+        boardLabel(kBoardStatLabel[k], bx + 12, y, 52, 12, true, true);
         m.picture(88, bx + 64, y + 11, a); // underline stays as before
         if (k == 0) drawShopNumber(m, values[0], bx + 68, y - 2, 7, 12, a);
         else drawShopNumber(m, values[k], bx + 80, y - 2, 4, 12, a);

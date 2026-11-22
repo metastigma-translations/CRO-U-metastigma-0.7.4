@@ -178,7 +178,7 @@ msgstr "Следующий"
 
 #: src/app/menus.cpp
 msgid "EXP"
-msgstr "Опыт"
+msgstr "ОПЫТ"
 
 #: src/app/menus.cpp
 msgid "ATTACK"
