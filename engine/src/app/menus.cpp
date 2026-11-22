@@ -1097,7 +1097,7 @@ void drawShop(App& app) {
     const PhoneMenu phoneMenu(app, m); // the iPhone layout: its screen's menu coordinates
     if (s.phase == App::Shop::Talk) { // the shopkeeper's scene: ShopPrc 2 takes windows 1 - 5 off, "Shop" (window 0)
         r.setOrigin(vitaLeft(app));      // stays over it (Part 12 2142-2184 s: "Shop" over Piu-Piu's talk)
-        m.picture(97, 8, 4, 1);
+        m.headingStrip(8, 4, tr("Shop"), 1);
         r.setOrigin(r.uiX());
         return;
     }
@@ -1121,7 +1121,7 @@ void drawShop(App& app) {
     if (s.keeper.id && !list && !board) // window 3: tex 10's (1, 3), 256 x 256 at (0, 64) (Part 4 1173.5 s)
         r.drawQuad(s.keeper, (16 + 0 - 240 * slide) * 2, (32 + 64) * 2, 256 * 2, 256 * 2, 1, 1, 1, 1);
     if (board) drawShopBoard(app, 12 - 200 * slide, 92, shopCharacter(app), s.selling ? 0 : item, a);
-    m.picture(97, 8, 4, 1); // "Shop"
+    m.headingStrip(8, 4, tr("Shop"), 1); // "Shop"
     if (s.phase == App::Shop::Main) { // window 2: font 0 (7, 0x3a) "Shopping" at (12, 40) over picture 15
         m.textCentred(sysText(app, 58058), 12 - 140 * slide, 47, false, a, kFont);
         m.picture(15, -140 * slide, 56, a);
@@ -2981,7 +2981,7 @@ void drawLastBattle(App& app) {
     // right, the question centred
     r.setOrigin(wideLeft(app));
     auto ease = [](float t) { return 1 - (1 - t) * (1 - t); };
-    if (lb.win[0] > 0) m.picture(110, 8, 6, lb.win[0]); // (_stMuPictInfo_LastBt: picture 110 at (8, 6))
+    if (lb.win[0] > 0) m.headingStrip(8, 6, tr("Scenarios"), lb.win[0]); // Scenarios strip
     if (lb.win[1] > 0) {
         const float dx = -140 * (1 - ease(lb.win[1]));
         m.picture(15, dx, 56, lb.win[1]);
@@ -3310,7 +3310,7 @@ void drawWorldSelect(App& app) {
         m.image(ws.maps[mapIx], dx(1) + ox, dy(1) + 64 + oy, 256, 256, ws.win[1]); // (the whole sheet: the _hd one is 512 square)
         r.setLayer(keep);
     }
-    if (ws.win[0] > 0) m.picture(0, dx(0) + 8 + ox, dy(0) + 4 + oy, ws.win[0]);
+    if (ws.win[0] > 0) m.headingStrip(dx(0) + 8 + ox, dy(0) + 4 + oy, tr("World Select"), ws.win[0]);
     if (ws.win[2] > 0) { // (the labels as the camp's: FontDisp's y the line box's top)
         m.picture(15, dx(2) + ox, dy(2) + 56 + oy, ws.win[2]);
         m.textCentred(sysText(app, 58000), dx(2) + 12 + ox, dy(2) + 47 + oy, false, ws.win[2], 14); // (the menu font, as the Camp's lines)
@@ -3470,7 +3470,7 @@ void drawCamp(App& app) {
     // "Camp" (window 0): CampMain 0xd takes it off with the rest at the Emergency Exit's end (kCampExitHide), whole
     // the frame after, then 3/4 .. gone
     const float exitOff = c.phase == App::Camp::Exit ? std::clamp(float(c.exitT - kCampExitHide - 1) / 4.0f, 0.0f, 1.0f) : 0.0f;
-    m.picture(81, 8, 4, (1 - leave) * (1 - exitOff)); // "Camp"
+    m.headingStrip(8, 4, tr("Camp"), (1 - leave) * (1 - exitOff));
     // The main screen's pieces slide away on a page (CampMain 6), before the page's own come (campEase), and stay
     // away while the page's go on Back
     const float out = main ? std::max(1 - ease, leave) : c.pageOut ? 1.0f : std::min(1.0f, float(c.anim) / 4.0f);
@@ -4440,7 +4440,7 @@ void drawScenarios(App& app) {
     };
     if (s.card < 0) { // __menuu_SccnariosPut, windows 0..5
         drawClockAndOz(app, m, a);
-        m.picture(160, 8, 4, a);
+        m.headingStrip(8, 4, tr("Scenarios"), a);
         sheet(0, 13, 48, a);
         for (int i = 2; i < 8; ++i)
             if (flags(app).flag(0x518 + i - 2)) sheet(1, 15 + 57.0f * float(i), 50, a);
@@ -4965,7 +4965,7 @@ void drawManual(App& app) {
     if (!app.manualIntro) {
         const PhoneFit phoneFit(app, m); // the iPhone layout: its screen's menu coordinates
         const float a = std::min(1.0f, app.manualAnim / 8.0f);
-        m.picture(103, 8, 4, a); // "Options" (_stMuPictInfo_Option)
+        m.headingStrip(8, 4, tr("Options"), a);
         m.text(sysLabel(app, 58081, "Instruction Manual"), 236, 14, false, a, 16);
         // The list (MuScrList: windows 7 and 8) fades out as a topic opens and is off while it's up
         const float la = mm.state == 0 ? a : mm.state == 1 ? a * float(std::max(0, mm.count)) / 4.0f : 0.0f;

@@ -3896,7 +3896,7 @@ void drawBattleResults(App& app, cr::MenuPainter& m, float a) {
     const float in = rs.stage == 3 ? std::max(0.0f, float(rs.count) / 4) : std::min(1.0f, float(rs.frames) / 4);
     const float away = 1 - in;
     r.setOrigin(wideLeft(app)); // (widescreen: the heading and boards left, the takings right)
-    m.picture(19, 8, 4, a * in); // "Results"
+    m.headingStrip(8, 4, tr("Results"), a * in);
     for (int k = 0; k < 2; ++k) {
         const cr::Fighter& f = b.rules.f[size_t(k)];
         if (!f.present) continue;

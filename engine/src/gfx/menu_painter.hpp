@@ -82,6 +82,8 @@ public:
     void textCentred(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
                      bool verticalGradient = false);
 
+    // Rebuild a window_hd section's fading white strip and draw its label with the selected font.
+    void headingStrip(float x, float y, const std::string& label, float alpha = 1, float width = 216);
     // ComUty_OptCategoryDraw: a 24-tall white bar (100 solid, 123 fading out, alpha up to
     // 0xB3) with the label in black at (x + 8, y + 5). `highlight` tints the bar (keyboard
     // cursor - an addition: the original is touch-only)

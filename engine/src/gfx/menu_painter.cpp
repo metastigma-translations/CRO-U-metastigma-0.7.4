@@ -185,6 +185,22 @@ float MenuPainter::textWidth(const std::string& s, float size) {
     return rasterise(s, menuSize(size) * K()).w / kScale / K();
 }
 
+// Rebuild the window_hd section headings (World Select, Results, Camp, Shop, Options, Scenarios).
+// The old pictures baked the words into a white strip fading to transparency at the right.
+void MenuPainter::headingStrip(float x, float y, const std::string& label, float alpha, float width) {
+    if (!r_ || label.empty() || alpha <= 0.001f || width <= 20.0f) return;
+    const float solid[4] = {1, 1, 1, alpha}, clear[4] = {1, 1, 1, 0};
+    // window_hd's strip: 32 px high at double scale, 204 menu units wide, alpha-faded to the right.
+    quad(x, y + 16.0f, std::min(204.0f, width - 12.0f), 16.0f, solid, clear);
+    float size = 14.0f;
+    const float maxTextWidth = std::max(8.0f, width - 18.0f);
+    const float measured = textWidth(label, size);
+    if (measured > maxTextWidth && measured > 0.0f)
+        size = std::max(9.0f, std::floor(size * maxTextWidth / measured));
+    // The original title starts 9 menu units from the left and sits slightly above the strip centre.
+    textCentred(label, x + 9.0f, y + 19.0f, true, alpha, size, false);
+}
+
 void MenuPainter::rowBar(float x, float y, const std::string& label, float alpha, bool highlight, float shade, float cap) {
     const float a = std::min(alpha, cap);
     // Keyboard cursor: the cyan the game lights pressed controls with (tex2d colour 0xEBFF4B, A B G R:
