@@ -1001,8 +1001,9 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     const float gaugeLabelSize = nextWidth > kGaugeLabelWidth && nextWidth > 0.0f
         ? kGaugeLabelBaseSize * kGaugeLabelWidth / nextWidth : kGaugeLabelBaseSize;
     auto gaugeLabel = [&](const std::string& label, float x, float trackY) {
-        // Raise the 14-unit line box by one unit: a small, consistent clear gap above the track.
-        m.textCentred(label, x, trackY - 1.0f, false, a, gaugeLabelSize);
+        // First glyph starts at the coloured fill's left edge; the glyph box overlaps
+        // the top of the track slightly and is drawn after the track so the text stays on top.
+        m.textCentred(label, x, trackY + 4.0f, false, a, gaugeLabelSize);
     };
 
     // The five white stat chips share one font size. Negative tracking tightens the long
@@ -1024,33 +1025,42 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     };
     m.quad(bx + 12, by, 143, 16, white, white); // the name
     const std::string name = sysText(app, 58000 + charNameId(app, c)); // (ComUty_StateBoardChrName)
-    m.textCentred(name, bx + 12 + (143 - m.textWidth(name, 14)) / 2, by + 5, true, a, 14);
+    m.textCentred(name, bx + 12 + (143 - m.textWidth(name, 14)) * 0.5f, by + 8.0f, true, a, 14);
     if (record) m.picture(148 + std::clamp(c, 0, cr::kCharacters - 1), bx - 8, by - 32, a); // ComUty_StateBoardDraw: 0x94 + record
     m.quad(bx + 12, by + 32, 143, 15, white, white); // level
-    const float levelLabelWidth = m.textWidth(statusLabels[0], 14);
-    // The full Russian word fits in the left part of the white strip; centre it in that area
-    // and lift the line box to the actual vertical centre of the strip.
-    m.textCentred(statusLabels[0], bx + 12 + (62.0f - levelLabelWidth) * 0.5f,
-                  by + 39.5f, true, a, 14, false, false, true);
-    boardNumber(pm.level, bx + 80, by + 33, 3, 12, 2, true);
+    if (fontNumbers) {
+        const std::string levelValue = std::to_string(std::abs(pm.level));
+        const float labelWidth = m.textWidth(statusLabels[0], 14);
+        const float valueWidth = m.textWidth(levelValue, 14);
+        constexpr float kLevelGroupGap = 8.0f;
+        const float groupWidth = labelWidth + kLevelGroupGap + valueWidth;
+        const float groupX = bx + 12 + (143.0f - groupWidth) * 0.5f;
+        m.textCentred(statusLabels[0], groupX, by + 39.5f, true, a, 14, false, false, true);
+        boardNumber(pm.level, groupX + labelWidth + kLevelGroupGap, by + 32.5f, 3, 12, 2, true);
+    } else {
+        const float levelLabelWidth = m.textWidth(statusLabels[0], 14);
+        m.textCentred(statusLabels[0], bx + 12 + (62.0f - levelLabelWidth) * 0.5f,
+                      by + 39.5f, true, a, 14, false, false, true);
+        boardNumber(pm.level, bx + 80, by + 33, 3, 12, 2, true);
+    }
     const int hpMax = cr::memberStat(app.game, c, cr::kHp, app.itemTable), mpMax = cr::memberStat(app.game, c, cr::kMp, app.itemTable);
     const int hp = pm.hp < 0 ? hpMax : pm.hp, mp = pm.mp < 0 ? mpMax : pm.mp;
     for (int k = 0; k < 2; ++k) { // __ComUty_FaceBoardHpMp
         const float x = bx - 1, y = by + 56 + 20 * k;
-        gaugeLabel(statusLabels[k ? 2 : 1], bx - 1.0f, y + 0.0f);
         boardNumber(k ? mp : hp, x + 22, y - 4, 5, 12, 0, false);
         m.picture(k ? 65 : 66, x + 82, y - 4, a); // the slash remains the atlas glyph
         boardNumber(k ? mpMax : hpMax, x + 94, y - 4, 5, 12, 0, false);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
+        gaugeLabel(statusLabels[k ? 2 : 1], bx + 18.0f, y);
     }
     { // __ComUty_FaceBoardNextExp
-        const float x = bx - 2, y = by + 96;
+        const float x = bx - 1, y = by + 96;
         const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
-        gaugeLabel(statusLabels[3], bx - 1.0f, y + 0.0f);
         boardNumber(pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), x + 82, y - 4, 6, 12, 0, false);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
+        gaugeLabel(statusLabels[3], bx + 18.0f, y);
     }
     // Rebuild the five white atlas label chips without their baked English lettering.
     const std::string* kBoardStatLabel = statusLabels + 4;
