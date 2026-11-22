@@ -1536,7 +1536,7 @@ void drawOptions(App& app, float, float) {
     // The windows slide in: rows from the left, controls from the right (WinDispOn -240 / +240)
     const float t = std::min(1.0f, app.optionsAnim / 8.0f), ease = 1 - (1 - t) * (1 - t);
     const float rowsX = -240 * (1 - ease), ctrlX = 240 * (1 - ease), a = t;
-    m.text(tr("Options"), 8, 4, false, 1, 14, true); // Options in the selected font
+    m.headingStrip(8, 4, tr("Options"), 1, 216, 22, 20.5f); // Options: rebuilt white strip + selected font
     const std::vector<OptRow> rows = optionRows(app, app.optionsPage);
     const int n = int(rows.size()), shown = std::min(n, kOptVisible);
     optionsScrollFix(app, n, false);

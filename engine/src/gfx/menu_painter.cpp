@@ -340,7 +340,7 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
         const bool savedCleanOutline = cleanOutline_;
         outline_ = false;
         cleanOutline_ = true;
-        textCentred(label, start + glyphWidth + gap, y + 12, true, alpha, size, true);
+        textCentred(label, start + glyphWidth + gap, y + 12, true, alpha, size, false);
         outline_ = savedOutline;
         cleanOutline_ = savedCleanOutline;
     }
@@ -365,10 +365,15 @@ void MenuPainter::backBar(float x, float y, bool pressed, float alpha, const std
     const float totalWidth = arrowWidth + gap + labelWidth;
     const float ax = x + (232.0f - totalWidth) * 0.5f;
     piece(ax, y, 0, 224, arrowWidth, 24, alpha); // window_hd's return symbol, without the atlas word "Back"
-    textCentred(label, ax + arrowWidth + gap, y + 12, false, alpha, size, true);
+    const bool savedOutline = outline_, savedCleanOutline = cleanOutline_;
+    outline_ = false;
+    cleanOutline_ = true;
+    textCentred(label, ax + arrowWidth + gap, y + 12, true, alpha, size, false);
+    outline_ = savedOutline;
+    cleanOutline_ = savedCleanOutline;
 }
 
-void MenuPainter::backOkBar(float x, float y, int pressed, float alpha) {
+void MenuPainter::backOkBar(float x, float y, int pressed, float alpha, const std::string& label) {
     const float cyan[4] = {0x4B / 255.0f, 1, 0xEB / 255.0f, alpha}; // (tex2d's 0xEBFF4B is A B G R: cyan)
     const float white[4] = {1, 1, 1, alpha};
     const float* b = pressed == 1 ? cyan : white;
@@ -378,7 +383,21 @@ void MenuPainter::backOkBar(float x, float y, int pressed, float alpha) {
     quad(x + 24, y, 90, 24, b, b);
     quad(x + 118, y, 90, 24, o, o);
     quad(x + 208, y, 24, 24, o, clearO);
-    piece(x + 36, y, 0, 224, 76, 24, alpha);
+    constexpr float arrowWidth = 18.0f, gap = 5.0f, maxLabelWidth = 54.0f;
+    float size = 14.0f;
+    float labelWidth = textWidth(label, size);
+    if (labelWidth > maxLabelWidth)
+        size = std::max(9.0f, std::floor(size * maxLabelWidth / labelWidth));
+    labelWidth = textWidth(label, size);
+    const float total = arrowWidth + gap + labelWidth;
+    const float start = x + 24.0f + (90.0f - total) * 0.5f;
+    piece(start, y, 0, 224, arrowWidth, 24, alpha); // return glyph only
+    const bool savedOutline = outline_, savedCleanOutline = cleanOutline_;
+    outline_ = false;
+    cleanOutline_ = true;
+    textCentred(label, start + arrowWidth + gap, y + 12, true, alpha, size, false);
+    outline_ = savedOutline;
+    cleanOutline_ = savedCleanOutline;
     piece(x + 126, y + 2, 76, 224, 64, 20, alpha);
 }
 
