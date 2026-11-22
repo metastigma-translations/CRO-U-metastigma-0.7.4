@@ -2981,7 +2981,7 @@ void drawLastBattle(App& app) {
     // right, the question centred
     r.setOrigin(wideLeft(app));
     auto ease = [](float t) { return 1 - (1 - t) * (1 - t); };
-    if (lb.win[0] > 0) m.headingStrip(8, 6, tr("Scenarios"), lb.win[0]); // Scenarios strip
+    if (lb.win[0] > 0) m.headingStrip(8, 6, tr("Scenarios"), lb.win[0], 216, 17, 15.25f); // Scenarios strip
     if (lb.win[1] > 0) {
         const float dx = -140 * (1 - ease(lb.win[1]));
         m.picture(15, dx, 56, lb.win[1]);
@@ -3310,7 +3310,7 @@ void drawWorldSelect(App& app) {
         m.image(ws.maps[mapIx], dx(1) + ox, dy(1) + 64 + oy, 256, 256, ws.win[1]); // (the whole sheet: the _hd one is 512 square)
         r.setLayer(keep);
     }
-    if (ws.win[0] > 0) m.headingStrip(dx(0) + 8 + ox, dy(0) + 4 + oy, tr("World Select"), ws.win[0]);
+    if (ws.win[0] > 0) m.headingStrip(dx(0) + 8 + ox, dy(0) + 4 + oy, tr("World Select"), ws.win[0], 216, 17, 17);
     if (ws.win[2] > 0) { // (the labels as the camp's: FontDisp's y the line box's top)
         m.picture(15, dx(2) + ox, dy(2) + 56 + oy, ws.win[2]);
         m.textCentred(sysText(app, 58000), dx(2) + 12 + ox, dy(2) + 47 + oy, false, ws.win[2], 14); // (the menu font, as the Camp's lines)
@@ -4440,7 +4440,7 @@ void drawScenarios(App& app) {
     };
     if (s.card < 0) { // __menuu_SccnariosPut, windows 0..5
         drawClockAndOz(app, m, a);
-        m.headingStrip(8, 4, tr("Scenarios"), a);
+        m.headingStrip(8, 4, tr("Scenarios"), a, 216, 17, 15.25f);
         sheet(0, 13, 48, a);
         for (int i = 2; i < 8; ++i)
             if (flags(app).flag(0x518 + i - 2)) sheet(1, 15 + 57.0f * float(i), 50, a);
@@ -4965,7 +4965,7 @@ void drawManual(App& app) {
     if (!app.manualIntro) {
         const PhoneFit phoneFit(app, m); // the iPhone layout: its screen's menu coordinates
         const float a = std::min(1.0f, app.manualAnim / 8.0f);
-        m.headingStrip(8, 4, tr("Options"), a);
+        m.headingStrip(8, 4, tr("Options"), a, 216, 22, 20.5f);
         m.text(sysLabel(app, 58081, "Instruction Manual"), 236, 14, false, a, 16);
         // The list (MuScrList: windows 7 and 8) fades out as a topic opens and is off while it's up
         const float la = mm.state == 0 ? a : mm.state == 1 ? a * float(std::max(0, mm.count)) / 4.0f : 0.0f;
