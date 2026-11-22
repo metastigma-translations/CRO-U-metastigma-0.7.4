@@ -162,18 +162,20 @@ void MenuPainter::edge(const Texture& tex, float x, float y, float w, float h, f
             if (dx || dy) r_->drawQuad(tex, X(x + float(dx)) * kScale, Y(y + float(dy)) * kScale, w, h, k, k, k, alpha);
 }
 
-void MenuPainter::text(const std::string& s, float x, float y, bool dark, float alpha, float size, bool verticalGradient, bool darkGradient) {
+void MenuPainter::text(const std::string& s, float x, float y, bool dark, float alpha, float size, bool verticalGradient, bool darkGradient, bool noOutline) {
     if (!r_ || s.empty() || alpha <= 0.001f) return;
     Cached& c = rasterise(s, menuSize(size) * K(), verticalGradient, darkGradient);
     if (!c.tex.id) return;
     const float x0 = X(x) * kScale - c.pad, y0 = Y(y) * kScale - c.pad;
     const float w = c.w + 2 * c.pad, h = c.h + 2 * c.pad;
     const float k = dark && !darkGradient ? 0.0f : 1.0f;
-    if (outline_ && cleanOutline_ && c.edgeTex.id) {
-        const float edge = dark ? 1.0f : 0.0f;
-        r_->drawQuad(c.edgeTex, x0, y0, w, h, edge, edge, edge, alpha);
-    } else if (!cleanOutline_) {
-        edge(c.tex, x, y, c.w, c.h, dark ? 1.0f : 0.0f, alpha);
+    if (!noOutline) {
+        if (outline_ && cleanOutline_ && c.edgeTex.id) {
+            const float edge = dark ? 1.0f : 0.0f;
+            r_->drawQuad(c.edgeTex, x0, y0, w, h, edge, edge, edge, alpha);
+        } else if (!cleanOutline_) {
+            edge(c.tex, x, y, c.w, c.h, dark ? 1.0f : 0.0f, alpha);
+        }
     }
     // RGB in the cached texture is shaded independently per glyph; alpha remains the glyph mask.
     // Draw once with white tint so the per-character ramp is preserved and transparent pixels stay clear.
@@ -196,10 +198,10 @@ void MenuPainter::textTint(const std::string& s, float x, float y, float r, floa
 }
 
 void MenuPainter::textCentred(const std::string& s, float x, float y, bool dark, float alpha, float size,
-                                bool verticalGradient, bool darkGradient) {
+                                bool verticalGradient, bool darkGradient, bool noOutline) {
     if (!r_ || s.empty()) return;
     const Cached& c = rasterise(s, menuSize(size) * K(), verticalGradient, darkGradient);
-    text(s, x, y - c.h / kScale / K() / 2, dark, alpha, size, verticalGradient, darkGradient);
+    text(s, x, y - c.h / kScale / K() / 2, dark, alpha, size, verticalGradient, darkGradient, noOutline);
 }
 
 float MenuPainter::textWidth(const std::string& s, float size) {
