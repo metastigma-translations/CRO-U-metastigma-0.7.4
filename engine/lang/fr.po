@@ -32,6 +32,10 @@ msgstr "Ultra perf."
 msgid "Off"
 msgstr "Désactivé"
 
+#: src/app/battle.cpp
+msgid "Results"
+msgstr ""
+
 #: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
 msgid "Back"
 msgstr "Retour"
@@ -154,6 +158,18 @@ msgstr "Activé"
 
 #: src/app/menus.cpp
 msgid "Ohm"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Shop"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "World Select"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Camp"
 msgstr ""
 
 #: src/app/menus.cpp src/platform/setup.cpp

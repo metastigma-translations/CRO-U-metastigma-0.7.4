@@ -32,6 +32,10 @@ msgstr "Ультра-произв."
 msgid "Off"
 msgstr "Выключить"
 
+#: src/app/battle.cpp
+msgid "Results"
+msgstr "Результаты"
+
 #: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
 msgid "Back"
 msgstr "Назад"
@@ -155,6 +159,18 @@ msgstr "Включить"
 #: src/app/menus.cpp
 msgid "Ohm"
 msgstr "Ом"
+
+#: src/app/menus.cpp
+msgid "Shop"
+msgstr "Магазин"
+
+#: src/app/menus.cpp
+msgid "World Select"
+msgstr "Выбор мира"
+
+#: src/app/menus.cpp
+msgid "Camp"
+msgstr "Лагерь"
 
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
