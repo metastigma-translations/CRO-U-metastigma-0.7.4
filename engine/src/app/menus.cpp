@@ -1026,7 +1026,7 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     m.quad(bx + 12, by, 143, 16, white, white); // the name
     const std::string name = sysText(app, 58000 + charNameId(app, c)); // (ComUty_StateBoardChrName)
     // Optical alignment for the configured bold-italic UI font: centre the visible ink, not only its advance box.
-    m.textCentred(name, bx + 12 + (143 - m.textWidth(name, 14)) * 0.5f + 1.85f, by + 6.6f, true, a, 14);
+    m.textCentred(name, bx + 12 + (143 - m.textWidth(name, 14)) * 0.5f + 3.1f, by + 5.6f, true, a, 14);
     if (record) m.picture(148 + std::clamp(c, 0, cr::kCharacters - 1), bx - 8, by - 32, a); // ComUty_StateBoardDraw: 0x94 + record
     m.quad(bx + 12, by + 32, 143, 15, white, white); // level
     if (fontNumbers) {
@@ -1036,8 +1036,8 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         constexpr float kLevelGroupGap = 8.0f;
         const float groupWidth = labelWidth + kLevelGroupGap + valueWidth;
         // Small optical correction for the visible «Уровень» + value ink inside the strip.
-        constexpr float kLevelGroupOpticalX = -0.67f;
-        constexpr float kLevelGroupOpticalY = -0.67f;
+        constexpr float kLevelGroupOpticalX = -1.25f;
+        constexpr float kLevelGroupOpticalY = -1.1f;
         const float groupX = bx + 12 + (143.0f - groupWidth) * 0.5f + kLevelGroupOpticalX;
         m.textCentred(statusLabels[0], groupX, by + 39.5f + kLevelGroupOpticalY, true, a, 14, false, false, true);
         boardNumber(pm.level, groupX + labelWidth + kLevelGroupGap, by + 32.5f + kLevelGroupOpticalY, 3, 12, 2, true);
