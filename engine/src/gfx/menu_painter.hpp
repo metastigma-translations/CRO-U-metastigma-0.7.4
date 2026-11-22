@@ -4,6 +4,8 @@
 // its coordinates doubled too) and plain colour (slot 45). Text uses the font the game's text
 // uses (gfx/font.hpp) at its size: 14 menu units.
 
+#include <array>
+#include <cstdint>
 #include <map>
 #include <string>
 
@@ -72,7 +74,7 @@ public:
     void setCleanOutline(bool on) { cleanOutline_ = on; }
     // Text with its top-left at (x, y), 14 units high; dark = black (style 1), else white
     void text(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
-              bool verticalGradient = false);
+              bool verticalGradient = false, bool darkGradient = false);
     float textWidth(const std::string& s, float size = 14);
     // ... in a colour (MuComFontPlateDisp's colours: the plates' yellow, grey)
     void textTint(const std::string& s, float x, float y, float r, float g, float b, float alpha = 1, float size = 14,
@@ -80,7 +82,7 @@ public:
     // Text whose line box is centred on y (labels in bars and on buttons: this font's box is
     // taller than the iOS system font's, so a fixed top offset would sit low)
     void textCentred(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
-                     bool verticalGradient = false);
+                     bool verticalGradient = false, bool darkGradient = false);
 
     // Rebuild a window_hd section's fading white strip and draw its label with the selected font.
     void headingStrip(float x, float y, const std::string& label, float alpha = 1, float width = 216, float textSize = 20, float textOffset = 20);
@@ -131,8 +133,9 @@ private:
         int generation = -1;
     };
     std::map<std::string, Cached> text_;
-    Texture white_;
-    Cached& rasterise(const std::string& s, float size, bool perGlyphVerticalGradient = false);
+    std::map<std::array<uint8_t, 8>, Texture> gradients_;
+    Cached& rasterise(const std::string& s, float size, bool perGlyphVerticalGradient = false,
+                      bool darkVerticalGradient = false);
 };
 
 } // namespace cr

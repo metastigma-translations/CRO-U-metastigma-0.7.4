@@ -1548,7 +1548,7 @@ void drawOptions(App& app, float, float) {
         m.quad(12, kOptRowTop - 8, 250, optRowY(shown) + 42 - kOptRowTop, shade, shade);
         m.quad(262, kOptRowTop - 8, 238, optRowY(shown) + 42 - kOptRowTop, shade, fade);
     }
-    m.text(tr(kOptionPageName[app.optionsPage]), 236, 14, false, a, 16);
+    m.text(tr(kOptionPageName[app.optionsPage]), 236, 14, false, a, 16, true);
     for (int i = app.optionsScroll; i < n && i < app.optionsScroll + kOptVisible; ++i) {
         const OptRow& row = rows[size_t(i)];
         const float y = optRowY(i - app.optionsScroll), mid = y + 12;

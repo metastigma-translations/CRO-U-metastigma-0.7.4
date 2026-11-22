@@ -194,7 +194,7 @@ bool Font::covers(const std::string& utf8) const {
 }
 
 bool Font::rasterise(const std::vector<std::string>& lines, float em, float lineStep, int pad, Image& out,
-                     bool perGlyphVerticalGradient) const {
+                     bool perGlyphVerticalGradient, bool darkVerticalGradient) const {
     if (!loaded() || lines.empty()) return false;
     const stbtt_fontinfo& info = face_->info;
     const float scale = stbtt_ScaleForMappingEmToPixels(&info, em);
@@ -298,11 +298,13 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
                             // Each character receives its own vertical ramp, based on its own bitmap.
                             // Lowercase letters therefore get a complete ramp, not a leftover section
                             // of the uppercase letter's taller shared line gradient.
-                            const float position = perGlyphVerticalGradient && gh > 1 ? float(y) / float(gh - 1) : 0.0f;
-                            // Keep the upper 50% white; fade to dark grey through the lower 50%.
+                            const float position = (perGlyphVerticalGradient || darkVerticalGradient) && gh > 1
+                                                       ? float(y) / float(gh - 1) : 0.0f;
                             const float t = std::clamp((position - 0.50f) / 0.50f, 0.0f, 1.0f);
-                            const uint8_t shade = uint8_t(std::lround(255.0f + (85.0f - 255.0f) * t));
-                            p[0] = p[1] = p[2] = shade; // white -> dark grey (#555555)
+                            const float top = darkVerticalGradient ? 85.0f : 255.0f;
+                            const float bottom = darkVerticalGradient ? 0.0f : 85.0f;
+                            const uint8_t shade = uint8_t(std::lround(top + (bottom - top) * t));
+                            p[0] = p[1] = p[2] = shade; // light: white -> #555; dark: #555 -> black
                             p[3] = coverage;
                         }
                     }
