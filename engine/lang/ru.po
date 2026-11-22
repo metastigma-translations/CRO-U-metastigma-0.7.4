@@ -161,6 +161,42 @@ msgid "Ohm"
 msgstr "Ом"
 
 #: src/app/menus.cpp
+msgid "LV"
+msgstr "ур"
+
+#: src/app/menus.cpp
+msgid "HP"
+msgstr "ОЗ"
+
+#: src/app/menus.cpp
+msgid "MP"
+msgstr "ОМ"
+
+#: src/app/menus.cpp
+msgid "NEXT"
+msgstr "Следующий"
+
+#: src/app/menus.cpp
+msgid "EXP"
+msgstr "Опыт"
+
+#: src/app/menus.cpp
+msgid "ATTACK"
+msgstr "АТАКА"
+
+#: src/app/menus.cpp
+msgid "DEFENSE"
+msgstr "ЗАЩИТА"
+
+#: src/app/menus.cpp
+msgid "SPEED"
+msgstr "СКОРОСТЬ"
+
+#: src/app/menus.cpp
+msgid "LUCK"
+msgstr "УДАЧА"
+
+#: src/app/menus.cpp
 msgid "Shop"
 msgstr "Магазин"
 

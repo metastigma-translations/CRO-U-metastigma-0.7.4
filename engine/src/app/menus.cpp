@@ -987,9 +987,10 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     drawShopNumber(m, pm.level, bx + 80, by + 33, 3, 12, a, 2, true);
     const int hpMax = cr::memberStat(app.game, c, cr::kHp, app.itemTable), mpMax = cr::memberStat(app.game, c, cr::kMp, app.itemTable);
     const int hp = pm.hp < 0 ? hpMax : pm.hp, mp = pm.mp < 0 ? mpMax : pm.mp;
+    const std::string hpLabel = tr("HP"), mpLabel = tr("MP");
     for (int k = 0; k < 2; ++k) { // __ComUty_FaceBoardHpMp
         const float x = bx - 1, y = by + 56 + 20 * k;
-        boardLabel(tr(k ? "MP" : "HP"), x, y, 22, 10, 12, false, false);
+        boardLabel(k ? mpLabel : hpLabel, x, y, 22, 10, 12, false, false);
         drawShopNumber(m, k ? mp : hp, x + 22, y - 4, 5, 12, a);
         m.picture(k ? 65 : 66, x + 82, y - 4, a); // the slash remains the atlas glyph
         drawShopNumber(m, k ? mpMax : hpMax, x + 94, y - 4, 5, 12, a);
@@ -1005,13 +1006,13 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         drawShopBar(m, x + 15, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
     }
     // Rebuild the five white atlas label chips without their baked English lettering.
-    static const char* const kBoardStatLabel[5] = {"EXP", "ATTACK", "DEFENSE", "SPEED", "LUCK"};
+    const std::string kBoardStatLabel[5] = {tr("EXP"), tr("ATTACK"), tr("DEFENSE"), tr("SPEED"), tr("LUCK")};
     const int values[5] = {pm.exp, cr::memberStat(app.game, c, cr::kAttack, app.itemTable), cr::memberStat(app.game, c, cr::kDefense, app.itemTable),
                            cr::memberStat(app.game, c, cr::kSpeed, app.itemTable), cr::memberStat(app.game, c, cr::kLuck, app.itemTable)};
     for (int k = 0; k < 5; ++k) {
         const float y = by + 116 + 20 * k;
         m.quad(bx + 12, y, 52, 12, white, white); // same size and position as atlas pictures 83..87
-        boardLabel(tr(kBoardStatLabel[k]), bx + 12, y, 52, 12, 14, true, true);
+        boardLabel(kBoardStatLabel[k], bx + 12, y, 52, 12, 14, true, true);
         m.picture(88, bx + 64, y + 11, a); // underline stays as before
         if (k == 0) drawShopNumber(m, values[0], bx + 68, y - 2, 7, 12, a);
         else drawShopNumber(m, values[k], bx + 80, y - 2, 4, 12, a);

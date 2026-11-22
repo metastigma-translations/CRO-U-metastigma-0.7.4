@@ -161,6 +161,42 @@ msgid "Ohm"
 msgstr ""
 
 #: src/app/menus.cpp
+msgid "LV"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "HP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "MP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "NEXT"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "EXP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "ATTACK"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "DEFENSE"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "SPEED"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "LUCK"
+msgstr ""
+
+#: src/app/menus.cpp
 msgid "Shop"
 msgstr ""
 
