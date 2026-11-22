@@ -980,8 +980,8 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     const float gaugeLabelSize = nextWidth > kGaugeLabelWidth && nextWidth > 0.0f
         ? kGaugeLabelBaseSize * kGaugeLabelWidth / nextWidth : kGaugeLabelBaseSize;
     auto gaugeLabel = [&](const std::string& label, float x, float trackY) {
-        // A 14-unit line box ends just before the 8-unit-high gauge track.
-        m.textCentred(label, x, trackY, false, a, gaugeLabelSize);
+        // Raise the 14-unit line box by one unit: a small, consistent clear gap above the track.
+        m.textCentred(label, x, trackY - 1.0f, false, a, gaugeLabelSize);
     };
 
     // The five white stat chips share one font size. Negative tracking tightens the long
