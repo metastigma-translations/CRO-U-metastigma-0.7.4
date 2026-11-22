@@ -973,35 +973,46 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         tr("LV"), tr("HP"), tr("MP"), tr("NEXT"),
         tr("EXP"), tr("ATTACK"), tr("DEFENSE"), tr("SPEED"), tr("LUCK")
     };
-    const float statusLabelWidths[9] = {22, 20, 20, 80, 50, 50, 50, 50, 50};
-    constexpr float kStatusLabelBaseSize = 14.0f;
-    float statusLabelSize = kStatusLabelBaseSize;
-    for (int i = 0; i < 9; ++i) {
-        const float measured = m.textWidth(statusLabels[i], kStatusLabelBaseSize);
-        if (measured > statusLabelWidths[i] && measured > 0.0f)
-            statusLabelSize = std::min(statusLabelSize,
-                kStatusLabelBaseSize * statusLabelWidths[i] / measured);
+    // Gauge labels use one common font size and a shared first-glyph origin.
+    constexpr float kGaugeLabelBaseSize = 14.0f;
+    constexpr float kGaugeLabelWidth = 78.0f; // leave a clear gap before the right-side value
+    const float nextWidth = m.textWidth(statusLabels[3], kGaugeLabelBaseSize);
+    const float gaugeLabelSize = nextWidth > kGaugeLabelWidth && nextWidth > 0.0f
+        ? kGaugeLabelBaseSize * kGaugeLabelWidth / nextWidth : kGaugeLabelBaseSize;
+    auto gaugeLabel = [&](const std::string& label, float x, float trackY) {
+        // A 14-unit line box ends just before the 8-unit-high gauge track.
+        m.textCentred(label, x, trackY, false, a, gaugeLabelSize);
+    };
+
+    // The five white stat chips share one font size. Negative tracking tightens the long
+    // Russian words without shrinking individual labels or changing their baseline.
+    constexpr float kStatChipBaseSize = 14.0f;
+    constexpr float kStatChipTracking = -0.55f;
+    constexpr float kStatChipMaxWidth = 48.0f;
+    float statChipSize = kStatChipBaseSize;
+    for (int i = 4; i < 9; ++i) {
+        const float width = m.textWidth(statusLabels[i], kStatChipBaseSize, kStatChipTracking);
+        if (width > kStatChipMaxWidth && width > 0.0f)
+            statChipSize = std::min(statChipSize, kStatChipBaseSize * kStatChipMaxWidth / width);
     }
-    statusLabelSize = std::max(8.0f, statusLabelSize);
-    auto boardLabel = [&](const std::string& label, float x, float y, float w, float h,
-                          bool dark, bool noOutline, float verticalOffset = 0.0f) {
-        const float width = m.textWidth(label, statusLabelSize);
-        m.textCentred(label, x + (w - width) * 0.5f,
-                      y + h * 0.5f + verticalOffset,
-                      dark, a, statusLabelSize, false, false, noOutline);
+    auto statChipLabel = [&](const std::string& label, float x, float y, float w, float h) {
+        const float width = m.textWidth(label, statChipSize, kStatChipTracking);
+        // Horizontal centre of each full white strip; identical font size and tracking for all five.
+        m.textCentred(label, x + (w - width) * 0.5f, y + h * 0.5f,
+                      true, a, statChipSize, false, false, true, kStatChipTracking);
     };
     m.quad(bx + 12, by, 143, 16, white, white); // the name
     const std::string name = sysText(app, 58000 + charNameId(app, c)); // (ComUty_StateBoardChrName)
     m.textCentred(name, bx + 12 + (143 - m.textWidth(name, 14)) / 2, by + 5, true, a, 14);
     if (record) m.picture(148 + std::clamp(c, 0, cr::kCharacters - 1), bx - 8, by - 32, a); // ComUty_StateBoardDraw: 0x94 + record
     m.quad(bx + 12, by + 32, 143, 15, white, white); // level
-    boardLabel(statusLabels[0], bx + 50, by + 36, 24, 10, true, true, -1.5f);
+    m.textCentred(statusLabels[0], bx + 50, by + 40.5f, true, a, 12, false, false, true);
     drawShopNumber(m, pm.level, bx + 80, by + 33, 3, 12, a, 2, true);
     const int hpMax = cr::memberStat(app.game, c, cr::kHp, app.itemTable), mpMax = cr::memberStat(app.game, c, cr::kMp, app.itemTable);
     const int hp = pm.hp < 0 ? hpMax : pm.hp, mp = pm.mp < 0 ? mpMax : pm.mp;
     for (int k = 0; k < 2; ++k) { // __ComUty_FaceBoardHpMp
         const float x = bx - 1, y = by + 56 + 20 * k;
-        boardLabel(statusLabels[k ? 2 : 1], x, y, 22, 10, false, false);
+        gaugeLabel(statusLabels[k ? 2 : 1], bx - 1.0f, y + 0.0f);
         drawShopNumber(m, k ? mp : hp, x + 22, y - 4, 5, 12, a);
         m.picture(k ? 65 : 66, x + 82, y - 4, a); // the slash remains the atlas glyph
         drawShopNumber(m, k ? mpMax : hpMax, x + 94, y - 4, 5, 12, a);
@@ -1011,7 +1022,7 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     { // __ComUty_FaceBoardNextExp
         const float x = bx - 2, y = by + 96;
         const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
-        boardLabel(statusLabels[3], x, y - 5.0f, 82, 10, false, false);
+        gaugeLabel(statusLabels[3], bx - 1.0f, y + 0.0f);
         drawShopNumber(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), x + 82, y - 4, 6, 12, a);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
@@ -1023,7 +1034,7 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     for (int k = 0; k < 5; ++k) {
         const float y = by + 116 + 20 * k;
         m.quad(bx + 12, y, 52, 12, white, white); // same size and position as atlas pictures 83..87
-        boardLabel(kBoardStatLabel[k], bx + 12, y, 52, 12, true, true);
+        statChipLabel(kBoardStatLabel[k], bx + 12, y, 52, 12);
         m.picture(88, bx + 64, y + 11, a); // underline stays as before
         if (k == 0) drawShopNumber(m, values[0], bx + 68, y - 2, 7, 12, a);
         else drawShopNumber(m, values[k], bx + 80, y - 2, 4, 12, a);
