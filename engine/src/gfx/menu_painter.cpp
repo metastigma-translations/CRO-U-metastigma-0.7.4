@@ -302,7 +302,7 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
         const bool savedCleanOutline = cleanOutline_;
         outline_ = false;
         cleanOutline_ = true;
-        textCentred(label, start + glyphWidth + gap, y + 12, true, alpha, size, false);
+        textCentred(label, start + glyphWidth + gap, y + 12, true, alpha, size, true);
         outline_ = savedOutline;
         cleanOutline_ = savedCleanOutline;
     }

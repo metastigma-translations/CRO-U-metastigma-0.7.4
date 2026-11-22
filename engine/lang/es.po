@@ -108,7 +108,7 @@ msgstr ""
 msgid "Escape"
 msgstr ""
 
-#: src/app/menus.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Check"
 msgstr ""
 
@@ -185,6 +185,14 @@ msgid "Graphics"
 msgstr "Gráficos"
 
 #: src/app/scene_fx.cpp
+msgid "Japanese"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "English"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Text Language"
 msgstr "Idioma del texto"
 
@@ -204,9 +212,8 @@ msgstr "Ayuda de controles"
 
 #: src/app/scene_fx.cpp
 msgid ""
-"Show the control hints and status overlay. Off hides the WASD help; F3 is a shortcut."
+"Show the control hints and status overlay. Disable hides the WASD help; F3 is a shortcut."
 msgstr ""
-"Muestra la ayuda de controles y el estado en pantalla. Si no, se oculta la ayuda WASD; F3 la alterna."
 
 #: src/app/scene_fx.cpp
 msgid "Import Vita Saves"

@@ -108,7 +108,7 @@ msgstr ""
 msgid "Escape"
 msgstr ""
 
-#: src/app/menus.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Check"
 msgstr ""
 
@@ -185,6 +185,14 @@ msgid "Graphics"
 msgstr "グラフィック"
 
 #: src/app/scene_fx.cpp
+msgid "Japanese"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "English"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Text Language"
 msgstr "テキスト言語"
 
@@ -203,8 +211,8 @@ msgstr "操作ヒント"
 
 #: src/app/scene_fx.cpp
 msgid ""
-"Show the control hints and status overlay. Off hides the WASD help; F3 is a shortcut."
-msgstr "操作ヒントとステータス表示を出す。オフでWASDの説明を隠す。F3で切り替え"
+"Show the control hints and status overlay. Disable hides the WASD help; F3 is a shortcut."
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Import Vita Saves"

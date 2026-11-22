@@ -108,7 +108,7 @@ msgstr ""
 msgid "Escape"
 msgstr ""
 
-#: src/app/menus.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Check"
 msgstr ""
 
@@ -200,11 +200,6 @@ msgstr "移植版自身文本（这些选项及提示信息）的语言；自动
 #: src/app/scene_fx.cpp
 msgid "Control Hints"
 msgstr "操作提示"
-
-#: src/app/scene_fx.cpp
-msgid ""
-"Show the control hints and status overlay. Off hides the WASD help; F3 is a shortcut."
-msgstr "显示操作提示和状态信息。关闭后隐藏WASD说明；快捷键为F3。"
 
 #: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
@@ -618,6 +613,19 @@ msgstr "原始方式绘制八次偏移副本；修复方式只绘制一次抗锯
 #: src/app/scene_fx.cpp
 msgid "Quit the game?"
 msgstr "要退出游戏吗？"
+
+#: src/app/scene_fx.cpp
+msgid ""
+"Show the control hints and status overlay. Disable hides the WASD help; F3 is a shortcut."
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "Japanese"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "English"
+msgstr ""
 
 #: src/gfx/render_device.hpp
 msgid "needs the Vulkan renderer"

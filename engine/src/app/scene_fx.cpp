@@ -1052,15 +1052,14 @@ std::vector<OptRow> optionRows(App& app, int page) {
                     }
                 }
             });
-            if (!app.fanText) rows.back().valueTex = &app.charSheet;
-            const float uv[4] = {88.0f * float(app.language), 0, 88, 24};
-            std::memcpy(rows.back().valueUv, uv, sizeof uv);
+            // The selected language name is rendered by the port font like every other button value.
         } else {
         OptRow lang;
         lang.label = sysLabel(app, 58082, "Language");
         lang.kind = OptControl::Pair;
-        lang.words[0] = 37; // Japanese
-        lang.words[1] = 38; // English
+        lang.words[0] = lang.words[1] = -1;
+        lang.texts[0] = tr("Japanese");
+        lang.texts[1] = tr("English");
         lang.selected = app.fanText ? -1 : app.language == 0 ? 0 : app.language == 1 ? 1 : -1;
         lang.act = [&app](int i) { setLanguageChoice(app, i); };
         rows.push_back(lang);
@@ -1095,7 +1094,7 @@ std::vector<OptRow> optionRows(App& app, int page) {
         onOff(sysLabel(app, 58109, "Lock Screen Orientation"), &app.lockOrientation,
               [&app] { applyOrientation(app, app.lockOrientation); });
         onOff(tr("Control Hints"), &app.showHud, nullptr);
-        rows.back().hint = tr("Show the control hints and status overlay. Off hides the WASD help; F3 is a shortcut.");
+        rows.back().hint = tr("Show the control hints and status overlay. Disable hides the WASD help; F3 is a shortcut.");
         value(tr("Import Vita Saves"), tr("Choose Folder"), [&app](int dir) {
             if (dir == 0 && app.optionsFromTitle) app.saveImport.begin("omega", app.window);
         });
@@ -1565,7 +1564,7 @@ void drawOptions(App& app, float, float) {
         const float cx = kOptCtrlX + ctrlX;
         switch (row.kind) {
         case OptControl::Check:
-            m.button(cx + 120, y - 8, -1, menuWordText(23), false, dim, cursor && row.enabled, true);
+            m.button(cx + 120, y - 8, -1, tr("Check"), false, dim, cursor && row.enabled, true);
             break;
         case OptControl::Gauge: {
             App::GaugeEase& e = app.gaugeEase[row.gauge];
@@ -1576,15 +1575,11 @@ void drawOptions(App& app, float, float) {
             break;
         }
         case OptControl::Pair:
-            for (int k = 0; k < 2; ++k) {
-                const bool onOff = row.texts[k] == menuWordText(33) || row.texts[k] == menuWordText(34);
-                m.button(cx + 120 * k, y - 8, onOff ? -1 : row.words[k], row.texts[k], row.selected == k, a, false, onOff);
-            }
+            for (int k = 0; k < 2; ++k)
+                m.button(cx + 120 * k, y - 8, -1, row.texts[k], row.selected == k, a, false, true);
             break;
         case OptControl::Value: // our picker: the value on a button with the Back arrows either side
-            m.button(cx + 60, y - 8, -1, row.valueTex ? std::string() : row.valueText, false, dim, cursor && row.enabled);
-            if (row.valueTex) // (where the button's word goes)
-                m.imagePieceTo(*row.valueTex, cx + 70, y, 88, 24, row.valueUv[0], row.valueUv[1], row.valueUv[2], row.valueUv[3], dim);
+            m.button(cx + 60, y - 8, -1, row.valueText, false, dim, cursor && row.enabled, true);
             m.piece(cx + 36, y + 4, 336, 880, 16, 16, dim);
             m.piece(cx + 180, y + 4, 352, 880, 16, 16, dim);
             break;
@@ -1626,7 +1621,7 @@ void drawOptions(App& app, float, float) {
             m.plate(336, 104, 0, -1, app.saveImport.focus == 0, 1, false, tr("Yes"), true);
             m.plate(336, 160, 1, -1, app.saveImport.focus == 1, 1, false, tr("No"), true);
         } else if (app.saveImport.state == vitaimport::Session::Result) {
-            m.plate(336, 104, -1, -1, true, 1, false, "OK");
+            m.plate(336, 104, -1, -1, true, 1, false, "OK", true);
         }
     }
     if (app.resetAsk) { // OptionPrc 9 / 10: the message board (57078, then 57079), Yes / No at (336, 104 / 160)
