@@ -927,6 +927,22 @@ void drawShopNumber(cr::MenuPainter& m, int value, float x, float y, int digits,
                 alpha);
 }
 
+// Status-only numeric values use the selected font: white glyphs with the standard black outline.
+// Preserve each 14x14 atlas number slot's right/left alignment and vertical centre.
+void drawStatusNumber(cr::MenuPainter& m, int value, float x, float y, int digits, float step, float alpha,
+                      bool left) {
+    const std::string text = std::to_string(std::abs(value));
+    float size = 14.0f;
+    const float slotWidth = float(digits) * step;
+    float width = m.textWidth(text, size);
+    if (width > slotWidth - 2.0f && width > 0.0f) {
+        size *= (slotWidth - 2.0f) / width;
+        width = m.textWidth(text, size);
+    }
+    const float textX = left ? x : x + slotWidth - width;
+    m.textCentred(text, textX, y + 7.0f, false, alpha, size);
+}
+
 // __ComUty_SubColorBar: a 140-wide bar, `type` 0 the black track, 1 HP red -> orange, 2 MP green
 // -> orange, 3 experience blue -> lilac (0xc8800), filled to value / most
 void drawShopBar(cr::MenuPainter& m, float x, float y, float value, float most, int type, float alpha) {
@@ -962,11 +978,16 @@ void drawHelpWindow(App& app, cr::MenuPainter& m, int item, float a, float dx, f
 // ComUty_StateBoardDraw at (bx, by) for character c; `item` (if > 0) shows what wearing it changes;
 // `record` draws the small record picture over the name (param_11: the Status page leaves it out);
 // a seed `item` (3..6) marks its stat with `seeds` x 10 (param_9: the Camp's board after use)
-void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool record = true, int seeds = 0) {
+void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool record = true, int seeds = 0,
+                   bool fontNumbers = false) {
     using namespace shopui;
     cr::MenuPainter& m = app.menu;
     const cr::PartyMember& pm = app.game.party[size_t(c)];
     const float white[4] = {1, 1, 1, a};
+    auto boardNumber = [&](int value, float x, float y, int digits, float step, int style, bool left) {
+        if (fontNumbers) drawStatusNumber(m, value, x, y, digits, step, a, left);
+        else drawShopNumber(m, value, x, y, digits, step, a, style, left);
+    };
     // One common font size for every Status-board label. Pick the largest size that
     // fits the narrowest label cell, and reserve the number column beside NEXT.
     const std::string statusLabels[9] = {
@@ -1006,16 +1027,20 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     m.textCentred(name, bx + 12 + (143 - m.textWidth(name, 14)) / 2, by + 5, true, a, 14);
     if (record) m.picture(148 + std::clamp(c, 0, cr::kCharacters - 1), bx - 8, by - 32, a); // ComUty_StateBoardDraw: 0x94 + record
     m.quad(bx + 12, by + 32, 143, 15, white, white); // level
-    m.textCentred(statusLabels[0], bx + 50, by + 40.5f, true, a, 12, false, false, true);
-    drawShopNumber(m, pm.level, bx + 80, by + 33, 3, 12, a, 2, true);
+    const float levelLabelWidth = m.textWidth(statusLabels[0], 14);
+    // The full Russian word fits in the left part of the white strip; centre it in that area
+    // and lift the line box to the actual vertical centre of the strip.
+    m.textCentred(statusLabels[0], bx + 12 + (62.0f - levelLabelWidth) * 0.5f,
+                  by + 39.5f, true, a, 14, false, false, true);
+    boardNumber(pm.level, bx + 80, by + 33, 3, 12, 2, true);
     const int hpMax = cr::memberStat(app.game, c, cr::kHp, app.itemTable), mpMax = cr::memberStat(app.game, c, cr::kMp, app.itemTable);
     const int hp = pm.hp < 0 ? hpMax : pm.hp, mp = pm.mp < 0 ? mpMax : pm.mp;
     for (int k = 0; k < 2; ++k) { // __ComUty_FaceBoardHpMp
         const float x = bx - 1, y = by + 56 + 20 * k;
         gaugeLabel(statusLabels[k ? 2 : 1], bx - 1.0f, y + 0.0f);
-        drawShopNumber(m, k ? mp : hp, x + 22, y - 4, 5, 12, a);
+        boardNumber(k ? mp : hp, x + 22, y - 4, 5, 12, 0, false);
         m.picture(k ? 65 : 66, x + 82, y - 4, a); // the slash remains the atlas glyph
-        drawShopNumber(m, k ? mpMax : hpMax, x + 94, y - 4, 5, 12, a);
+        boardNumber(k ? mpMax : hpMax, x + 94, y - 4, 5, 12, 0, false);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
     }
@@ -1023,7 +1048,7 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         const float x = bx - 2, y = by + 96;
         const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
         gaugeLabel(statusLabels[3], bx - 1.0f, y + 0.0f);
-        drawShopNumber(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), x + 82, y - 4, 6, 12, a);
+        boardNumber(pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), x + 82, y - 4, 6, 12, 0, false);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
     }
@@ -1036,8 +1061,8 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         m.quad(bx + 12, y, 52, 12, white, white); // same size and position as atlas pictures 83..87
         statChipLabel(kBoardStatLabel[k], bx + 12, y, 52, 12);
         m.picture(88, bx + 64, y + 11, a); // underline stays as before
-        if (k == 0) drawShopNumber(m, values[0], bx + 68, y - 2, 7, 12, a);
-        else drawShopNumber(m, values[k], bx + 80, y - 2, 4, 12, a);
+        if (k == 0) boardNumber(values[0], bx + 68, y - 2, 7, 12, 0, false);
+        else boardNumber(values[k], bx + 80, y - 2, 4, 12, 0, false);
     }
     if (item <= 0) return;
     int delta[6] = {0, 0, 0, 0, 0, 0};
@@ -3764,7 +3789,7 @@ void drawCamp(App& app) {
                 r.setLayer(keep);
             }
             right(); // (the Vita's board at 0x134 as 3.1.0's; its lists - the table's - 43 to the right)
-            if (c.statusView == 0) drawShopBoard(app, 308 + 200 * (1 - ease), 68, ch, 0, ease, false); // (StateBoardDraw param_11 = 0)
+            if (c.statusView == 0) drawShopBoard(app, 308 + 200 * (1 - ease), 68, ch, 0, ease, false, 0, true); // Status screen: font digits
             else { // (MuScrList mode 0 as the others - code reading only: no video shows the Status page)
                 rightV();
                 scrollList(kRowX, int(c.list.size()), [&](int k, float x, float y, bool lit) {

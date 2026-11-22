@@ -162,7 +162,7 @@ msgstr "Ом"
 
 #: src/app/menus.cpp
 msgid "LV"
-msgstr "ур"
+msgstr "Уровень"
 
 #: src/app/menus.cpp
 msgid "HP"
