@@ -185,6 +185,14 @@ msgid "Graphics"
 msgstr "그래픽"
 
 #: src/app/scene_fx.cpp
+msgid "Japanese"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "English"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Text Language"
 msgstr "텍스트 언어"
 
@@ -203,8 +211,8 @@ msgstr "조작 힌트"
 
 #: src/app/scene_fx.cpp
 msgid ""
-"Show the control hints and status overlay. Off hides the WASD help; F3 is a shortcut."
-msgstr "조작 힌트와 상태 표시를 보여 줍니다. 끄면 WASD 도움말이 숨겨집니다. F3로 전환"
+"Show the control hints and status overlay. Disable hides the WASD help; F3 is a shortcut."
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
