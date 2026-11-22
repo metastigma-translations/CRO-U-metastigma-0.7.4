@@ -108,7 +108,7 @@ msgstr ""
 msgid "Escape"
 msgstr ""
 
-#: src/app/menus.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Check"
 msgstr ""
 
