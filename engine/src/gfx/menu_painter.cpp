@@ -285,7 +285,9 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
         piece(x + 80, y, 0, 224, 76, 24, alpha); // other menus retain the complete atlas label
     } else {
         // Keep the original atlas return glyph; replace only its English lettering with the selected font.
-        constexpr float glyphWidth = 20.0f, gap = 5.0f, labelMaxWidth = 92.0f;
+        // The atlas return glyph occupies only the first 18 px of this cell; a wider crop
+        // includes a few pixels of the original English "Back" lettering.
+        constexpr float glyphWidth = 18.0f, gap = 5.0f, labelMaxWidth = 92.0f;
         float size = 14.0f;
         float width = textWidth(label, size);
         if (width > labelMaxWidth) size = std::max(8.0f, std::floor(size * labelMaxWidth / width));
@@ -293,7 +295,16 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
         const float total = glyphWidth + gap + width;
         const float start = x + 56.0f + (120.0f - total) / 2.0f;
         piece(start, y, 0, 224, glyphWidth, 24, alpha);
-        textCentred(label, start + glyphWidth + gap, y + 12, false, alpha, size, true);
+
+        // The original button uses plain black lettering: bypass the optional menu outline
+        // and gradient for this label only, without changing the setting for other text.
+        const bool savedOutline = outline_;
+        const bool savedCleanOutline = cleanOutline_;
+        outline_ = false;
+        cleanOutline_ = true;
+        textCentred(label, start + glyphWidth + gap, y + 12, true, alpha, size, false);
+        outline_ = savedOutline;
+        cleanOutline_ = savedCleanOutline;
     }
 }
 
