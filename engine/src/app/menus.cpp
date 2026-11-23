@@ -1052,10 +1052,12 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     for (int k = 0; k < 2; ++k) { // __ComUty_FaceBoardHpMp
         const float x = bx - 1, y = by + 56 + 20 * k;
         boardNumber(k ? mp : hp, x + 22, y - 4, 5, 12, 0, false);
-        m.text("/", x + 82, y - 4, false, a, 14); // selected font; preserve the atlas slash's exact top-left origin
         boardNumber(k ? mpMax : hpMax, x + 94, y - 4, 5, 12, 0, false);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
+        // Draw the slash last, above both bars. Preserve its X origin and lift it clear of the track.
+        // HP stays white/black; MP is black with a white outline for contrast on the dark track.
+        m.text("/", x + 82, y - 8, k != 0, a, 14);
         gaugeLabel(statusLabels[k ? 2 : 1], bx + 18.0f, y);
     }
     { // __ComUty_FaceBoardNextExp
@@ -1588,10 +1590,12 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
         const float hx = x + 96, hy = y + 50 + 20.0f * float(k);
         m.picture(k ? 63 : 62, hx, hy, a);
         drawShopNumber(m, k ? mp : hp, hx + 22, hy - 4, 5, 12, a, 2);
-        m.picture(65, hx + 82, hy - 4, a);
         drawShopNumber(m, k ? mpMax : hpMax, hx + 94, hy - 4, 5, 12, a, 2);
         drawShopBar(m, hx + 16, hy + 9, 1, 1, 0, a);
         drawShopBar(m, hx + 15, hy + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
+        // The character-card slash is font-rendered too, after the bars so it cannot be masked.
+        // Keep the original X origin; raise the glyph and use black/white only for the MP row.
+        m.text("/", hx + 82, hy - 8, k != 0, a, 14);
     }
     const float nx = x + 96, ny = y + 90;
     const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
