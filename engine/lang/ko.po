@@ -161,6 +161,14 @@ msgid "Ohm"
 msgstr ""
 
 #: src/app/menus.cpp
+msgid "Date"
+msgstr "Date"
+
+#: src/app/menus.cpp
+msgid "Played in game"
+msgstr "Played in game"
+
+#: src/app/menus.cpp
 msgid "LV"
 msgstr ""
 
