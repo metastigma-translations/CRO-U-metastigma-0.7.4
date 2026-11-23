@@ -470,23 +470,8 @@ void drawSaveDate(App& app, cr::MenuPainter& m, const cr::SaveData& d, float a, 
         m.textCentred(label, x + (w - width) * 0.5f, y + h * 0.5f, false, a, size,
                       false, false, false);
     };
-    auto saveNumber = [&](int value, float x, float y, int digits) {
-        const std::string valueText = std::to_string(std::abs(value));
-        const float slotWidth = float(digits) * 12.0f;
-        float size = 14.0f;
-        float width = m.textWidth(valueText, size);
-        if (width > slotWidth - 2.0f && width > 0.0f) size *= (slotWidth - 2.0f) / width;
-        width = m.textWidth(valueText, size);
-        // Each digit is centred in its own 12-unit cell (or in the combined day/year cell).
-        m.textCentred(valueText, x + (slotWidth - width) * 0.5f, y + 7.0f, false, a, size);
-    };
-    auto saveSymbol = [&](const char* symbol, float x, float y, float slotWidth) {
-        constexpr float size = 14.0f;
-        const float width = m.textWidth(symbol, size);
-        m.textCentred(symbol, x + (slotWidth - width) * 0.5f, y + 7.0f,
-                      false, a, size, false, false, false);
-    };
-
+    // The date and time are each rendered as a single string: this preserves natural
+    // word/number spacing and avoids artificial gaps between independently centred glyph cells.
     // Rebuild the date and played-time labels from the selected menu font. Keep the panel
     // geometry and rules, but put the rules behind the outlined headings.
     m.quad(324 + dx, 12, 148, 64, dark, dark);
@@ -498,28 +483,22 @@ void drawSaveDate(App& app, cr::MenuPainter& m, const cr::SaveData& d, float a, 
         "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
     };
     const int month = std::clamp(tm.tm_mon, 0, 11);
-    // The month gets a wider cell; the font size is reduced only when a full name needs it.
-    centredLabel(kMonth[month], 326 + dx, 38, 60, 16, 14.0f);
-    saveNumber(tm.tm_mday, 386 + dx, 38, 2);
-    saveSymbol(".", 410 + dx, 38, 12.0f);
-    saveNumber(tm.tm_year + 1900, 422 + dx, 38, 4);
+    const std::string dateText = std::string(kMonth[month]) + " " +
+        std::to_string(tm.tm_mday) + "." + std::to_string(tm.tm_year + 1900);
+    centredLabel(dateText, 326 + dx, 38, 144, 16, 14.0f);
 
-    const int digit[4] = {tm.tm_hour / 10, tm.tm_hour % 10, tm.tm_min / 10, tm.tm_min % 10};
-    static const float kAt[4] = {0, 12, 36, 48};
-    for (int i = 0; i < 4; ++i)
-        if (i || tm.tm_hour >= 10) saveNumber(digit[i], 368 + dx + kAt[i], 58, 1);
-    saveSymbol(":", 392 + dx, 58, 12.0f);
+    const std::string clockText = std::to_string(tm.tm_hour) + ":" +
+        (tm.tm_min < 10 ? "0" : "") + std::to_string(tm.tm_min);
+    centredLabel(clockText, 324 + dx, 58, 148, 18, 20.0f);
 
     const int secs = int(std::max(0.0, d.playSeconds));
     const int hours = std::min(999, secs / 3600), mins = std::min(59, secs / 60 % 60);
     m.quad(324 + dx, 84, 148, 40, dark, dark);
     m.quad(325 + dx, 100, 146, 1, white, white);
     centredLabel(tr("TOTAL PLAYTIME"), 344 + dx, 88, 108, 12, 14.0f);
-    const int pd[5] = {hours / 100, hours % 100 / 10, hours % 10, mins / 10, mins % 10};
-    static const float kPlay[5] = {32, 44, 56, 80, 92};
-    for (int i = 0; i < 5; ++i)
-        if (i || pd[i]) saveNumber(pd[i], 324 + dx + kPlay[i], 84 + 22, 1);
-    saveSymbol(":", 324 + dx + 68, 84 + 22, 12.0f);
+    const std::string playTime = std::to_string(hours) + ":" +
+        (mins < 10 ? "0" : "") + std::to_string(mins);
+    centredLabel(playTime, 324 + dx, 106, 148, 18, 20.0f);
 }
 
 void drawSaveScreen(App& app) {
@@ -1088,11 +1067,11 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     const int hp = pm.hp < 0 ? hpMax : pm.hp, mp = pm.mp < 0 ? mpMax : pm.mp;
     for (int k = 0; k < 2; ++k) { // __ComUty_FaceBoardHpMp
         const float x = bx - 1, y = by + 56 + 20 * k;
-        boardNumber(k ? mp : hp, x + 22, y - 4, 5, 12, 0, false);
-        boardNumber(k ? mpMax : hpMax, x + 94, y - 4, 5, 12, 0, false);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
-        // Draw the slash last, above both bars. Preserve its X origin and lift it clear of the track.
+        // Current and maximum values must stay visible over the coloured gauge fill.
+        boardNumber(k ? mp : hp, x + 22, y - 4, 5, 12, 0, false);
+        boardNumber(k ? mpMax : hpMax, x + 94, y - 4, 5, 12, 0, false);
         // HP stays white/black; MP is black with a white outline for contrast on the dark track.
         m.text("/", x + 82, y - 8, k != 0, a, 14);
         gaugeLabel(statusLabels[k ? 2 : 1], bx + 14.0f, y);
@@ -1100,9 +1079,9 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     { // __ComUty_FaceBoardNextExp
         const float x = bx - 1, y = by + 96;
         const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
-        boardNumber(pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), x + 82, y - 4, 6, 12, 0, false);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
+        boardNumber(pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), x + 82, y - 4, 6, 12, 0, false);
         gaugeLabel(statusLabels[3], bx + 14.0f, y);
     }
     // Rebuild the five white atlas label chips without their baked English lettering.
@@ -1637,20 +1616,20 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
 
     for (int k = 0; k < 2; ++k) {
         const float hx = x + 96, hy = y + 50 + 20.0f * float(k);
-        drawStatusNumber(m, k ? mp : hp, hx + 22, hy - 4, 5, 12, a, false);
-        drawStatusNumber(m, k ? mpMax : hpMax, hx + 94, hy - 4, 5, 12, a, false);
         drawShopBar(m, hx + 16, hy + 9, 1, 1, 0, a);
         drawShopBar(m, hx + 15, hy + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
-        // Use the selected font for captions and slash, and draw them after the tracks.
-        // HP keeps white/black; the MP slash is black with a white outline.
+        // Values and labels are rendered after the gauge fill so the coloured bar cannot mask them.
+        drawStatusNumber(m, k ? mp : hp, hx + 22, hy - 4, 5, 12, a, false);
+        drawStatusNumber(m, k ? mpMax : hpMax, hx + 94, hy - 4, 5, 12, a, false);
         m.textCentred(gaugeLabels[k], hx + 15.0f, hy + 4.0f, false, a, faceGaugeLabelSize);
+        // HP keeps white/black; the MP slash is black with a white outline.
         m.text("/", hx + 82, hy - 8, k != 0, a, 14);
     }
     const float nx = x + 96, ny = y + 90;
     const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
-    drawStatusNumber(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), nx + 82, ny - 4, 6, 12, a, false);
     drawShopBar(m, nx + 16, ny + 9, 1, 1, 0, a);
     drawShopBar(m, nx + 15, ny + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
+    drawStatusNumber(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), nx + 82, ny - 4, 6, 12, a, false);
     m.textCentred(gaugeLabels[2], nx + 15.0f, ny + 4.0f, false, a, faceGaugeLabelSize);
 }
 
