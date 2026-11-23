@@ -382,7 +382,22 @@ void MenuPainter::promptButton(float x, float y, float size, bool secondary, flo
         auto line = [&](float px, float py, float x0, float y0, float x1, float y1) {
             return distanceToSegmentSquared(px, py, x0, y0, x1, y1) <= halfStroke * halfStroke;
         };
-        // The same round face is used in every layout. Its white vector glyph is X / O or A / B.
+        // The same round face is used in every layout. Colour the glyph, not the dark button face:
+    // PlayStation X: pale violet, O: red; Xbox A: green, B: red.
+    uint8_t glyphRed = 0, glyphGreen = 0, glyphBlue = 0;
+    if (xboxPrompts_) {
+        if (secondary) { // Xbox B
+            glyphRed = 0xE5; glyphGreen = 0x45; glyphBlue = 0x45;
+        } else { // Xbox A
+            glyphRed = 0x80; glyphGreen = 0xC3; glyphBlue = 0x42;
+        }
+    } else {
+        if (secondary) { // PlayStation O
+            glyphRed = 0xE5; glyphGreen = 0x39; glyphBlue = 0x35;
+        } else { // PlayStation X
+            glyphRed = 0xC7; glyphGreen = 0xA6; glyphBlue = 0xE8;
+        }
+    }
         for (int sy = 0; sy < high.height; ++sy) {
             const float py = (float(sy) + 0.5f) / float(kSupersample);
             for (int sx = 0; sx < high.width; ++sx) {
@@ -430,7 +445,9 @@ void MenuPainter::promptButton(float x, float y, float size, bool secondary, flo
                         line(px, py, middleX, bottomY, leftX, bottomY);
                 }
                 uint8_t* pixel = high.rgba.data() + (size_t(sy) * size_t(high.width) + size_t(sx)) * 4;
-                pixel[0] = pixel[1] = pixel[2] = onGlyph ? 255 : 0;
+                pixel[0] = onGlyph ? glyphRed : 0;
+                pixel[1] = onGlyph ? glyphGreen : 0;
+                pixel[2] = onGlyph ? glyphBlue : 0;
                 pixel[3] = 255;
             }
         }
@@ -440,20 +457,26 @@ void MenuPainter::promptButton(float x, float y, float size, bool secondary, flo
         icon.rgba.resize(size_t(icon.width) * size_t(icon.height) * 4, 0);
         for (int oy = 0; oy < icon.height; ++oy) {
             for (int ox = 0; ox < icon.width; ++ox) {
-                int covered = 0, white = 0;
+                int covered = 0, red = 0, green = 0, blue = 0;
                 for (int yy = 0; yy < kSupersample; ++yy) {
                     for (int xx = 0; xx < kSupersample; ++xx) {
                         const int hx = ox * kSupersample + xx, hy = oy * kSupersample + yy;
                         const uint8_t* sample = high.rgba.data() +
                             (size_t(hy) * size_t(high.width) + size_t(hx)) * 4;
-                        if (sample[3]) { ++covered; if (sample[0]) ++white; }
+                        if (sample[3]) {
+                            ++covered;
+                            red += sample[0];
+                            green += sample[1];
+                            blue += sample[2];
+                        }
                     }
                 }
                 uint8_t* pixel = icon.rgba.data() + (size_t(oy) * size_t(icon.width) + size_t(ox)) * 4;
                 pixel[3] = uint8_t((covered * 255 + kSamplesPerPixel / 2) / kSamplesPerPixel);
                 if (covered) {
-                    const uint8_t value = uint8_t((white * 255 + covered / 2) / covered);
-                    pixel[0] = pixel[1] = pixel[2] = value;
+                    pixel[0] = uint8_t((red + covered / 2) / covered);
+                    pixel[1] = uint8_t((green + covered / 2) / covered);
+                    pixel[2] = uint8_t((blue + covered / 2) / covered);
                 }
             }
         }
