@@ -170,7 +170,7 @@ msgstr "ПРОВЕДЕНО В ИГРЕ"
 
 #: src/app/menus.cpp
 msgid "LV"
-msgstr "Уровень"
+msgstr "УРОВЕНЬ"
 
 #: src/app/menus.cpp
 msgid "HP"

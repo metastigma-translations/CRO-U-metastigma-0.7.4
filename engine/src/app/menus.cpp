@@ -1020,8 +1020,8 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         else drawShopNumber(m, value, x, y, digits, step, a, style, left);
     };
     auto gaugeNumber = [&](int value, float x, float baselineY, int digits, float step, int style, bool left) {
-        // Gauge values use black glyphs with a white outline in both font and atlas-number modes.
-        drawStatusNumberAtBaseline(m, value, x, baselineY, digits, step, a, left, true);
+        // Status and Equipment use white gauge values; other board contexts keep black glyphs.
+        drawStatusNumberAtBaseline(m, value, x, baselineY, digits, step, a, left, !fontNumbers);
     };
     // One common font size for every Status-board label. Pick the largest size that
     // fits the narrowest label cell, and reserve the number column beside NEXT.
@@ -1075,7 +1075,8 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         constexpr float kLevelGroupOpticalY = -1.1f;
         const float groupX = bx + 12 + (143.0f - groupWidth) * 0.5f + kLevelGroupOpticalX;
         m.textCentred(statusLabels[0], groupX, by + 39.5f + kLevelGroupOpticalY, true, a, 14, false, false, true);
-        boardNumber(pm.level, groupX + labelWidth + kLevelGroupGap, by + 32.5f + kLevelGroupOpticalY, 3, 12, 2, true);
+        drawStatusNumber(m, pm.level, groupX + labelWidth + kLevelGroupGap,
+                         by + 32.5f + kLevelGroupOpticalY, 3, 12, a, true, true);
     } else {
         const float levelLabelWidth = m.textWidth(statusLabels[0], 14);
         m.textCentred(statusLabels[0], bx + 12 + (62.0f - levelLabelWidth) * 0.5f,
@@ -1092,7 +1093,7 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         gaugeNumber(k ? mp : hp, x + 22, y + 8.0f, 5, 12, 0, false);
         gaugeNumber(k ? mpMax : hpMax, x + 94, y + 8.0f, 5, 12, 0, false);
         // All gauge slashes use black glyphs with a white outline.
-        m.text("/", x + 82, y - 9, true, a, 14);
+        m.text("/", x + 82, y - 9, !fontNumbers, a, 14);
         gaugeLabel(statusLabels[k ? 2 : 1], bx + 14.0f, y);
     }
     { // __ComUty_FaceBoardNextExp
@@ -1113,8 +1114,9 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         m.quad(bx + 12, y, 52, 12, white, white); // same size and position as atlas pictures 83..87
         statChipLabel(kBoardStatLabel[k], bx + 12, y, 52, 12);
         m.picture(88, bx + 64, y + 11, a); // underline stays as before
-        if (k == 0) boardNumber(values[0], bx + 68, y - 2, 7, 12, 0, false);
-        else boardNumber(values[k], bx + 80, y - 2, 4, 12, 0, false);
+        const float statValueY = y - (fontNumbers ? 3.0f : 2.0f);
+        if (k == 0) boardNumber(values[0], bx + 68, statValueY, 7, 12, 0, false);
+        else boardNumber(values[k], bx + 80, statValueY, 4, 12, 0, false);
     }
     if (item <= 0) return;
     int delta[6] = {0, 0, 0, 0, 0, 0};
