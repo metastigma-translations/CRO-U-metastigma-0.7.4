@@ -223,11 +223,11 @@ void MenuPainter::headingStrip(float x, float y, const std::string& label, float
     const float solid[4] = {1, 1, 1, alpha}, clear[4] = {1, 1, 1, 0};
     const float stripY = y + 16.0f;
     // window_hd's Camp sprite: a 2-unit vertical start mark, a 2-unit transparent gap,
-    // a 28-unit opaque section, then the 158.5-unit fade to transparency.
+    // 84 units of solid white, then the 116-unit fade to transparency (204 units total).
     quad(x, stripY, 2.0f, 16.0f, solid, solid);
-    quad(x + 4.0f, stripY, std::min(28.0f, width - 4.0f), 16.0f, solid, solid);
-    const float fadeWidth = std::max(0.0f, std::min(158.5f, width - 57.5f));
-    if (fadeWidth > 0.0f) quad(x + 32.0f, stripY, fadeWidth, 16.0f, solid, clear);
+    quad(x + 4.0f, stripY, std::min(84.0f, width - 4.0f), 16.0f, solid, solid);
+    const float fadeWidth = std::max(0.0f, std::min(116.0f, width - 88.0f));
+    if (fadeWidth > 0.0f) quad(x + 88.0f, stripY, fadeWidth, 16.0f, solid, clear);
 
     float size = textSize;
     const float maxTextWidth = std::max(8.0f, width - 18.0f);
