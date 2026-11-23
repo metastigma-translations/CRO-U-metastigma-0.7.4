@@ -322,15 +322,12 @@ void MenuPainter::arrowTriangle(float x, float y, float w, float h, bool pointsR
     const float tipX = pointsRight ? x + w : x;
     const float baseX = pointsRight ? x : x + w;
     const float tipY = y + h * 0.5f;
-    const float xy[8] = pointsRight
-        ? (float[8]){X(tipX) * kScale, Y(tipY) * kScale,
-                     X(baseX) * kScale, Y(y + h) * kScale,
-                     X(baseX) * kScale, Y(y) * kScale,
-                     X(tipX) * kScale, Y(tipY) * kScale}
-        : (float[8]){X(tipX) * kScale, Y(tipY) * kScale,
-                     X(baseX) * kScale, Y(y) * kScale,
-                     X(baseX) * kScale, Y(y + h) * kScale,
-                     X(tipX) * kScale, Y(tipY) * kScale};
+    const float xy[8] = {
+        X(tipX) * kScale, Y(tipY) * kScale,
+        X(baseX) * kScale, Y(pointsRight ? y + h : y) * kScale,
+        X(baseX) * kScale, Y(pointsRight ? y : y + h) * kScale,
+        X(tipX) * kScale, Y(tipY) * kScale,
+    };
     // A solid black triangle, built by the renderer rather than sampled from window_hd.
     r_->fillQuad(xy, 0, 0, 0, alpha);
 }
