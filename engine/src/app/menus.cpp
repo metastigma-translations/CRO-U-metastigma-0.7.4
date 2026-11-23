@@ -461,28 +461,55 @@ void drawSaveDate(App& app, cr::MenuPainter& m, const cr::SaveData& d, float a, 
     localtime_r(&when, &tm);
 #endif
     const float dark[4] = {0, 0, 0, 0.5f * a}, white[4] = {1, 1, 1, a};
+    auto centredLabel = [&](const std::string& label, float x, float y, float w, float h, float size) {
+        const float available = std::max(1.0f, w - 2.0f);
+        float width = m.textWidth(label, size);
+        if (width > available && width > 0.0f) size *= available / width;
+        width = m.textWidth(label, size);
+        m.textCentred(label, x + (w - width) * 0.5f, y + h * 0.5f, false, a, size);
+    };
+    auto saveNumber = [&](int value, float x, float y, int digits) {
+        const std::string valueText = std::to_string(std::abs(value));
+        const float slotWidth = float(digits) * 12.0f;
+        float size = 14.0f;
+        float width = m.textWidth(valueText, size);
+        if (width > slotWidth - 2.0f && width > 0.0f) size *= (slotWidth - 2.0f) / width;
+        width = m.textWidth(valueText, size);
+        m.textCentred(valueText, x + slotWidth - width, y + 7.0f, false, a, size);
+    };
+
+    // Rebuild the date and played-time labels from the selected menu font; retain the original
+    // dark panels, rules, number slots and separators' positions.
     m.quad(324 + dx, 12, 148, 64, dark, dark);
-    m.picture(0x81, 372 + dx, 12, a);
+    centredLabel(tr("Date"), 372 + dx, 12, 52, 16, 20.0f);
     m.quad(325 + dx, 28, 146, 1, white, white);
-    m.picture(0x82 + std::clamp(tm.tm_mon + 1, 1, 12), 336 + dx, 38, a);
-    drawShopNumber(m, tm.tm_mday, 378 + dx, 38, 2, 12, a);
-    m.picture(0x8f, 400 + dx, 38, a);
-    drawShopNumber(m, tm.tm_year + 1900, 410 + dx, 38, 4, 12, a);
+
+    static const char* const kMonth[12] = {
+        "Янв.", "Фев.", "Мар.", "Апр.", "Май", "Июн.",
+        "Июл.", "Авг.", "Сен.", "Окт.", "Ноя.", "Дек."
+    };
+    const int month = std::clamp(tm.tm_mon, 0, 11);
+    centredLabel(kMonth[month], 336 + dx, 38, 40, 16, 14.0f);
+    saveNumber(tm.tm_mday, 378 + dx, 38, 2);
+    m.textCentred(".", 400 + dx, 45.0f, false, a, 14.0f);
+    saveNumber(tm.tm_year + 1900, 410 + dx, 38, 4);
+
     const int digit[4] = {tm.tm_hour / 10, tm.tm_hour % 10, tm.tm_min / 10, tm.tm_min % 10};
     static const float kAt[4] = {0, 12, 36, 48};
     for (int i = 0; i < 4; ++i)
-        if (i || tm.tm_hour >= 10) drawShopNumber(m, digit[i], 368 + dx + kAt[i], 58, 1, 12, a);
-    m.picture(0x4b, 392 + dx, 58, a);
+        if (i || tm.tm_hour >= 10) saveNumber(digit[i], 368 + dx + kAt[i], 58, 1);
+    m.textCentred(":", 392 + dx, 65.0f, false, a, 14.0f);
+
     const int secs = int(std::max(0.0, d.playSeconds));
     const int hours = std::min(999, secs / 3600), mins = std::min(59, secs / 60 % 60);
     m.quad(324 + dx, 84, 148, 40, dark, dark);
-    m.picture(0x82, 344 + dx, 88, a);
+    centredLabel(tr("Played in game"), 344 + dx, 88, 108, 12, 14.0f);
     m.quad(325 + dx, 100, 146, 1, white, white);
     const int pd[5] = {hours / 100, hours % 100 / 10, hours % 10, mins / 10, mins % 10};
     static const float kPlay[5] = {32, 44, 56, 80, 92};
     for (int i = 0; i < 5; ++i)
-        if (i || pd[i]) drawShopNumber(m, pd[i], 324 + dx + kPlay[i], 84 + 22, 1, 12, a);
-    m.picture(0x4b, 324 + dx + 68, 84 + 22, a);
+        if (i || pd[i]) saveNumber(pd[i], 324 + dx + kPlay[i], 84 + 22, 1);
+    m.textCentred(":", 324 + dx + 68, 84 + 22 + 7.0f, false, a, 14.0f);
 }
 
 void drawSaveScreen(App& app) {
