@@ -1089,23 +1089,23 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     const int hp = pm.hp < 0 ? hpMax : pm.hp, mp = pm.mp < 0 ? mpMax : pm.mp;
     for (int k = 0; k < 2; ++k) { // __ComUty_FaceBoardHpMp
         const float x = bx - 1, y = by + 56 + 20 * k;
-        drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
-        drawShopBar(m, x + 15, y + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
+        drawShopBar(m, x + 13, y + 9, 1, 1, 0, a);
+        drawShopBar(m, x + 12, y + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
         // Current and maximum values must stay visible over the coloured gauge fill.
         gaugeNumber(k ? mp : hp, x + 22, y + 8.0f, 5, 12, 0, false);
         gaugeNumber(k ? mpMax : hpMax, x + 94, y + 8.0f, 5, 12, 0, false);
         // All gauge slashes use black glyphs with a white outline.
         m.text("/", x + 82, y - 9, !fontNumbers, a, 14);
-        gaugeLabel(statusLabels[k ? 2 : 1], bx + 14.0f, y);
+        gaugeLabel(statusLabels[k ? 2 : 1], bx + 11.0f, y);
     }
     { // __ComUty_FaceBoardNextExp
         const float x = bx - 1, y = by + 96;
         const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
-        drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
-        drawShopBar(m, x + 15, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
+        drawShopBar(m, x + 13, y + 9, 1, 1, 0, a);
+        drawShopBar(m, x + 12, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
         gaugeNumber(pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp),
                      x + 82, y + 8.0f, 6, 12, 0, false);
-        gaugeLabel(statusLabels[3], bx + 14.0f, y);
+        gaugeLabel(statusLabels[3], bx + 11.0f, y);
     }
     // Rebuild the five white atlas label chips without their baked English lettering.
     const std::string* kBoardStatLabel = statusLabels + 4;
