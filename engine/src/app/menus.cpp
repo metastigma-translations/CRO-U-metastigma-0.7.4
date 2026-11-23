@@ -483,13 +483,28 @@ void drawSaveDate(App& app, cr::MenuPainter& m, const cr::SaveData& d, float a, 
         "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
     };
     const int month = std::clamp(tm.tm_mon, 0, 11);
-    const std::string dateText = std::string(kMonth[month]) + " " +
-        std::to_string(tm.tm_mday) + "." + std::to_string(tm.tm_year + 1900);
-    centredLabel(dateText, 326 + dx, 38, 144, 16, 14.0f);
+    const std::string monthText = kMonth[month];
+    const std::string dateNumbers = std::to_string(tm.tm_mday) + "." +
+        std::to_string(tm.tm_year + 1900);
+    // Keep one natural space between the full month and date, but lift only the numerals.
+    float dateFontSize = 14.0f;
+    const float dateCellX = 326 + dx, dateCellWidth = 144.0f;
+    const float spaceWidth = m.textWidth(" ", dateFontSize);
+    float monthWidth = m.textWidth(monthText, dateFontSize);
+    float numbersWidth = m.textWidth(dateNumbers, dateFontSize);
+    const float dateWidth = monthWidth + spaceWidth + numbersWidth;
+    if (dateWidth > dateCellWidth - 2.0f && dateWidth > 0.0f) {
+        dateFontSize *= (dateCellWidth - 2.0f) / dateWidth;
+        monthWidth = m.textWidth(monthText, dateFontSize);
+        numbersWidth = m.textWidth(dateNumbers, dateFontSize);
+    }
+    const float dateStartX = dateCellX + (dateCellWidth - monthWidth - spaceWidth - numbersWidth) * 0.5f;
+    m.textCentred(monthText, dateStartX, 46.0f, false, a, dateFontSize);
+    m.textCentred(dateNumbers, dateStartX + monthWidth + spaceWidth, 44.0f, false, a, dateFontSize);
 
     const std::string clockText = std::to_string(tm.tm_hour) + ":" +
         (tm.tm_min < 10 ? "0" : "") + std::to_string(tm.tm_min);
-    centredLabel(clockText, 324 + dx, 58, 148, 18, 20.0f);
+    centredLabel(clockText, 324 + dx, 56, 148, 18, 20.0f);
 
     const int secs = int(std::max(0.0, d.playSeconds));
     const int hours = std::min(999, secs / 3600), mins = std::min(59, secs / 60 % 60);
@@ -498,7 +513,7 @@ void drawSaveDate(App& app, cr::MenuPainter& m, const cr::SaveData& d, float a, 
     centredLabel(tr("TOTAL PLAYTIME"), 344 + dx, 88, 108, 12, 14.0f);
     const std::string playTime = std::to_string(hours) + ":" +
         (mins < 10 ? "0" : "") + std::to_string(mins);
-    centredLabel(playTime, 324 + dx, 106, 148, 18, 20.0f);
+    centredLabel(playTime, 324 + dx, 104, 148, 18, 20.0f);
 }
 
 void drawSaveScreen(App& app) {
