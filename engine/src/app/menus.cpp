@@ -466,7 +466,9 @@ void drawSaveDate(App& app, cr::MenuPainter& m, const cr::SaveData& d, float a, 
         float width = m.textWidth(label, size);
         if (width > available && width > 0.0f) size *= available / width;
         width = m.textWidth(label, size);
-        m.textCentred(label, x + (w - width) * 0.5f, y + h * 0.5f, false, a, size);
+        // Explicitly keep the font outline; draw this text after any rule crossing its line box.
+        m.textCentred(label, x + (w - width) * 0.5f, y + h * 0.5f, false, a, size,
+                      false, false, false);
     };
     auto saveNumber = [&](int value, float x, float y, int digits) {
         const std::string valueText = std::to_string(std::abs(value));
@@ -475,41 +477,49 @@ void drawSaveDate(App& app, cr::MenuPainter& m, const cr::SaveData& d, float a, 
         float width = m.textWidth(valueText, size);
         if (width > slotWidth - 2.0f && width > 0.0f) size *= (slotWidth - 2.0f) / width;
         width = m.textWidth(valueText, size);
-        m.textCentred(valueText, x + slotWidth - width, y + 7.0f, false, a, size);
+        // Each digit is centred in its own 12-unit cell (or in the combined day/year cell).
+        m.textCentred(valueText, x + (slotWidth - width) * 0.5f, y + 7.0f, false, a, size);
+    };
+    auto saveSymbol = [&](const char* symbol, float x, float y, float slotWidth) {
+        constexpr float size = 14.0f;
+        const float width = m.textWidth(symbol, size);
+        m.textCentred(symbol, x + (slotWidth - width) * 0.5f, y + 7.0f,
+                      false, a, size, false, false, false);
     };
 
-    // Rebuild the date and played-time labels from the selected menu font; retain the original
-    // dark panels, rules, number slots and separators' positions.
+    // Rebuild the date and played-time labels from the selected menu font. Keep the panel
+    // geometry and rules, but put the rules behind the outlined headings.
     m.quad(324 + dx, 12, 148, 64, dark, dark);
-    centredLabel(tr("DATE"), 372 + dx, 12, 52, 16, 20.0f);
     m.quad(325 + dx, 28, 146, 1, white, white);
+    centredLabel(tr("DATE"), 372 + dx, 12, 52, 16, 20.0f);
 
     static const char* const kMonth[12] = {
-        "Янв.", "Фев.", "Мар.", "Апр.", "Май", "Июн.",
-        "Июл.", "Авг.", "Сен.", "Окт.", "Ноя.", "Дек."
+        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
     };
     const int month = std::clamp(tm.tm_mon, 0, 11);
-    centredLabel(kMonth[month], 336 + dx, 38, 40, 16, 14.0f);
-    saveNumber(tm.tm_mday, 378 + dx, 38, 2);
-    m.textCentred(".", 400 + dx, 45.0f, false, a, 14.0f);
-    saveNumber(tm.tm_year + 1900, 410 + dx, 38, 4);
+    // The month gets a wider cell; the font size is reduced only when a full name needs it.
+    centredLabel(kMonth[month], 326 + dx, 38, 60, 16, 14.0f);
+    saveNumber(tm.tm_mday, 386 + dx, 38, 2);
+    saveSymbol(".", 410 + dx, 38, 12.0f);
+    saveNumber(tm.tm_year + 1900, 422 + dx, 38, 4);
 
     const int digit[4] = {tm.tm_hour / 10, tm.tm_hour % 10, tm.tm_min / 10, tm.tm_min % 10};
     static const float kAt[4] = {0, 12, 36, 48};
     for (int i = 0; i < 4; ++i)
         if (i || tm.tm_hour >= 10) saveNumber(digit[i], 368 + dx + kAt[i], 58, 1);
-    m.textCentred(":", 392 + dx, 65.0f, false, a, 14.0f);
+    saveSymbol(":", 392 + dx, 58, 12.0f);
 
     const int secs = int(std::max(0.0, d.playSeconds));
     const int hours = std::min(999, secs / 3600), mins = std::min(59, secs / 60 % 60);
     m.quad(324 + dx, 84, 148, 40, dark, dark);
-    centredLabel(tr("TOTAL PLAYTIME"), 344 + dx, 88, 108, 12, 14.0f);
     m.quad(325 + dx, 100, 146, 1, white, white);
+    centredLabel(tr("TOTAL PLAYTIME"), 344 + dx, 88, 108, 12, 14.0f);
     const int pd[5] = {hours / 100, hours % 100 / 10, hours % 10, mins / 10, mins % 10};
     static const float kPlay[5] = {32, 44, 56, 80, 92};
     for (int i = 0; i < 5; ++i)
         if (i || pd[i]) saveNumber(pd[i], 324 + dx + kPlay[i], 84 + 22, 1);
-    m.textCentred(":", 324 + dx + 68, 84 + 22 + 7.0f, false, a, 14.0f);
+    saveSymbol(":", 324 + dx + 68, 84 + 22, 12.0f);
 }
 
 void drawSaveScreen(App& app) {
