@@ -65,6 +65,10 @@ msgid "No"
 msgstr "아니요"
 
 #: src/app/menus.cpp
+msgid "OK"
+msgstr ""
+
+#: src/app/menus.cpp
 msgid "Start Game"
 msgstr "시작"
 
