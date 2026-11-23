@@ -1635,7 +1635,8 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     m.quad(underlineX, underlineY, underlineWidth, 1.0f, underlineWhite, underlineWhite);
     m.quad(underlineX + underlineWidth, underlineY, 1.0f, 1.0f, underlineBlack, underlineBlack);
     m.quad(underlineX - 1.0f, underlineY + 1.0f, underlineWidth + 2.0f, 1.0f, underlineBlack, underlineBlack);
-    m.textCentred(name, nameX, underlineY + 2.0f - m.baselineFromCentre(nameSize),
+    // Lift the outlined glyph by one menu unit: its visible lower edge now meets the underline's bottom edge.
+    m.textCentred(name, nameX, underlineY + 1.0f - m.baselineFromCentre(nameSize),
                    false, a, nameSize, false);
     m.picture(facePicture(app, c), x, y, a);
     const cr::GameState& g = gs ? *gs : app.game;
