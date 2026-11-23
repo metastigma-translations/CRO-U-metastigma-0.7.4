@@ -137,6 +137,8 @@ private:
     };
     std::map<std::string, Cached> text_;
     std::map<std::array<uint8_t, 8>, Texture> gradients_;
+    void arrowTriangle(float x, float y, float w, float h, bool pointsRight, float alpha);
+    void returnGlyph(float x, float y, float w, float h, float alpha);
     Cached& rasterise(const std::string& s, float size, bool perGlyphVerticalGradient = false,
                       bool darkVerticalGradient = false, float letterSpacing = 0);
 };
