@@ -384,6 +384,14 @@ msgid "× (the bottom button) confirms, ○ (the right one) goes back"
 msgstr "×（下方键）确定，○（右侧键）返回"
 
 #: src/app/scene_fx.cpp
+msgid "Button Layout"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "Changes only the on-screen button symbols; it does not change controller actions."
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Master Volume"
 msgstr "主音量"
 
