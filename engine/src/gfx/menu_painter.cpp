@@ -8,6 +8,7 @@
 #include "game/stage_tables.hpp"
 #include "gfx/font.hpp"
 #include "gfx/font_outline.hpp"
+#include "assets/texture.hpp"
 
 namespace cr {
 
@@ -23,6 +24,8 @@ void MenuPainter::release(Renderer& r) {
     text_.clear();
     for (auto& [key, tex] : gradients_) r.destroy(tex);
     gradients_.clear();
+    r.destroy(crossButtonTex_);
+    crossButtonTexCorePixels_ = 0;
 }
 
 void MenuPainter::piece(float x, float y, float u, float v, float w, float h, float alpha, float r, float g, float b) {
@@ -335,47 +338,97 @@ void MenuPainter::arrowTriangle(float x, float y, float w, float h, bool pointsR
 void MenuPainter::crossButton(float x, float y, float size, float alpha) {
     if (!r_ || alpha <= 0.001f || size <= 0.0f) return;
 
-    // Solid circular gamepad button, tessellated at the active output resolution.
-    constexpr int segments = 24;
-    const float cx = x + size * 0.5f, cy = y + size * 0.5f;
-    const float radius = size * 0.5f;
-    for (int i = 0; i < segments; ++i) {
-        const float a0 = (2.0f * 3.14159265358979323846f * i) / segments;
-        const float a1 = (2.0f * 3.14159265358979323846f * (i + 1)) / segments;
-        const float x0 = cx + std::cos(a0) * radius, y0 = cy + std::sin(a0) * radius;
-        const float x1 = cx + std::cos(a1) * radius, y1 = cy + std::sin(a1) * radius;
-        const float xy[8] = {
-            X(cx) * kScale, Y(cy) * kScale,
-            X(x0) * kScale, Y(y0) * kScale,
-            X(x1) * kScale, Y(y1) * kScale,
-            X(x1) * kScale, Y(y1) * kScale,
+    // Match the final on-screen pixel density (including menu scaling), then draw with a
+    // two-pixel transparent guard so the filtered edge never samples outside the icon.
+    constexpr int kSupersample = 8;
+    constexpr int kPadPixels = 2;
+    constexpr int kSamplesPerPixel = kSupersample * kSupersample;
+    const float outputScale = r_->pixelScale() * K();
+    const int corePixels = std::max(8, int(std::ceil(size * kScale * outputScale)));
+    if (!crossButtonTex_.id || crossButtonTexCorePixels_ != corePixels) {
+        r_->destroy(crossButtonTex_);
+        crossButtonTexCorePixels_ = 0;
+
+        Image high;
+        high.width = (corePixels + 2 * kPadPixels) * kSupersample;
+        high.height = high.width;
+        high.rgba.resize(size_t(high.width) * size_t(high.height) * 4, 0);
+
+        const float centre = float(corePixels) * 0.5f + float(kPadPixels);
+        const float radius = float(corePixels) * 0.48f;
+        const float endOffset = radius * 0.46f;
+        const float halfStroke = radius * 0.1125f;
+        const float ax0 = centre - endOffset, ay0 = centre - endOffset;
+        const float ax1 = centre + endOffset, ay1 = centre + endOffset;
+        const float bx0 = centre - endOffset, by0 = centre + endOffset;
+        const float bx1 = centre + endOffset, by1 = centre - endOffset;
+
+        auto distanceToSegmentSquared = [](float px, float py, float x0, float y0, float x1, float y1) {
+            const float dx = x1 - x0, dy = y1 - y0;
+            const float lengthSquared = dx * dx + dy * dy;
+            const float t = lengthSquared > 0.0f
+                ? std::clamp(((px - x0) * dx + (py - y0) * dy) / lengthSquared, 0.0f, 1.0f)
+                : 0.0f;
+            const float ex = px - (x0 + t * dx), ey = py - (y0 + t * dy);
+            return ex * ex + ey * ey;
         };
-        r_->fillQuad(xy, 0, 0, 0, alpha);
+
+        // Render a true 8x intermediate image: 0 = transparent, 1 = black disc, 2 = white X.
+        for (int sy = 0; sy < high.height; ++sy) {
+            const float py = (float(sy) + 0.5f) / float(kSupersample);
+            for (int sx = 0; sx < high.width; ++sx) {
+                const float px = (float(sx) + 0.5f) / float(kSupersample);
+                const float dx = px - centre, dy = py - centre;
+                if (dx * dx + dy * dy > radius * radius) continue;
+
+                const bool onX =
+                    distanceToSegmentSquared(px, py, ax0, ay0, ax1, ay1) <= halfStroke * halfStroke ||
+                    distanceToSegmentSquared(px, py, bx0, by0, bx1, by1) <= halfStroke * halfStroke;
+                uint8_t* pixel = high.rgba.data() + (size_t(sy) * size_t(high.width) + size_t(sx)) * 4;
+                pixel[0] = pixel[1] = pixel[2] = onX ? 255 : 0;
+                pixel[3] = 255;
+            }
+        }
+
+        // Box-downsample the 8x intermediate image into the actual output-density texture.
+        // Store straight-alpha RGBA so the renderer's normal texture blending stays correct.
+        Image icon;
+        icon.width = corePixels + 2 * kPadPixels;
+        icon.height = icon.width;
+        icon.rgba.resize(size_t(icon.width) * size_t(icon.height) * 4, 0);
+        for (int oy = 0; oy < icon.height; ++oy) {
+            for (int ox = 0; ox < icon.width; ++ox) {
+                int covered = 0, white = 0;
+                for (int yy = 0; yy < kSupersample; ++yy) {
+                    for (int xx = 0; xx < kSupersample; ++xx) {
+                        const int hx = ox * kSupersample + xx;
+                        const int hy = oy * kSupersample + yy;
+                        const uint8_t* sample = high.rgba.data() +
+                            (size_t(hy) * size_t(high.width) + size_t(hx)) * 4;
+                        if (sample[3]) {
+                            ++covered;
+                            if (sample[0]) ++white;
+                        }
+                    }
+                }
+                uint8_t* pixel = icon.rgba.data() +
+                    (size_t(oy) * size_t(icon.width) + size_t(ox)) * 4;
+                pixel[3] = uint8_t((covered * 255 + kSamplesPerPixel / 2) / kSamplesPerPixel);
+                if (covered) {
+                    const uint8_t value = uint8_t((white * 255 + covered / 2) / covered);
+                    pixel[0] = pixel[1] = pixel[2] = value;
+                }
+            }
+        }
+        crossButtonTex_ = r_->upload(icon);
+        if (!crossButtonTex_.id) return;
+        crossButtonTexCorePixels_ = corePixels;
     }
 
-    // White X, drawn as two thin vector strokes rather than a font glyph.
-    constexpr float stroke = 1.8f;
-    const float half = stroke * 0.5f;
-    const float inset = size * 0.27f;
-    const float x0 = x + inset, y0 = y + inset;
-    const float x1 = x + size - inset, y1 = y + size - inset;
-    const float dx = x1 - x0, dy = y1 - y0;
-    const float len = std::sqrt(dx * dx + dy * dy);
-    const float px = -dy / len * half, py = dx / len * half;
-    const float xyA[8] = {
-        X(x0 + px) * kScale, Y(y0 + py) * kScale,
-        X(x1 + px) * kScale, Y(y1 + py) * kScale,
-        X(x1 - px) * kScale, Y(y1 - py) * kScale,
-        X(x0 - px) * kScale, Y(y0 - py) * kScale,
-    };
-    const float xyB[8] = {
-        X(x0 + px) * kScale, Y(y1 - py) * kScale,
-        X(x1 + px) * kScale, Y(y0 - py) * kScale,
-        X(x1 - px) * kScale, Y(y0 + py) * kScale,
-        X(x0 - px) * kScale, Y(y1 + py) * kScale,
-    };
-    r_->fillQuad(xyA, 1, 1, 1, alpha);
-    r_->fillQuad(xyB, 1, 1, 1, alpha);
+    const float padMenu = float(kPadPixels) / (r_->pixelScale() * K() * kScale);
+    r_->drawQuad(crossButtonTex_, X(x - padMenu) * kScale, Y(y - padMenu) * kScale,
+                 (size + 2.0f * padMenu) * K() * kScale,
+                 (size + 2.0f * padMenu) * K() * kScale, 1, 1, 1, alpha);
 }
 
 void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha, const std::string& label) {

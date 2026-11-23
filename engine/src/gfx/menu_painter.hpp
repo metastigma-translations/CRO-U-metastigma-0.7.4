@@ -137,6 +137,8 @@ private:
     };
     std::map<std::string, Cached> text_;
     std::map<std::array<uint8_t, 8>, Texture> gradients_;
+    Texture crossButtonTex_;
+    int crossButtonTexCorePixels_ = 0;
     void arrowTriangle(float x, float y, float w, float h, bool pointsRight, float alpha);
     void crossButton(float x, float y, float size, float alpha);
     Cached& rasterise(const std::string& s, float size, bool perGlyphVerticalGradient = false,
