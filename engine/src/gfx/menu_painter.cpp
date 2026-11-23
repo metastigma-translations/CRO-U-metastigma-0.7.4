@@ -332,51 +332,17 @@ void MenuPainter::arrowTriangle(float x, float y, float w, float h, bool pointsR
     r_->fillQuad(xy, 0, 0, 0, alpha);
 }
 
-void MenuPainter::returnGlyph(float x, float y, float w, float h, float alpha) {
+void MenuPainter::upTriangle(float x, float y, float w, float h, float alpha) {
     if (!r_ || alpha <= 0.001f) return;
-
-    const float cx = x + w * 0.5f, cy = y + h * 0.5f;
-    const float outer = std::min(w * 0.48f, h * 0.42f);
-    const float inner = outer * 0.53f;
-    constexpr float pi = 3.14159265358979323846f;
-    constexpr float start = 42.0f * pi / 180.0f;
-    constexpr float finish = 300.0f * pi / 180.0f;
-    // Tessellate more finely as the output resolution increases. This keeps the curved mark
-    // smooth at 4K and high-DPI scales without ever sampling the low-resolution menu atlas.
-    const int segments = std::clamp(int(std::ceil(18.0f * std::max(1.0f, r_->pixelScale()))), 18, 64);
-
-    auto point = [&](float radius, float angle, float& px, float& py) {
-        px = cx + std::cos(angle) * radius;
-        py = cy + std::sin(angle) * radius;
+    const float cx = x + w * 0.5f;
+    const float xy[8] = {
+        X(cx) * kScale, Y(y) * kScale,
+        X(x + w) * kScale, Y(y + h) * kScale,
+        X(x) * kScale, Y(y + h) * kScale,
+        X(cx) * kScale, Y(y) * kScale,
     };
-    auto fill = [&](float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3) {
-        const float xy[8] = {
-            X(x0) * kScale, Y(y0) * kScale,
-            X(x1) * kScale, Y(y1) * kScale,
-            X(x2) * kScale, Y(y2) * kScale,
-            X(x3) * kScale, Y(y3) * kScale,
-        };
-        r_->fillQuad(xy, 0, 0, 0, alpha);
-    };
-
-    for (int i = 0; i < segments; ++i) {
-        const float a0 = start + (finish - start) * float(i) / float(segments);
-        const float a1 = start + (finish - start) * float(i + 1) / float(segments);
-        float ox0, oy0, ox1, oy1, ix0, iy0, ix1, iy1;
-        point(outer, a0, ox0, oy0);
-        point(outer, a1, ox1, oy1);
-        point(inner, a1, ix1, iy1);
-        point(inner, a0, ix0, iy0);
-        fill(ox0, oy0, ox1, oy1, ix1, iy1, ix0, iy0);
-    }
-
-    // Arrowhead attached to the upper-right end of the circular stroke.
-    float baseOuterX, baseOuterY, baseInnerX, baseInnerY;
-    point(outer, finish, baseOuterX, baseOuterY);
-    point(inner, finish, baseInnerX, baseInnerY);
-    const float tipX = cx + std::cos(315.0f * pi / 180.0f) * outer * 1.45f;
-    const float tipY = cy + std::sin(315.0f * pi / 180.0f) * outer * 1.45f;
-    fill(baseOuterX, baseOuterY, tipX, tipY, baseInnerX, baseInnerY, tipX, tipY);
+    // The Back mark is a clean, solid triangle pointing straight up.
+    r_->fillQuad(xy, 0, 0, 0, alpha);
 }
 
 void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha, const std::string& label) {
@@ -398,7 +364,7 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
     arrowTriangle(x + 24 + bob, y + 4, 16, 16, false, alpha);
     arrowTriangle(x + 197 - bob, y + 4, 16, 16, true, alpha);
 
-    // The center face, curved return mark and lettering are all drawn at the active render scale.
+    // The center face, up-pointing Back triangle and lettering use the active render scale.
     constexpr float glyphWidth = 18.0f, gap = 5.0f, labelMaxWidth = 92.0f;
     float size = 14.0f;
     float width = textWidth(label, size);
@@ -406,7 +372,7 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
     width = textWidth(label, size);
     const float total = glyphWidth + (label.empty() ? 0.0f : gap) + width;
     const float start = x + 56.0f + (120.0f - total) / 2.0f;
-    returnGlyph(start, y, glyphWidth, 24.0f, alpha);
+    upTriangle(start + 1.0f, y + 4.0f, 16.0f, 16.0f, alpha);
 
     if (!label.empty()) {
         // Match the original button's plain black lettering; no menu outline or gradient.
@@ -437,7 +403,7 @@ void MenuPainter::backBar(float x, float y, bool pressed, float alpha, const std
     labelWidth = textWidth(label, size);
     const float totalWidth = arrowWidth + (label.empty() ? 0.0f : gap) + labelWidth;
     const float ax = x + (232.0f - totalWidth) * 0.5f;
-    returnGlyph(ax, y, arrowWidth, 24.0f, alpha);
+    upTriangle(ax + 2.0f, y + 4.0f, 16.0f, 16.0f, alpha);
     if (!label.empty()) {
         const bool savedOutline = outline_, savedCleanOutline = cleanOutline_;
         outline_ = false;
@@ -466,7 +432,7 @@ void MenuPainter::backOkBar(float x, float y, int pressed, float alpha, const st
     labelWidth = textWidth(label, size);
     const float total = arrowWidth + gap + labelWidth;
     const float start = x + 24.0f + (90.0f - total) * 0.5f;
-    returnGlyph(start, y, arrowWidth, 24.0f, alpha);
+    upTriangle(start + 1.0f, y + 4.0f, 16.0f, 16.0f, alpha);
     const bool savedOutline = outline_, savedCleanOutline = cleanOutline_;
     outline_ = false;
     cleanOutline_ = true;

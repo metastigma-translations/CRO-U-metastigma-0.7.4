@@ -226,7 +226,8 @@ struct App {
     int optionsScroll = 0;                 // the first row shown (a page of more than kOptVisible scrolls)
     bool optionsBarDrag = false;           // the scroll bar's thumb held
     int optionsAnim = 0;                   // frames since the page appeared (windows slide in)
-    int optionsBob = 0, optionsBobDir = 1; // ComUty_CmdBack's arrows
+    int menuArrowBob = 0, menuArrowBobDir = 1; // shared 0..5 bob for the menu Back arrows
+    float menuArrowClock = 0;              // shared 20 Hz animation clock, active in every menu
     struct GaugeEase { int from = -1, to = -1, left = 0; }; // SideGuageProc / Draw: the fill 10 frames from the old
     std::map<const int*, GaugeEase> gaugeEase;           // knob to the new (#17), by the setting it shows
     float optionsClock = 0;

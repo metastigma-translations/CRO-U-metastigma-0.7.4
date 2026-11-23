@@ -1363,7 +1363,7 @@ void drawShop(App& app) {
             m.text(have[0][0], 24, 250, false, 1, kFont);
     } else if (list && shopEquipment(app)) { // (the Vita's at 235: 43 right)
         m.backButton(kBackX + v, kBackY, shopPressIn(app, false, kBackX + 51, kBackY, 130, 24, v) ? 1 : shopPressIn(app, false, kBackX + 181, kBackY, 51, 24, v) ? 2
-                                     : shopPressIn(app, false, kBackX, kBackY, 51, 24, v) ? 3 : 0, s.bob, a, tr("Back")); // ComUty_CmdBack 2: < Back >
+                                     : shopPressIn(app, false, kBackX, kBackY, 51, 24, v) ? 3 : 0, app.menuArrowBob, a, tr("Back")); // ComUty_CmdBack 2: < Back >
     } else {
         m.backBar(kBackX + v, kBackY, shopPressIn(app, false, kBackX, kBackY, 232, 24, v), a, tr("Back")); // (lit while held: DAT_000ec80c)
     }
@@ -3918,7 +3918,7 @@ void drawCamp(App& app) {
             m.backOkBar(kBackX, by, campPressIn(app, ux, 0xc0, by, 0x72, 34) ? 1 : campPressIn(app, ux, 0x137, by, 0x72, 34) ? 5 : 0, barA, tr("Back"), menuWordText(5));
         else if (campArrows(app))
             m.backButton(kBackX, by, campPressIn(app, ux, 0xf8, by, 0x78, 34) ? 1 : campPressIn(app, ux, 0x175, by, 0x33, 34) ? 2
-                                     : campPressIn(app, ux, 0xc0, by, 0x33, 34) ? 3 : 0, 0, barA, tr("Back"));
+                                     : campPressIn(app, ux, 0xc0, by, 0x33, 34) ? 3 : 0, app.menuArrowBob, barA, tr("Back"));
         else m.backBar(kBackX, by, campPressIn(app, ux, kBackX, by, 256, 34), barA, tr("Back"));
     }
     if (items && !c.pageOut && ease <= 0) m.backBar(kBackX, campBackY(app), false, 1 - outA, tr("Back")); // (the main page's going)
@@ -4690,7 +4690,7 @@ void drawScenarios(App& app) {
     { // window 10: < Back > - the part held lit (DAT_000ed5e4: 1 Back, 2 right, 3 left)
         const float ux = app.renderer.uiX(), v = vitaEdge43(app); // (the Vita's at 0xeb = 235)
         m.backButton(192 + v, 288, pressIn(app, kPressScenarios, ux, 248 + v, 286, 120, 34) ? 1 : pressIn(app, kPressScenarios, ux, 373 + v, 286, 51, 34) ? 2
-                               : pressIn(app, kPressScenarios, ux, 192 + v, 286, 51, 34) ? 3 : 0, s.bob, a, tr("Back"));
+                               : pressIn(app, kPressScenarios, ux, 192 + v, 286, 51, 34) ? 3 : 0, app.menuArrowBob, a, tr("Back"));
     }
     drawShopNumber(m, presentsUsed(app), 0, 296, 2, 12, a); // window 11: presents used / all
     m.picture(66, 24, 296, a);
@@ -5138,7 +5138,7 @@ void drawManual(App& app) {
             }
             if (app.manualTop > 0) m.text("...", 100, 40, false, la, 12);
             if (app.manualTop + kManualRows < int(topics.size())) m.text("...", 100, 52 + 32.0f * kManualRows - 6, false, la, 12);
-            m.backButton(192, 344, false, 0, la, tr("Back"));
+            m.backButton(192, 344, false, app.menuArrowBob, la, tr("Back"));
             if (app.showHud) m.text("Up/Down  Enter: read  Esc: back", 20, 372, false, la * 0.8f, 9); // (our key hints)
         }
     }

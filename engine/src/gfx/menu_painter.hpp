@@ -108,7 +108,7 @@ public:
     void gauge(float x, float y, int value, float alpha, bool active, float fill = -1);
     // ComUty_CmdBack type 2: the Back bar at (x, y), `pressed` lights it, `bob` 0..5 moves the arrows
     void backButton(float x, float y, int pressed, int bob, float alpha, const std::string& label = std::string()); // pressed: 0 none, 1 Back, 2 right, 3 left; optional font label
-    // ComUty_CmdBack type 1 (the shop's): a 232-wide fading bar with a vector Enter arrow and a font-rendered label
+    // ComUty_CmdBack type 1 (the shop's): a 232-wide fading bar with a vector up-pointing triangle and a font-rendered label
     void backBar(float x, float y, bool pressed, float alpha, const std::string& label);
     // ComUty_CmdBack type 3: Back (x .. x + 114, faded in over 24, the word at + 36) and OK (x + 118 .. x + 208,
     // fading out to 232, its word (sheet (76, 224) 64 x 20) at (+126, +2)); `pressed` 1 lights Back, 5 OK
@@ -138,7 +138,7 @@ private:
     std::map<std::string, Cached> text_;
     std::map<std::array<uint8_t, 8>, Texture> gradients_;
     void arrowTriangle(float x, float y, float w, float h, bool pointsRight, float alpha);
-    void returnGlyph(float x, float y, float w, float h, float alpha);
+    void upTriangle(float x, float y, float w, float h, float alpha);
     Cached& rasterise(const std::string& s, float size, bool perGlyphVerticalGradient = false,
                       bool darkVerticalGradient = false, float letterSpacing = 0);
 };

@@ -1600,7 +1600,7 @@ void drawOptions(App& app, float, float) {
     m.digit(app.optionsPage + 1, 20, kOptPageY, a);
     m.digit(-1, 34, kOptPageY, a);
     m.digit(kOptionPages, 48, kOptPageY, a);
-    m.backButton(192, kOptBackY, app.optionsRow == kOptionsBackRow, app.optionsBob, a, tr("Back")); // EXE Options: atlas return glyph, selected-font label
+    m.backButton(192, kOptBackY, app.optionsRow == kOptionsBackRow, app.menuArrowBob, a, tr("Back")); // shared animated arrows; up-pointing triangle and selected-font label
     if (app.optionsRow >= 0 && app.optionsRow < n && !rows[size_t(app.optionsRow)].hint.empty()) { // (under the rows shown, clear of Back)
         const std::vector<std::string> lines = wrapText(m, rows[size_t(app.optionsRow)].hint, 470, 11, 2);
         for (size_t l = 0; l < lines.size(); ++l) m.text(lines[l], 20, optRowY(shown) + 2 + 13 * float(l), false, a, 11);
@@ -1650,8 +1650,6 @@ void stepOptions(App& app) {
     for (auto& [setting, e] : app.gaugeEase) // (SideGuageDraw's count: one a frame)
         if (e.left > 0) --e.left;
     ++app.optionsAnim;
-    app.optionsBob += app.optionsBobDir;
-    if (app.optionsBob >= 5 || app.optionsBob <= 0) app.optionsBobDir = -app.optionsBobDir;
 }
 
 
@@ -3180,6 +3178,12 @@ void drawFrame(App& app, bool present) {
     r.setPictureLayer(false); // (the interface from here on: kept off a camera cutout - Renderer::interfaceRect)
     r.setOrigin(r.uiX()); // the game's 2D from here on: its 1024 x 768 layout, centred
     app.order2d = App::Order2D();
+    // The Back arrows use the same 20 Hz bob in every menu, not just Options.
+    for (app.menuArrowClock += dt; app.menuArrowClock >= 1.0f / kFramesPerSecond;
+         app.menuArrowClock -= 1.0f / kFramesPerSecond) {
+        app.menuArrowBob += app.menuArrowBobDir;
+        if (app.menuArrowBob >= 5 || app.menuArrowBob <= 0) app.menuArrowBobDir = -app.menuArrowBobDir;
+    }
     // A message window this frame (the calls of drawMessageBox below): the front fade waits for its
     // text - else it goes over the portraits at once
     const bool heldNow = app.heldPage && !(!app.runner.running() || !app.dialogue.empty() || app.lastPage.empty());
