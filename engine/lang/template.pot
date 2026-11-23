@@ -184,6 +184,14 @@ msgid "NEXT"
 msgstr ""
 
 #: src/app/menus.cpp
+msgid "TIME"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "OZ"
+msgstr ""
+
+#: src/app/menus.cpp
 msgid "EXP"
 msgstr ""
 

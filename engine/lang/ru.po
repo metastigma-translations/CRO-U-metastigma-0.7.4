@@ -185,6 +185,14 @@ msgid "NEXT"
 msgstr "Следующий"
 
 #: src/app/menus.cpp
+msgid "TIME"
+msgstr "ВРЕМЯ"
+
+#: src/app/menus.cpp
+msgid "OZ"
+msgstr "ОЗ"
+
+#: src/app/menus.cpp
 msgid "EXP"
 msgstr "ОПЫТ"
 

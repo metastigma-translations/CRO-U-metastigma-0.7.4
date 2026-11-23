@@ -1548,18 +1548,36 @@ void drawClockAndOz(App& app, cr::MenuPainter& m, float a) {
 #else
     localtime_r(&now, &tm);
 #endif
-    m.picture(71, (363 + vx), 8, a);
+    const float white[4] = {1, 1, 1, a};
+    auto clockPlateLabel = [&](const std::string& label, float x, float y) {
+        // Keep each original 36x16 white atlas plate, but draw its lettering with the selected font.
+        m.quad(x, y, 36, 16, white, white);
+        float size = 14.0f;
+        float width = m.textWidth(label, size);
+        if (width > 34.0f && width > 0.0f) size *= 34.0f / width;
+        width = m.textWidth(label, size);
+        m.textCentred(label, x + (36.0f - width) * 0.5f, y + 8.0f,
+                      true, a, size, false, false, false);
+    };
+    const float clockX = 363.0f + vx;
+    clockPlateLabel(tr("TIME"), clockX, 8.0f);
     const int digit[4] = {tm.tm_hour / 10, tm.tm_hour % 10, tm.tm_min / 10, tm.tm_min % 10};
     static const float kAt[4] = {0, 12, 36, 48};
     for (int i = 0; i < 4; ++i)
-        if (i || digit[0]) drawShopNumber(m, digit[i], (363 + vx) + 47 + kAt[i], 6, 1, 12, a);
-    // (__ComUty_RealTimeDraw: the colon while its own count, one a frame, is under 20 of 40 - a second on,
-    // a second off at 20 Hz; Part 5 207-215 s: on 208.46-209.42, off to 210.44, on to 211.52, ...)
-    if (SDL_GetTicks() / 1000 % 2 == 0) m.picture(75, (363 + vx) + 71, 6, a);
-    m.picture(74, (363 + vx) + 36, 16, a);
-    m.picture(72, 326 + vx, 24, a);
-    drawShopNumber(m, app.game.oz, 362 + vx, 26, 9, 12, a);
-    m.picture(74, 362 + vx, 36, a);
+        if (i || digit[0])
+            drawStatusNumber(m, digit[i], clockX + 47.0f + kAt[i], 6.0f, 1, 12.0f, a, false);
+    // (__ComUty_RealTimeDraw: one second on, one second off at 20 Hz - keep the original phase.)
+    if (SDL_GetTicks() / 1000 % 2 == 0) {
+        const float colonWidth = m.textWidth(":", 14.0f);
+        m.textCentred(":", clockX + 71.0f + (14.0f - colonWidth) * 0.5f,
+                      13.0f, false, a, 14.0f, false, false, false);
+    }
+    m.picture(74, clockX + 36.0f, 16.0f, a);
+
+    const float ozX = 326.0f + vx;
+    clockPlateLabel(tr("OZ"), ozX, 24.0f);
+    drawStatusNumber(m, app.game.oz, 362.0f + vx, 26.0f, 9, 12.0f, a, false);
+    m.picture(74, 362.0f + vx, 36.0f, a);
 }
 
 // ComUty_FaceBoardDraw at (x, y): the face (29 + n), the board (28) and the name (37 + n and the
@@ -1603,7 +1621,7 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     constexpr float kLevelBadgeWidth = 28.0f;
     const float levelBadgeTextWidth = m.textWidth("УР", 14);
     m.text("УР", x + 24 + (kLevelBadgeWidth - levelBadgeTextWidth) * 0.5f, y + 86, true, a, 14);
-    drawStatusNumber(m, pm.level, x + 48, y + 86, 3, 12, a, false, true);
+    drawStatusNumber(m, pm.level, x + 48, y + 89, 3, 12, a, false, true);
 
     // Match the submenu/status panel typography and vertical position. The Russian NEXT caption
     // is sized once so it ends before the right-side value; original caption X origins are retained.
