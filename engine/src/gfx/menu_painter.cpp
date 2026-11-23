@@ -448,7 +448,7 @@ void MenuPainter::backBar(float x, float y, bool pressed, float alpha, const std
     }
 }
 
-void MenuPainter::backOkBar(float x, float y, int pressed, float alpha, const std::string& label) {
+void MenuPainter::backOkBar(float x, float y, int pressed, float alpha, const std::string& label, const std::string& okLabel) {
     const float cyan[4] = {0x4B / 255.0f, 1, 0xEB / 255.0f, alpha}; // (tex2d's 0xEBFF4B is A B G R: cyan)
     const float white[4] = {1, 1, 1, alpha};
     const float* b = pressed == 1 ? cyan : white;
@@ -471,7 +471,7 @@ void MenuPainter::backOkBar(float x, float y, int pressed, float alpha, const st
     outline_ = false;
     cleanOutline_ = true;
     textCentred(label, start + arrowWidth + gap, y + 12, true, alpha, size, false);
-    textCentred("OK", x + 126.0f + (64.0f - textWidth("OK", 14.0f)) * 0.5f, y + 12,
+    textCentred(okLabel, x + 126.0f + (64.0f - textWidth(okLabel, 14.0f)) * 0.5f, y + 12,
                 true, alpha, 14.0f, false);
     outline_ = savedOutline;
     cleanOutline_ = savedCleanOutline;
