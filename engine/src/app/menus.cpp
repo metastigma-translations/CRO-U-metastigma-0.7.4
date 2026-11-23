@@ -498,7 +498,7 @@ void drawSaveDate(App& app, cr::MenuPainter& m, const cr::SaveData& d, float a, 
     centredLabel(tr("TOTAL PLAYTIME"), 344 + dx, 88, 108, 12, 14.0f);
     const std::string playTime = std::to_string(hours) + ":" +
         (mins < 10 ? "0" : "") + std::to_string(mins);
-    centredLabel(playTime, 324 + dx, 106, 148, 18, 20.0f);
+    centredLabel(playTime, 324 + dx, 104, 148, 18, 20.0f);
 }
 
 void drawSaveScreen(App& app) {
