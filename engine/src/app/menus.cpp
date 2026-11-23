@@ -1058,7 +1058,7 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         // Draw the slash last, above both bars. Preserve its X origin and lift it clear of the track.
         // HP stays white/black; MP is black with a white outline for contrast on the dark track.
         m.text("/", x + 82, y - 8, k != 0, a, 14);
-        gaugeLabel(statusLabels[k ? 2 : 1], bx - 11.0f, y);
+        gaugeLabel(statusLabels[k ? 2 : 1], bx + 14.0f, y);
     }
     { // __ComUty_FaceBoardNextExp
         const float x = bx - 1, y = by + 96;
@@ -1066,7 +1066,7 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         boardNumber(pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), x + 82, y - 4, 6, 12, 0, false);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
-        gaugeLabel(statusLabels[3], bx - 11.0f, y);
+        gaugeLabel(statusLabels[3], bx + 14.0f, y);
     }
     // Rebuild the five white atlas label chips without their baked English lettering.
     const std::string* kBoardStatLabel = statusLabels + 4;
@@ -1606,7 +1606,7 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
         drawShopBar(m, hx + 15, hy + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
         // Use the selected font for captions and slash, and draw them after the tracks.
         // HP keeps white/black; the MP slash is black with a white outline.
-        m.textCentred(gaugeLabels[k], hx, hy + 4.0f, false, a, faceGaugeLabelSize);
+        m.textCentred(gaugeLabels[k], hx + 15.0f, hy + 4.0f, false, a, faceGaugeLabelSize);
         m.text("/", hx + 82, hy - 8, k != 0, a, 14);
     }
     const float nx = x + 96, ny = y + 90;
@@ -1614,7 +1614,7 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     drawStatusNumber(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), nx + 82, ny - 4, 6, 12, a, false);
     drawShopBar(m, nx + 16, ny + 9, 1, 1, 0, a);
     drawShopBar(m, nx + 15, ny + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
-    m.textCentred(gaugeLabels[2], nx, ny + 4.0f, false, a, faceGaugeLabelSize);
+    m.textCentred(gaugeLabels[2], nx + 15.0f, ny + 4.0f, false, a, faceGaugeLabelSize);
 }
 
 // The member's HP (full outside battles) and MP as the boards show them
