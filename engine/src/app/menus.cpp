@@ -987,7 +987,9 @@ void drawShopBar(cr::MenuPainter& m, float x, float y, float value, float most, 
     const float* b = kColour[type][1];
     const float l[4] = {a[0], a[1], a[2], alpha};
     const float rr[4] = {a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f, alpha};
-    m.quad(x + 4, y + 1, 140 * f, 3, l, rr);
+    // Original SubColorBar ends are clipped at 45 degrees: left tip points down,
+    // right tip points up. Use the same slant for the black track and the coloured fill.
+    m.slant(x + 4, y + 1, 140 * f, 3, 3, l, rr);
 }
 
 // ComUty_HelpWindowDraw: picture 0x11 (the 336 x 68 striped panel) at (144, 8), the "HELP" tag (0x12) at
