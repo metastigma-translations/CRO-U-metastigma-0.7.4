@@ -930,7 +930,7 @@ void drawShopNumber(cr::MenuPainter& m, int value, float x, float y, int digits,
 // Status-only numeric values use the selected font: white glyphs with the standard black outline.
 // Preserve each 14x14 atlas number slot's right/left alignment and vertical centre.
 void drawStatusNumber(cr::MenuPainter& m, int value, float x, float y, int digits, float step, float alpha,
-                      bool left) {
+                      bool left, bool dark = false) {
     const std::string text = std::to_string(std::abs(value));
     float size = 14.0f;
     const float slotWidth = float(digits) * step;
@@ -940,7 +940,7 @@ void drawStatusNumber(cr::MenuPainter& m, int value, float x, float y, int digit
         width = m.textWidth(text, size);
     }
     const float textX = left ? x : x + slotWidth - width;
-    m.textCentred(text, textX, y + 7.0f, false, alpha, size);
+    m.textCentred(text, textX, y + 7.0f, dark, alpha, size);
 }
 
 // __ComUty_SubColorBar: a 140-wide bar, `type` 0 the black track, 1 HP red -> orange, 2 MP green
@@ -1586,8 +1586,8 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     // Keep the original 28x14 label cell and right-aligned three-digit level slot.
     constexpr float kLevelBadgeWidth = 28.0f;
     const float levelBadgeTextWidth = m.textWidth("УР", 14);
-    m.text("УР", x + 24 + (kLevelBadgeWidth - levelBadgeTextWidth) * 0.5f, y + 86, false, a, 14);
-    drawStatusNumber(m, pm.level, x + 48, y + 86, 3, 12, a, false);
+    m.text("УР", x + 24 + (kLevelBadgeWidth - levelBadgeTextWidth) * 0.5f, y + 86, true, a, 14);
+    drawStatusNumber(m, pm.level, x + 48, y + 86, 3, 12, a, false, true);
 
     // Match the submenu/status panel typography and vertical position. The Russian NEXT caption
     // is sized once so it ends before the right-side value; original caption X origins are retained.
