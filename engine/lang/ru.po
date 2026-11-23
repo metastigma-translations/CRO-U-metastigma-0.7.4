@@ -1328,3 +1328,11 @@ msgstr "Предыдущие сохранения сохранены в резе
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "Загрузите сохранение с главного экрана."
+
+#: src/app/menus.cpp
+msgid "Date"
+msgstr "ДАТА"
+
+#: src/app/menus.cpp
+msgid "Played in game"
+msgstr "ПРОВЕДЕНО В ИГРЕ"
