@@ -317,6 +317,68 @@ void MenuPainter::gauge(float x, float y, int value, float alpha, bool active, f
     piece(knob, y - 16, p[0], p[1], p[2], p[3], alpha);
 }
 
+void MenuPainter::arrowTriangle(float x, float y, float w, float h, bool pointsRight, float alpha) {
+    if (!r_ || alpha <= 0.001f) return;
+    const float tipX = pointsRight ? x + w : x;
+    const float baseX = pointsRight ? x : x + w;
+    const float tipY = y + h * 0.5f;
+    const float xy[8] = {
+        X(tipX) * kScale, Y(tipY) * kScale,
+        X(baseX) * kScale, Y(y) * kScale,
+        X(baseX) * kScale, Y(y + h) * kScale,
+        X(tipX) * kScale, Y(tipY) * kScale,
+    };
+    // A solid black triangle, built by the renderer rather than sampled from window_hd.
+    r_->fillQuad(xy, 0, 0, 0, alpha);
+}
+
+void MenuPainter::returnGlyph(float x, float y, float w, float h, float alpha) {
+    if (!r_ || alpha <= 0.001f) return;
+
+    const float cx = x + w * 0.5f, cy = y + h * 0.5f;
+    const float outer = std::min(w * 0.48f, h * 0.42f);
+    const float inner = outer * 0.53f;
+    constexpr float pi = 3.14159265358979323846f;
+    constexpr float start = 42.0f * pi / 180.0f;
+    constexpr float finish = 300.0f * pi / 180.0f;
+    // Tessellate more finely as the output resolution increases. This keeps the curved mark
+    // smooth at 4K and high-DPI scales without ever sampling the low-resolution menu atlas.
+    const int segments = std::clamp(int(std::ceil(18.0f * std::max(1.0f, r_->pixelScale()))), 18, 64);
+
+    auto point = [&](float radius, float angle, float& px, float& py) {
+        px = cx + std::cos(angle) * radius;
+        py = cy + std::sin(angle) * radius;
+    };
+    auto fill = [&](float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3) {
+        const float xy[8] = {
+            X(x0) * kScale, Y(y0) * kScale,
+            X(x1) * kScale, Y(y1) * kScale,
+            X(x2) * kScale, Y(y2) * kScale,
+            X(x3) * kScale, Y(y3) * kScale,
+        };
+        r_->fillQuad(xy, 0, 0, 0, alpha);
+    };
+
+    for (int i = 0; i < segments; ++i) {
+        const float a0 = start + (finish - start) * float(i) / float(segments);
+        const float a1 = start + (finish - start) * float(i + 1) / float(segments);
+        float ox0, oy0, ox1, oy1, ix0, iy0, ix1, iy1;
+        point(outer, a0, ox0, oy0);
+        point(outer, a1, ox1, oy1);
+        point(inner, a1, ix1, iy1);
+        point(inner, a0, ix0, iy0);
+        fill(ox0, oy0, ox1, oy1, ix1, iy1, ix0, iy0);
+    }
+
+    // Arrowhead attached to the upper-right end of the circular stroke.
+    float baseOuterX, baseOuterY, baseInnerX, baseInnerY;
+    point(outer, finish, baseOuterX, baseOuterY);
+    point(inner, finish, baseInnerX, baseInnerY);
+    const float tipX = cx + std::cos(315.0f * pi / 180.0f) * outer * 1.45f;
+    const float tipY = cy + std::sin(315.0f * pi / 180.0f) * outer * 1.45f;
+    fill(baseOuterX, baseOuterY, baseInnerX, baseInnerY, tipX, tipY, tipX, tipY);
+}
+
 void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha, const std::string& label) {
     const float cyan[4] = {0x4B / 255.0f, 1, 0xEB / 255.0f, alpha}; // (tex2d's 0xEBFF4B is A B G R: cyan)
     const float white[4] = {1, 1, 1, alpha};
@@ -332,25 +394,22 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
     quad(x + 56, y, 120, 24, c, c);
     quad(x + 181, y, 27, 24, r, r);
     quad(x + 208, y, 24, 24, r, clearR);
-    piece(x + 24 + bob, y + 4, 336, 880, 16, 16, alpha);
-    piece(x + 197 - bob, y + 4, 352, 880, 16, 16, alpha);
-    if (label.empty()) {
-        piece(x + 80, y, 0, 224, 76, 24, alpha); // other menus retain the complete atlas label
-    } else {
-        // Keep the original atlas return glyph; replace only its English lettering with the selected font.
-        // The atlas return glyph occupies only the first 18 px of this cell; a wider crop
-        // includes a few pixels of the original English "Back" lettering.
-        constexpr float glyphWidth = 18.0f, gap = 5.0f, labelMaxWidth = 92.0f;
-        float size = 14.0f;
-        float width = textWidth(label, size);
-        if (width > labelMaxWidth) size = std::max(8.0f, std::floor(size * labelMaxWidth / width));
-        width = textWidth(label, size);
-        const float total = glyphWidth + gap + width;
-        const float start = x + 56.0f + (120.0f - total) / 2.0f;
-        piece(start, y, 0, 224, glyphWidth, 24, alpha);
+    // Arrows are vector triangles, so their edges are resolved at the current output scale.
+    arrowTriangle(x + 24 + bob, y + 4, 16, 16, false, alpha);
+    arrowTriangle(x + 197 - bob, y + 4, 16, 16, true, alpha);
 
-        // The original button uses plain black lettering: bypass the optional menu outline
-        // and gradient for this label only, without changing the setting for other text.
+    // The center face, curved return mark and lettering are all drawn at the active render scale.
+    constexpr float glyphWidth = 18.0f, gap = 5.0f, labelMaxWidth = 92.0f;
+    float size = 14.0f;
+    float width = textWidth(label, size);
+    if (width > labelMaxWidth) size = std::max(8.0f, std::floor(size * labelMaxWidth / width));
+    width = textWidth(label, size);
+    const float total = glyphWidth + (label.empty() ? 0.0f : gap) + width;
+    const float start = x + 56.0f + (120.0f - total) / 2.0f;
+    returnGlyph(start, y, glyphWidth, 24.0f, alpha);
+
+    if (!label.empty()) {
+        // Match the original button's plain black lettering; no menu outline or gradient.
         const bool savedOutline = outline_;
         const bool savedCleanOutline = cleanOutline_;
         outline_ = false;
@@ -370,22 +429,23 @@ void MenuPainter::backBar(float x, float y, bool pressed, float alpha, const std
     quad(x + 24, y, 184, 24, c, c);
     quad(x + 208, y, 24, 24, c, clear);
 
-    // Keep the original curved return mark from window_hd; only its "Back" lettering is replaced.
     const float arrowWidth = 20.0f, gap = 5.0f, maxLabelWidth = 76.0f;
     float size = 14.0f;
     float labelWidth = textWidth(label, size);
     if (labelWidth > maxLabelWidth)
         size = std::max(10.0f, std::floor(size * maxLabelWidth / labelWidth));
     labelWidth = textWidth(label, size);
-    const float totalWidth = arrowWidth + gap + labelWidth;
+    const float totalWidth = arrowWidth + (label.empty() ? 0.0f : gap) + labelWidth;
     const float ax = x + (232.0f - totalWidth) * 0.5f;
-    piece(ax, y, 0, 224, arrowWidth, 24, alpha); // window_hd's return symbol, without the atlas word "Back"
-    const bool savedOutline = outline_, savedCleanOutline = cleanOutline_;
-    outline_ = false;
-    cleanOutline_ = true;
-    textCentred(label, ax + arrowWidth + gap, y + 12, true, alpha, size, false);
-    outline_ = savedOutline;
-    cleanOutline_ = savedCleanOutline;
+    returnGlyph(ax, y, arrowWidth, 24.0f, alpha);
+    if (!label.empty()) {
+        const bool savedOutline = outline_, savedCleanOutline = cleanOutline_;
+        outline_ = false;
+        cleanOutline_ = true;
+        textCentred(label, ax + arrowWidth + gap, y + 12, true, alpha, size, false);
+        outline_ = savedOutline;
+        cleanOutline_ = savedCleanOutline;
+    }
 }
 
 void MenuPainter::backOkBar(float x, float y, int pressed, float alpha, const std::string& label) {
@@ -406,14 +466,15 @@ void MenuPainter::backOkBar(float x, float y, int pressed, float alpha, const st
     labelWidth = textWidth(label, size);
     const float total = arrowWidth + gap + labelWidth;
     const float start = x + 24.0f + (90.0f - total) * 0.5f;
-    piece(start, y, 0, 224, arrowWidth, 24, alpha); // return glyph only
+    returnGlyph(start, y, arrowWidth, 24.0f, alpha);
     const bool savedOutline = outline_, savedCleanOutline = cleanOutline_;
     outline_ = false;
     cleanOutline_ = true;
     textCentred(label, start + arrowWidth + gap, y + 12, true, alpha, size, false);
+    textCentred("OK", x + 126.0f + (64.0f - textWidth("OK", 14.0f)) * 0.5f, y + 12,
+                true, alpha, 14.0f, false);
     outline_ = savedOutline;
     cleanOutline_ = savedCleanOutline;
-    piece(x + 126, y + 2, 76, 224, 64, 20, alpha);
 }
 
 void MenuPainter::digit(int d, float x, float y, float alpha) {
