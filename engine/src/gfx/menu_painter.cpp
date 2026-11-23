@@ -24,9 +24,9 @@ void MenuPainter::release(Renderer& r) {
     text_.clear();
     for (auto& [key, tex] : gradients_) r.destroy(tex);
     gradients_.clear();
-    r.destroy(crossButtonTex_);
-    crossButtonTexCorePixels_ = 0;
-    crossButtonTexXbox_ = false;
+    for (Texture& tex : promptButtonTex_) r.destroy(tex);
+    promptButtonTexCorePixels_.fill(0);
+    promptButtonTexXbox_.fill(false);
 }
 
 void MenuPainter::piece(float x, float y, float u, float v, float w, float h, float alpha, float r, float g, float b) {
@@ -336,25 +336,32 @@ void MenuPainter::arrowTriangle(float x, float y, float w, float h, bool pointsR
     r_->fillQuad(xy, 0, 0, 0, alpha);
 }
 
-void MenuPainter::crossButton(float x, float y, float size, float alpha) {
-    if (!r_ || alpha <= 0.001f || size <= 0.0f) return;
+void MenuPainter::buttonPrompt(float x, float y, float size, bool secondary, float alpha) {
+    promptButton(x, y, size, secondary, alpha);
+}
 
-    // Match the final on-screen pixel density (including menu scaling), then draw with a
-    // two-pixel transparent guard so the filtered edge never samples outside the icon.
+void MenuPainter::crossButton(float x, float y, float size, float alpha) {
+    promptButton(x, y, size, false, alpha);
+}
+
+void MenuPainter::promptButton(float x, float y, float size, bool secondary, float alpha) {
+    if (!r_ || alpha <= 0.001f || size <= 0.0f) return;
     constexpr int kSupersample = 8;
     constexpr int kPadPixels = 2;
     constexpr int kSamplesPerPixel = kSupersample * kSupersample;
+    const size_t variant = secondary ? 1u : 0u;
+    Texture& cachedTexture = promptButtonTex_[variant];
+    int& cachedCorePixels = promptButtonTexCorePixels_[variant];
+    bool& cachedXbox = promptButtonTexXbox_[variant];
     const float outputScale = r_->pixelScale() * K();
     const int corePixels = std::max(8, int(std::ceil(size * kScale * outputScale)));
-    if (!crossButtonTex_.id || crossButtonTexCorePixels_ != corePixels || crossButtonTexXbox_ != xboxPrompts_) {
-        r_->destroy(crossButtonTex_);
-        crossButtonTexCorePixels_ = 0;
-
+    if (!cachedTexture.id || cachedCorePixels != corePixels || cachedXbox != xboxPrompts_) {
+        r_->destroy(cachedTexture);
+        cachedCorePixels = 0;
         Image high;
         high.width = (corePixels + 2 * kPadPixels) * kSupersample;
         high.height = high.width;
         high.rgba.resize(size_t(high.width) * size_t(high.height) * 4, 0);
-
         const float centre = float(corePixels) * 0.5f + float(kPadPixels);
         const float radius = float(corePixels) * 0.48f;
         const float endOffset = radius * 0.46f;
@@ -363,7 +370,6 @@ void MenuPainter::crossButton(float x, float y, float size, float alpha) {
         const float ax1 = centre + endOffset, ay1 = centre + endOffset;
         const float bx0 = centre - endOffset, by0 = centre + endOffset;
         const float bx1 = centre + endOffset, by1 = centre - endOffset;
-
         auto distanceToSegmentSquared = [](float px, float py, float x0, float y0, float x1, float y1) {
             const float dx = x1 - x0, dy = y1 - y0;
             const float lengthSquared = dx * dx + dy * dy;
@@ -373,41 +379,61 @@ void MenuPainter::crossButton(float x, float y, float size, float alpha) {
             const float ex = px - (x0 + t * dx), ey = py - (y0 + t * dy);
             return ex * ex + ey * ey;
         };
-
-        // Render a true 8x intermediate image: 0 = transparent, 1 = black disc, 2 = white X.
+        auto line = [&](float px, float py, float x0, float y0, float x1, float y1) {
+            return distanceToSegmentSquared(px, py, x0, y0, x1, y1) <= halfStroke * halfStroke;
+        };
+        // The same round face is used in every layout. Its white vector glyph is X / O or A / B.
         for (int sy = 0; sy < high.height; ++sy) {
             const float py = (float(sy) + 0.5f) / float(kSupersample);
             for (int sx = 0; sx < high.width; ++sx) {
                 const float px = (float(sx) + 0.5f) / float(kSupersample);
                 const float dx = px - centre, dy = py - centre;
                 if (dx * dx + dy * dy > radius * radius) continue;
-
                 bool onGlyph = false;
-                if (xboxPrompts_) {
-                    // Xbox A: two rising legs and a short crossbar in the same round face.
+                if (!xboxPrompts_ && !secondary) {
+                    onGlyph = line(px, py, ax0, ay0, ax1, ay1) ||
+                              line(px, py, bx0, by0, bx1, by1);
+                } else if (!xboxPrompts_ && secondary) {
+                    const float ringRadius = radius * 0.55f;
+                    onGlyph = std::fabs(std::sqrt(dx * dx + dy * dy) - ringRadius) <= radius * 0.075f;
+                } else if (xboxPrompts_ && !secondary) {
                     const float topY = centre - radius * 0.50f;
                     const float bottomY = centre + radius * 0.46f;
                     const float halfWidth = radius * 0.40f;
                     const float barY = centre + radius * 0.10f;
                     onGlyph =
-                        distanceToSegmentSquared(px, py, centre - halfWidth, bottomY, centre, topY) <= halfStroke * halfStroke ||
-                        distanceToSegmentSquared(px, py, centre, topY, centre + halfWidth, bottomY) <= halfStroke * halfStroke ||
-                        distanceToSegmentSquared(px, py, centre - halfWidth * 0.56f, barY,
-                                                centre + halfWidth * 0.56f, barY) <= halfStroke * halfStroke;
+                        line(px, py, centre - halfWidth, bottomY, centre, topY) ||
+                        line(px, py, centre, topY, centre + halfWidth, bottomY) ||
+                        line(px, py, centre - halfWidth * 0.56f, barY,
+                                  centre + halfWidth * 0.56f, barY);
                 } else {
-                    // PlayStation X.
+                    const float leftX = centre - radius * 0.32f;
+                    const float middleX = centre + radius * 0.015f;
+                    const float rightX = centre + radius * 0.34f;
+                    const float topY = centre - radius * 0.48f;
+                    const float middleY = centre;
+                    const float bottomY = centre + radius * 0.48f;
+                    const float upperShoulder = topY + radius * 0.12f;
+                    const float upperInner = middleY - radius * 0.10f;
+                    const float lowerInner = middleY + radius * 0.10f;
+                    const float lowerShoulder = bottomY - radius * 0.12f;
                     onGlyph =
-                        distanceToSegmentSquared(px, py, ax0, ay0, ax1, ay1) <= halfStroke * halfStroke ||
-                        distanceToSegmentSquared(px, py, bx0, by0, bx1, by1) <= halfStroke * halfStroke;
+                        line(px, py, leftX, topY, leftX, bottomY) ||
+                        line(px, py, leftX, topY, middleX, topY) ||
+                        line(px, py, middleX, topY, rightX, upperShoulder) ||
+                        line(px, py, rightX, upperShoulder, rightX, upperInner) ||
+                        line(px, py, rightX, upperInner, middleX, middleY) ||
+                        line(px, py, middleX, middleY, leftX, middleY) ||
+                        line(px, py, middleX, middleY, rightX, lowerInner) ||
+                        line(px, py, rightX, lowerInner, rightX, lowerShoulder) ||
+                        line(px, py, rightX, lowerShoulder, middleX, bottomY) ||
+                        line(px, py, middleX, bottomY, leftX, bottomY);
                 }
                 uint8_t* pixel = high.rgba.data() + (size_t(sy) * size_t(high.width) + size_t(sx)) * 4;
                 pixel[0] = pixel[1] = pixel[2] = onGlyph ? 255 : 0;
                 pixel[3] = 255;
             }
         }
-
-        // Box-downsample the 8x intermediate image into the actual output-density texture.
-        // Store straight-alpha RGBA so the renderer's normal texture blending stays correct.
         Image icon;
         icon.width = corePixels + 2 * kPadPixels;
         icon.height = icon.width;
@@ -417,18 +443,13 @@ void MenuPainter::crossButton(float x, float y, float size, float alpha) {
                 int covered = 0, white = 0;
                 for (int yy = 0; yy < kSupersample; ++yy) {
                     for (int xx = 0; xx < kSupersample; ++xx) {
-                        const int hx = ox * kSupersample + xx;
-                        const int hy = oy * kSupersample + yy;
+                        const int hx = ox * kSupersample + xx, hy = oy * kSupersample + yy;
                         const uint8_t* sample = high.rgba.data() +
                             (size_t(hy) * size_t(high.width) + size_t(hx)) * 4;
-                        if (sample[3]) {
-                            ++covered;
-                            if (sample[0]) ++white;
-                        }
+                        if (sample[3]) { ++covered; if (sample[0]) ++white; }
                     }
                 }
-                uint8_t* pixel = icon.rgba.data() +
-                    (size_t(oy) * size_t(icon.width) + size_t(ox)) * 4;
+                uint8_t* pixel = icon.rgba.data() + (size_t(oy) * size_t(icon.width) + size_t(ox)) * 4;
                 pixel[3] = uint8_t((covered * 255 + kSamplesPerPixel / 2) / kSamplesPerPixel);
                 if (covered) {
                     const uint8_t value = uint8_t((white * 255 + covered / 2) / covered);
@@ -436,14 +457,13 @@ void MenuPainter::crossButton(float x, float y, float size, float alpha) {
                 }
             }
         }
-        crossButtonTex_ = r_->upload(icon);
-        if (!crossButtonTex_.id) return;
-        crossButtonTexCorePixels_ = corePixels;
-        crossButtonTexXbox_ = xboxPrompts_;
+        cachedTexture = r_->upload(icon);
+        if (!cachedTexture.id) return;
+        cachedCorePixels = corePixels;
+        cachedXbox = xboxPrompts_;
     }
-
     const float padMenu = float(kPadPixels) / (r_->pixelScale() * K() * kScale);
-    r_->drawQuad(crossButtonTex_, X(x - padMenu) * kScale, Y(y - padMenu) * kScale,
+    r_->drawQuad(cachedTexture, X(x - padMenu) * kScale, Y(y - padMenu) * kScale,
                  (size + 2.0f * padMenu) * K() * kScale,
                  (size + 2.0f * padMenu) * K() * kScale, 1, 1, 1, alpha);
 }

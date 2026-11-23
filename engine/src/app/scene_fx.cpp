@@ -1157,7 +1157,8 @@ std::vector<OptRow> optionRows(App& app, int page) {
         speed(tr("Field Speed"), &app.fieldSpeed, tr("Walking the field 2 .. 5 times as fast - the scenes, talk and menus as they are"));
         speed(tr("Battle Speed"), &app.battleSpeed, tr("The battles 2 .. 5 times as fast"));
         OptRow swap; // the controller's ○ (east) / × (south): Off as on the Vita, ○ confirms
-        swap.label = tr("Swap \u25cb and \u00d7");
+        swap.label = tr("Swap");
+        swap.promptPair = true;
         swap.kind = OptControl::Pair;
         swap.words[0] = swap.words[1] = -1;
         swap.texts[0] = tr("On");
@@ -1168,8 +1169,8 @@ std::vector<OptRow> optionRows(App& app, int page) {
             saveMix(app);
         };
         swap.hint = (app.pad ? trf("Controller: {0}.", {SDL_GetGamepadName(app.pad) ? SDL_GetGamepadName(app.pad) : ""}) + " " : std::string(tr("With a controller:")) + " ") +
-                    (app.padConfirmEast ? tr("\u25cb (the right button) confirms, \u00d7 (the bottom one) goes back - as on the Vita")
-                                        : tr("\u00d7 (the bottom button) confirms, \u25cb (the right one) goes back"));
+                    (app.padConfirmEast ? tr("The right button confirms, the bottom one goes back - as on the Vita")
+                                        : tr("The bottom button confirms, the right one goes back"));
         rows.push_back(swap);
         pair(tr("Button Layout"), "PlayStation", "Xbox", app.xboxButtonPrompts ? 1 : 0, [&app](int i) {
             app.xboxButtonPrompts = i == 1;
@@ -1567,6 +1568,15 @@ void drawOptions(App& app, float, float) {
         // pad lead; under a finger or the mouse every row alike, 3.1.0's white at 0xb3: #17)
         const bool focus = !app.pointerLast, vita = r.vitaScreen();
         m.rowBar(20 + rowsX, y, row.label, dim, false, focus && !cursor ? 0xc8 / 255.0f : 1, (vita ? 0xd2 : 0xb3) / 255.0f);
+        if (row.promptPair) {
+            const std::string conjunction = tr("and");
+            const float firstPromptX = 28.0f + rowsX + m.textWidth(row.label, 14.0f) + 6.0f;
+            m.buttonPrompt(firstPromptX, y + 4.0f, 16.0f, false, dim);
+            const float conjunctionX = firstPromptX + 20.0f;
+            const float conjunctionWidth = m.textWidth(conjunction, 14.0f);
+            m.textCentred(conjunction, conjunctionX, y + 12.0f, true, dim, 14.0f, false, true);
+            m.buttonPrompt(conjunctionX + conjunctionWidth + 4.0f, y + 4.0f, 16.0f, true, dim);
+        }
         // The control in the original's design units (buttons 8 above the bar, gauges 4 below),
         // scaled about (kOptCtrlX, the bar's middle)
         m.setScale(kOptCtrlX + ctrlX, mid, kOptCtrlScale);

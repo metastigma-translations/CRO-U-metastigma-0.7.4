@@ -1333,6 +1333,7 @@ struct OptRow {
     int words[2] = {-1, -1};     // Pair: word pictures (Japanese / English, On / Off ...), else texts
     std::string texts[2];
     int selected = -1;           // Pair: the lit button
+    bool promptPair = false;       // draw the active layout's two button glyphs beside this row
     int* gauge = nullptr;        // Gauge: the 0..100 setting
     int value = 0;
     std::string valueText;       // Value

@@ -24,6 +24,8 @@ public:
         cleanOutline_ = cleanOutline;
     }
     void setXboxPrompts(bool enabled) { xboxPrompts_ = enabled; }
+    // Draw the layout's primary / secondary face button: PS X / O or Xbox A / B.
+    void buttonPrompt(float x, float y, float size, bool secondary, float alpha = 1);
     void release(Renderer& r); // the cached text
     // Everything drawn after this is scaled by k about (x, y) (our denser Options pages draw
     // the game's controls at 85%); k = 1 turns it off
@@ -138,11 +140,12 @@ private:
     };
     std::map<std::string, Cached> text_;
     std::map<std::array<uint8_t, 8>, Texture> gradients_;
-    Texture crossButtonTex_;
-    int crossButtonTexCorePixels_ = 0;
-    bool crossButtonTexXbox_ = false;
+    std::array<Texture, 2> promptButtonTex_{};
+    std::array<int, 2> promptButtonTexCorePixels_{};
+    std::array<bool, 2> promptButtonTexXbox_{};
     bool xboxPrompts_ = false;
     void arrowTriangle(float x, float y, float w, float h, bool pointsRight, float alpha);
+    void promptButton(float x, float y, float size, bool secondary, float alpha);
     void crossButton(float x, float y, float size, float alpha);
     Cached& rasterise(const std::string& s, float size, bool perGlyphVerticalGradient = false,
                       bool darkVerticalGradient = false, float letterSpacing = 0);
