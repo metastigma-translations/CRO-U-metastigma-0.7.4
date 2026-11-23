@@ -1549,20 +1549,22 @@ void drawClockAndOz(App& app, cr::MenuPainter& m, float a) {
     localtime_r(&now, &tm);
 #endif
     const float white[4] = {1, 1, 1, a};
-    auto clockPlateLabel = [&](const std::string& label, float x, float y, bool noOutline) {
-        // Keep each original 36x16 white atlas plate, but draw its lettering with the selected font.
-        m.quad(x, y, 36, 16, white, white);
+    auto clockPlateLabel = [&](const std::string& label, float x, float y, bool noOutline,
+                                float plateWidth = 36.0f) {
+        // White label plate; TIME is slightly wider so the selected-font text has clear side margins.
+        m.quad(x, y, plateWidth, 16.0f, white, white);
         float size = 14.0f;
         float width = m.textWidth(label, size);
-        if (width > 34.0f && width > 0.0f) size *= 34.0f / width;
+        const float textMaxWidth = plateWidth - 4.0f;
+        if (width > textMaxWidth && width > 0.0f) size *= textMaxWidth / width;
         width = m.textWidth(label, size);
-        m.textCentred(label, x + (36.0f - width) * 0.5f, y + 8.0f,
+        m.textCentred(label, x + (plateWidth - width) * 0.5f, y + 8.0f,
                       true, a, size, false, false, noOutline);
     };
     const float clockX = 363.0f + vx;
-    // The white plate ends exactly at the original rule; TIME is plain black text without outline.
-    clockPlateLabel(tr("TIME"), clockX, 0.0f, true);
-    m.picture(74, clockX + 36.0f, 16.0f, a); // rule behind the time glyphs
+    // Bottom of the wider TIME plate aligns with the bottom of the 4-unit underline (y=16..20).
+    clockPlateLabel(tr("TIME"), clockX, 4.0f, true, 40.0f);
+    m.picture(74, clockX + 40.0f, 16.0f, a); // rule starts at the widened plate's right edge
     const int digit[4] = {tm.tm_hour / 10, tm.tm_hour % 10, tm.tm_min / 10, tm.tm_min % 10};
     static const float kAt[4] = {0, 12, 36, 48};
     for (int i = 0; i < 4; ++i)
