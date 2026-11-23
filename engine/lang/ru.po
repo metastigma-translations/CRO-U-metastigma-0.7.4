@@ -395,7 +395,8 @@ msgid "Button Layout"
 msgstr "Раскладка кнопок"
 
 #: src/app/scene_fx.cpp
-msgid "Changes only the on-screen button symbols; it does not change controller actions."
+msgid ""
+"Changes only the on-screen button symbols; it does not change controller actions."
 msgstr "Меняет только значки кнопок на экране, не меняя их назначение."
 
 #: src/app/scene_fx.cpp

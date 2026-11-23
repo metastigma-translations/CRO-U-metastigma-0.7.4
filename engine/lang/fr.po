@@ -393,7 +393,8 @@ msgid "Button Layout"
 msgstr ""
 
 #: src/app/scene_fx.cpp
-msgid "Changes only the on-screen button symbols; it does not change controller actions."
+msgid ""
+"Changes only the on-screen button symbols; it does not change controller actions."
 msgstr ""
 
 #: src/app/scene_fx.cpp
