@@ -8,227 +8,227 @@ msgstr ""
 "X-Language-Name: 한국어\n"
 "Last-Translator: Claude (machine translation, unreviewed)\n"
 
-#: src/app/scene_fx.cpp
+#: src/app/app.hpp
 msgid "Native AA"
 msgstr "네이티브 AA"
 
-#: src/app/scene_fx.cpp
+#: src/app/app.hpp
 msgid "Quality"
 msgstr "품질"
 
-#: src/app/scene_fx.cpp
+#: src/app/app.hpp
 msgid "Balanced"
 msgstr "균형"
 
-#: src/app/scene_fx.cpp
+#: src/app/app.hpp
 msgid "Performance"
 msgstr "성능"
 
-#: src/app/scene_fx.cpp
+#: src/app/app.hpp
 msgid "Ultra Perf."
 msgstr "울트라 성능"
 
-#: src/app/scene_fx.cpp
+#: src/app/app.hpp src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Off"
 msgstr "끄기"
 
-#: src/app/scene_fx.cpp
+#: src/app/battle.cpp
 msgid "Results"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
 msgid "Back"
 msgstr "뒤로"
 
-#: src/app/scene_fx.cpp
+#: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Quit Game"
 msgstr "게임 종료"
 
-#: src/app/scene_fx.cpp
+#: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Menu Language"
 msgstr "메뉴 언어"
 
-#: src/app/scene_fx.cpp
+#: src/app/field_puzzle.cpp
 msgid "Fan translation"
 msgstr "팬 번역"
 
-#: src/app/scene_fx.cpp
+#: src/app/field_puzzle.cpp
 msgid "{0} (fan translation)"
 msgstr "{0} (팬 번역)"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Yes"
 msgstr "예"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "No"
 msgstr "아니요"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "OK"
 msgstr "OK"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Start Game"
 msgstr "시작"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Options"
 msgstr "옵션"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "New"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Load"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Items"
 msgstr "아이템"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Equipment"
 msgstr "장비"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Genes"
 msgstr "유전자"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Status"
 msgstr "상태"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Extra"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Pair"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Solo"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Escape"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Check"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Attack"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Defend"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Talk"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Buy"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Sell"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Weapons"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Armor"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Jewel"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Scenarios"
 msgstr "시나리오"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "On"
 msgstr "켜기"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Ohm"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "DATE"
 msgstr "DATE"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "TOTAL PLAYTIME"
 msgstr "TOTAL PLAYTIME"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "LV"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "HP"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "MP"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "NEXT"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "EXP"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "ATTACK"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "DEFENSE"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "SPEED"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "LUCK"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Shop"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "TIME"
 msgstr "TIME"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "OZ"
 msgstr "OZ"
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "World Select"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp
 msgid "Camp"
 msgstr ""
 
-#: src/app/scene_fx.cpp
+#: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
 msgstr "종료"
 
@@ -713,399 +713,399 @@ msgstr "와"
 msgid "Quit the game?"
 msgstr "게임을 종료하시겠습니까?"
 
-#: src/app/scene_fx.cpp
+#: src/gfx/render_device.hpp
 msgid "needs the Vulkan renderer"
 msgstr "Vulkan 렌더러가 필요합니다"
 
-#: src/app/scene_fx.cpp
+#: src/gfx/vk_device.cpp
 msgid "this GPU lacks what temporal upscaling needs"
 msgstr "이 GPU에는 템포럴 업스케일링에 필요한 기능이 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/gfx/vk_device.cpp
 msgid "this GPU can't run FSR 3.1"
 msgstr "이 GPU에서는 FSR 3.1을 실행할 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/gfx/vk_device.cpp
 msgid "MetalFX is Apple's: macOS only"
 msgstr "MetalFX는 Apple 기술이라 macOS 전용입니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Any file"
 msgstr "모든 파일"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "can't be read"
 msgstr "읽을 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "not a zip (no central directory) - an .ipa is one"
 msgstr "zip이 아닙니다(중앙 디렉터리 없음). .ipa는 zip 형식입니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "its directory is past its end"
 msgstr "디렉터리가 파일 끝을 넘어섭니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "a broken directory entry"
 msgstr "손상된 디렉터리 항목이 있습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "{0}: no local header"
 msgstr "{0}: 로컬 헤더가 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "{0}: can't be written"
 msgstr "{0}: 쓸 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "{0}: can't be unpacked"
 msgstr "{0}: 압축을 풀 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "A file picked can't be read ({0})."
 msgstr "선택한 파일을 읽을 수 없습니다({0})."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "A file picked ({0} GB) needs about {1} GB free in {2} - the copy and what it unpacks to -, and there is {3} GB."
 msgstr ""
 "선택한 파일({0}GB)에는 {2}에 약 {1}GB의 여유 공간(복사본과 압축 해제된 데이터용)이 필요하지만 {3}GB밖에 없습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Copying the file picked ({0} of {1}) ..."
 msgstr "선택한 파일 복사 중({0}/{1})..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Copying the file picked ..."
 msgstr "선택한 파일 복사 중..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "A file picked can't be copied into {0}"
 msgstr "선택한 파일을 {0}에 복사할 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "can't be opened"
 msgstr "열 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "no Payload/<name>.app in it - not an iOS app"
 msgstr "Payload/<name>.app이 없습니다(iOS 앱이 아님)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "{0}: can't be made"
 msgstr "{0}: 만들 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "no work.bin (its licence) to decrypt it with"
 msgstr "복호화에 쓸 work.bin(라이선스)이 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "its files don't decrypt (a part of the dump missing or damaged?)"
 msgstr "파일이 복호화되지 않습니다(덤프 일부가 없거나 손상되었을 수 있습니다)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "its files can't be read with its own work.bin - not a whole NoNpDrm dump"
 msgstr "함께 있는 work.bin으로 파일을 읽을 수 없습니다. 완전한 NoNpDrm 덤프가 아닙니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "this build can't decrypt the Vita's files - install the dump in Vita3K, then choose Vita3K's folder"
 msgstr "이 빌드에서는 Vita 파일을 복호화할 수 없습니다. 덤프를 Vita3K에 설치한 뒤 Vita3K 폴더를 선택하세요"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "{0}: {1}"
 msgstr "{0}: {1}"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "an entry it can't read (after the start)"
 msgstr "읽을 수 없는 항목이 있습니다(맨 처음)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "an entry it can't read (after {0})"
 msgstr "읽을 수 없는 항목이 있습니다({0} 다음)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "this build can't open archives - unpack it first, then choose its folder"
 msgstr "이 빌드에서는 압축 파일을 열 수 없습니다. 먼저 압축을 푼 뒤 그 폴더를 선택하세요"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "no fan translation in it (its rePatch/{0}/)"
 msgstr "팬 번역이 들어 있지 않습니다(rePatch/{0}/)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "not a SELF"
 msgstr "SELF가 아닙니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "a broken SELF"
 msgstr "손상된 SELF입니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "a broken SELF (a segment past its end)"
 msgstr "손상된 SELF입니다(세그먼트가 파일 끝을 넘어섬)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "a SELF of a kind (or key revision) the port has no key for"
 msgstr "이 이식판에 키가 없는 종류(또는 키 리비전)의 SELF입니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "its key doesn't open it (its licence isn't its own?)"
 msgstr "키로 열 수 없습니다(다른 게임의 라이선스일 수 있습니다)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "a broken SELF (no metadata)"
 msgstr "손상된 SELF입니다(메타데이터 없음)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "a broken SELF (its metadata)"
 msgstr "손상된 SELF입니다(메타데이터)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "a broken SELF (its keys)"
 msgstr "손상된 SELF입니다(키)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "a broken SELF (an encrypted segment without its key)"
 msgstr "손상된 SELF입니다(키가 없는 암호화 세그먼트)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "a segment doesn't inflate"
 msgstr "세그먼트의 압축을 풀 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "built without zlib"
 msgstr "zlib 없이 빌드되었습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "this build can't decrypt the Vita's programs"
 msgstr "이 빌드에서는 Vita 프로그램을 복호화할 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "it needs about {0} GB free in {1}, and there is {2} GB"
 msgstr "{1}에 약 {0}GB의 여유 공간이 필요하지만 {2}GB밖에 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Decrypting the Vita release ..."
 msgstr "Vita판을 복호화하는 중..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Copying the Vita release ..."
 msgstr "Vita판을 복사하는 중..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Decrypting the game's add-on ..."
 msgstr "게임의 추가 콘텐츠를 복호화하는 중..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Copying the game's add-on ..."
 msgstr "게임의 추가 콘텐츠를 복사하는 중..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "{0}: no licence to decrypt it with (the dump's work.bin, Vita3K's ux0/license)"
 msgstr "{0}: 복호화에 쓸 라이선스가 없습니다(덤프의 work.bin, Vita3K의 ux0/license)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "neither {0}'s APK nor its OBB is in it"
 msgstr "{0}의 APK도 OBB도 들어 있지 않습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "{0} plays your own copy of {1}. Choose where it is - any one of them; the files it needs are copied into its folder:"
 msgstr ""
 "{0}은(는) 보유하신 {1}(으)로 플레이합니다. 그 위치를 선택하세요(아래 중 하나면 됩니다). 필요한 파일은 {0}의 폴더로 복사됩니다:"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Android - the APK and its {0} (both at once)"
 msgstr "Android - APK와 그 {0}(둘 다 한 번에)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Android - the .apks (or the APK and its asset packs, all at once)"
 msgstr "Android - .apks(또는 APK와 에셋 팩을 모두 한 번에)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "iOS - the .ipa (an unpacked .app: copy it into ios/ over USB)"
 msgstr "iOS - .ipa(압축 해제된 .app은 USB로 ios/에 복사)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "Vita - a NoNpDrm dump: packed (.zip, .rar, .vpk), or its folder copied in over USB"
 msgstr "Vita - NoNpDrm 덤프: 압축 파일(.zip, .rar, .vpk) 또는 USB로 복사한 폴더"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "What is copied into its folder over USB is found with Look again."
 msgstr "USB로 폴더에 복사한 것은 [다시 찾기]로 찾을 수 있습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "iOS - the .ipa (or a file in its unpacked .app)"
 msgstr "iOS - .ipa(또는 압축 해제된 .app 안의 파일)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "Vita - Vita3K's folder with the game installed (or the game's {0} folder)"
 msgstr "Vita - 게임을 설치한 Vita3K 폴더(또는 게임의 {0} 폴더)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Its folder: {0}"
 msgstr "복사할 폴더: {0}"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "In place:"
 msgstr "준비됨:"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "iOS: {0}"
 msgstr "iOS: {0}"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Android: {0}"
 msgstr "Android: {0}"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Vita: {0}"
 msgstr "Vita: {0}"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Its fan translation: {0}"
 msgstr "팬 번역: {0}"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "More of them add to it (the Vita's voices and music, Android's art); or Start."
 msgstr "다른 판을 추가하면 내용이 더해집니다(Vita의 음성과 음악, Android의 그림). 또는 [시작]을 누르세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "iOS (.ipa)..."
 msgstr "iOS (.ipa)..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Android (APK + OBB)..."
 msgstr "Android (APK + OBB)..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Android (.apks)..."
 msgstr "Android (.apks)..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Vita..."
 msgstr "Vita..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Vita / Vita3K..."
 msgstr "Vita / Vita3K..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Start"
 msgstr "시작"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Look again"
 msgstr "다시 찾기"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "iOS app (.ipa)"
 msgstr "iOS 앱 (.ipa)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Any file (one in an unpacked .app)"
 msgstr "모든 파일(압축 해제된 .app 안의 파일)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "That isn't an .ipa. Choose the .ipa - or copy the unpacked .app into {0} over USB, then Look again."
 msgstr ".ipa가 아닙니다. .ipa를 선택하거나, 압축 해제된 .app을 USB로 {0}에 복사한 뒤 [다시 찾기]를 누르세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Unpacking {0} ..."
 msgstr "{0} 압축 해제 중..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "No {0} data in {1}"
 msgstr "{1}에 {0} 데이터가 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Copying {0} ..."
 msgstr "{0} 복사 중..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "can't be written"
 msgstr "쓸 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "{0} isn't {1}'s iOS release."
 msgstr "{0}은(는) {1}의 iOS판이 아닙니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Android (.apk, .obb, .apks)"
 msgstr "Android (.apk, .obb, .apks)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Choose {0}'s Android release: the APK and its {1}, both at once."
 msgstr "{0}의 Android판을 선택하세요: APK와 그 {1}을(를) 한 번에 함께."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Unpacking the Android release ..."
 msgstr "Android판 압축 해제 중..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Copying the Android release ..."
 msgstr "Android판 복사 중..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Not {0}'s Android release (or not all of it):"
 msgstr "{0}의 Android판이 아닙니다(또는 일부가 빠져 있습니다):"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Choose the APK and its {0}, both at once."
 msgstr "APK와 그 {0}을(를) 한 번에 함께 선택하세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "The Android release can't be copied into {0} (nor the profile folder's)."
 msgstr "Android판을 {0}(및 프로필 폴더 안의 것)에 복사할 수 없습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Where is the Vita release?"
 msgstr "Vita판은 어디에 있나요?"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "A folder - copied into {0} over USB: a NoNpDrm dump's as it was dumped (its app/, and addcont/ for the Prequel Trilogy), Vita3K's ux0, or the game's own folder"
 msgstr ""
 "폴더 - USB로 {0}에 복사한 것: 덤프한 그대로의 NoNpDrm 덤프 폴더(app/, 프리퀄 트릴로지는 addcont/도), Vita3K의 ux0, 또는 게임 자체 폴더"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "An archive - a NoNpDrm dump packed as .zip, .rar or .vpk (a .7z: unpack it on a PC)"
 msgstr "압축 파일 - .zip, .rar, .vpk로 압축한 NoNpDrm 덤프(.7z는 PC에서 압축을 풀어 주세요)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Copied in..."
 msgstr "복사해 둔 폴더..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "An archive..."
 msgstr "압축 파일..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "A folder - Vita3K's (or its ux0), the game's own, or a NoNpDrm dump's"
 msgstr "폴더 - Vita3K 폴더(또는 그 ux0), 게임 자체 폴더, 또는 NoNpDrm 덤프 폴더"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "An archive - a NoNpDrm dump packed as .rar, .7z, .zip or .vpk"
 msgstr "압축 파일 - .rar, .7z, .zip, .vpk로 압축한 NoNpDrm 덤프"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "A folder..."
 msgstr "폴더..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "A Vita dump (.rar, .7z, .zip, .vpk)"
 msgstr "Vita 덤프 (.rar, .7z, .zip, .vpk)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "Copy the Vita release's folder into\n"
 "  {0}\n"
@@ -1115,74 +1115,74 @@ msgstr ""
 "  {0}\n"
 "에 복사하세요. 덤프한 그대로의 NoNpDrm 덤프 폴더(app/, 프리퀄 트릴로지는 addcont/도), Vita3K의 ux0, 또는 게임 자체 폴더입니다. 그런 다음 [계속]을 누르세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Continue"
 msgstr "계속"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "The Prequel Trilogy keeps {0}'s data in its add-on (addcont/PCSG00457/{1}), and it isn't beside {2} - install the add-on in Vita3K too, or choose a dump with it."
 msgstr ""
 "프리퀄 트릴로지는 {0}의 데이터를 추가 콘텐츠(addcont/PCSG00457/{1})에 두는데, {2} 옆에 없습니다. Vita3K에 추가 콘텐츠도 설치하거나 그것이 포함된 덤프를 선택하세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "No {0} ({1}) in {2} - choose Vita3K's folder, its ux0, the game's own folder or a NoNpDrm dump of it."
 msgstr ""
 "{2}에 {0}({1})이(가) 없습니다. Vita3K 폴더, 그 ux0, 게임 자체 폴더, 또는 게임의 NoNpDrm 덤프를 선택하세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "No {0} ({1}) in the archive - choose Vita3K's folder, its ux0, the game's own folder or a NoNpDrm dump of it."
 msgstr ""
 "압축 파일에 {0}({1})이(가) 없습니다. Vita3K 폴더, 그 ux0, 게임 자체 폴더, 또는 게임의 NoNpDrm 덤프를 선택하세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "The Vita release in {0}: {1}"
 msgstr "{0}의 Vita판: {1}"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "The Prequel Trilogy keeps {0}'s data in its add-on (addcont/PCSG00457/{1}), and it isn't beside {2} - install it in Vita3K too, or choose the dump with it."
 msgstr ""
 "프리퀄 트릴로지는 {0}의 데이터를 추가 콘텐츠(addcont/PCSG00457/{1})에 두는데, {2} 옆에 없습니다. 그것도 Vita3K에 설치하거나 그것이 포함된 덤프를 선택하세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "{0} isn't {1}'s Vita release as the port reads it."
 msgstr "{0}은(는) 이 이식판이 읽을 수 있는 {1}의 Vita판이 아닙니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "The Vita release in {0} can't be copied into {1} (nor the profile folder's)."
 msgstr "{0}의 Vita판을 {1}(및 프로필 폴더 안의 것)에 복사할 수 없습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Choose its folder..."
 msgstr "폴더 선택..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Its archive..."
 msgstr "압축 파일..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Without it"
 msgstr "없이 진행"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "This Vita release is in Japanese. A fan translation puts its text over it - gbatemp's English one or Joseas's Spanish one: its rePatch folder ({0}), or the .rar / .zip it comes in. Is one here too?"
 msgstr ""
 "이 Vita판은 일본어판입니다. 팬 번역(gbatemp의 영어판이나 Joseas의 스페인어판)으로 텍스트를 바꿀 수 있습니다. 그 rePatch 폴더({0}) 또는 배포된 .rar / .zip 파일입니다. 이것도 있나요?"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "The fan translation (.rar, .zip, .7z)"
 msgstr "팬 번역 (.rar, .zip, .7z)"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Unpacking the fan translation ..."
 msgstr "팬 번역 압축 해제 중..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "Copy the fan translation's rePatch folder (or the {0} in it) into\n"
 "  {1}\n"
@@ -1192,133 +1192,133 @@ msgstr ""
 "  {1}\n"
 "에 복사한 뒤 [계속]을 누르세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "No fan translation in {0} - copy its rePatch folder (or the {1} in it)."
 msgstr "{0}에 팬 번역이 없습니다. 그 rePatch 폴더(또는 그 안의 {1})를 복사하세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "No fan translation in {0} - choose its rePatch folder (or the {1} in it)."
 msgstr "{0}에 팬 번역이 없습니다. 그 rePatch 폴더(또는 그 안의 {1})를 선택하세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "The fan translation can't be moved to {0}"
 msgstr "팬 번역을 {0}(으)로 옮길 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "Copying the fan translation ..."
 msgstr "팬 번역 복사 중..."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "The fan translation can't be copied into {0}"
 msgstr "팬 번역을 {0}에 복사할 수 없습니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "{0} can't be unpacked: {1}"
 msgstr "{0}의 압축을 풀 수 없습니다: {1}"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "{0} holds no {1} ({2}) as the port reads it."
 msgstr "{0}에 이 이식판이 읽을 수 있는 {1}({2})이(가) 없습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "The Vita release is unpacked and decrypted into {0}."
 msgstr "Vita판을 {0}에 압축 해제하고 복호화했습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "{0} isn't needed any more - delete it to get the space back."
 msgstr "{0}은(는) 이제 필요 없습니다. 삭제하면 공간을 되찾을 수 있습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "The Vita release is decrypted into {0}."
 msgstr "Vita판을 {0}에 복호화했습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "The dump you copied in ({0}) isn't needed any more - delete it to get the space back."
 msgstr "복사해 둔 덤프({0})는 이제 필요 없습니다. 삭제하면 공간을 되찾을 수 있습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "The dump you copied in ({0} and {1}) isn't needed any more - delete it to get the space back."
 msgstr "복사해 둔 덤프({0}, {1})는 이제 필요 없습니다. 삭제하면 공간을 되찾을 수 있습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "The Vita dump in {0} can't be decrypted: {1}"
 msgstr "{0}의 Vita 덤프를 복호화할 수 없습니다: {1}"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "The Prequel Trilogy keeps {0}'s data in its add-on (addcont/PCSG00457/{1}), and it isn't beside {2} - copy the dump's addcont folder in too, beside its app folder."
 msgstr ""
 "프리퀄 트릴로지는 {0}의 데이터를 추가 콘텐츠(addcont/PCSG00457/{1})에 두는데, {2} 옆에 없습니다. 덤프의 addcont 폴더도 app 폴더 옆에 복사하세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "The Vita dump can't be decrypted into {0} - it can't be written there."
 msgstr "Vita 덤프를 {0}에 복호화할 수 없습니다. 그곳에 쓸 수 없습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "it isn't {0}'s iOS release"
 msgstr "{0}의 iOS판이 아닙니다"
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "{0} is unpacked into {1} - the .ipa isn't needed any more: delete it to get the space back."
 msgstr "{0}을(를) {1}에 압축 해제했습니다. .ipa는 이제 필요 없습니다. 삭제하면 공간을 되찾을 수 있습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "{0} is unpacked into {1} - the {0} isn't needed any more: delete it to get the space back."
 msgstr "{0}을(를) {1}에 압축 해제했습니다. {0}은(는) 이제 필요 없습니다. 삭제하면 공간을 되찾을 수 있습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "{0} is unpacked into {1}, but {2}'s {3} isn't there - put it in {1} too."
 msgstr "{0}을(를) {1}에 압축 해제했지만 {2}의 {3}이(가) 없습니다. 그것도 {1}에 넣어 주세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid "{0} can't be opened by this build - unpack it into {1} first."
 msgstr "이 빌드에서는 {0}을(를) 열 수 없습니다. 먼저 {1}에 압축을 풀어 주세요."
 
-#: src/app/scene_fx.cpp
+#: src/platform/setup.cpp
 msgid ""
 "The fan translation is unpacked into {0} - {1} isn't needed any more: delete it to get the space back."
 msgstr "팬 번역을 {0}에 압축 해제했습니다. {1}은(는) 이제 필요 없습니다. 삭제하면 공간을 되찾을 수 있습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/vita_import_ui.hpp
 msgid "Found {0} save slot(s)."
 msgstr "세이브 슬롯 {0}개를 찾았습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/vita_import_ui.hpp
 msgid "Existing saves will be backed up."
 msgstr "기존 세이브는 백업됩니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/vita_import_ui.hpp
 msgid "Invalid suspend skipped."
 msgstr "잘못된 중단 데이터는 건너뛰었습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/vita_import_ui.hpp
 msgid "Import now?"
 msgstr "지금 가져올까요?"
 
-#: src/app/scene_fx.cpp
+#: src/platform/vita_import_ui.hpp
 msgid "Import failed: {0}"
 msgstr "가져오기 실패: {0}"
 
-#: src/app/scene_fx.cpp
+#: src/platform/vita_import_ui.hpp
 msgid "Cannot open the folder picker: {0}"
 msgstr "폴더 선택 창을 열 수 없습니다: {0}"
 
-#: src/app/scene_fx.cpp
+#: src/platform/vita_import_ui.hpp
 msgid "Imported {0} save slot(s)."
 msgstr "세이브 슬롯 {0}개를 가져왔습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/vita_import_ui.hpp
 msgid "Previous saves backed up."
 msgstr "이전 세이브를 백업했습니다."
 
-#: src/app/scene_fx.cpp
+#: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "타이틀 화면에서 불러오세요."
