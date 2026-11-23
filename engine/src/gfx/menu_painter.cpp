@@ -332,17 +332,50 @@ void MenuPainter::arrowTriangle(float x, float y, float w, float h, bool pointsR
     r_->fillQuad(xy, 0, 0, 0, alpha);
 }
 
-void MenuPainter::upTriangle(float x, float y, float w, float h, float alpha) {
-    if (!r_ || alpha <= 0.001f) return;
-    const float cx = x + w * 0.5f;
-    const float xy[8] = {
-        X(cx) * kScale, Y(y) * kScale,
-        X(x + w) * kScale, Y(y + h) * kScale,
-        X(x) * kScale, Y(y + h) * kScale,
-        X(cx) * kScale, Y(y) * kScale,
+void MenuPainter::crossButton(float x, float y, float size, float alpha) {
+    if (!r_ || alpha <= 0.001f || size <= 0.0f) return;
+
+    // Solid circular gamepad button, tessellated at the active output resolution.
+    constexpr int segments = 24;
+    const float cx = x + size * 0.5f, cy = y + size * 0.5f;
+    const float radius = size * 0.5f;
+    for (int i = 0; i < segments; ++i) {
+        const float a0 = (2.0f * 3.14159265358979323846f * i) / segments;
+        const float a1 = (2.0f * 3.14159265358979323846f * (i + 1)) / segments;
+        const float x0 = cx + std::cos(a0) * radius, y0 = cy + std::sin(a0) * radius;
+        const float x1 = cx + std::cos(a1) * radius, y1 = cy + std::sin(a1) * radius;
+        const float xy[8] = {
+            X(cx) * kScale, Y(cy) * kScale,
+            X(x0) * kScale, Y(y0) * kScale,
+            X(x1) * kScale, Y(y1) * kScale,
+            X(x1) * kScale, Y(y1) * kScale,
+        };
+        r_->fillQuad(xy, 0, 0, 0, alpha);
+    }
+
+    // White X, drawn as two thin vector strokes rather than a font glyph.
+    constexpr float stroke = 1.8f;
+    const float half = stroke * 0.5f;
+    const float inset = size * 0.27f;
+    const float x0 = x + inset, y0 = y + inset;
+    const float x1 = x + size - inset, y1 = y + size - inset;
+    const float dx = x1 - x0, dy = y1 - y0;
+    const float len = std::sqrt(dx * dx + dy * dy);
+    const float px = -dy / len * half, py = dx / len * half;
+    const float xyA[8] = {
+        X(x0 + px) * kScale, Y(y0 + py) * kScale,
+        X(x1 + px) * kScale, Y(y1 + py) * kScale,
+        X(x1 - px) * kScale, Y(y1 - py) * kScale,
+        X(x0 - px) * kScale, Y(y0 - py) * kScale,
     };
-    // The Back mark is a clean, solid triangle pointing straight up.
-    r_->fillQuad(xy, 0, 0, 0, alpha);
+    const float xyB[8] = {
+        X(x0 + px) * kScale, Y(y1 - py) * kScale,
+        X(x1 + px) * kScale, Y(y0 - py) * kScale,
+        X(x1 - px) * kScale, Y(y0 + py) * kScale,
+        X(x0 - px) * kScale, Y(y1 + py) * kScale,
+    };
+    r_->fillQuad(xyA, 1, 1, 1, alpha);
+    r_->fillQuad(xyB, 1, 1, 1, alpha);
 }
 
 void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha, const std::string& label) {
@@ -364,7 +397,7 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
     arrowTriangle(x + 24 + bob, y + 4, 16, 16, false, alpha);
     arrowTriangle(x + 197 - bob, y + 4, 16, 16, true, alpha);
 
-    // The center face, up-pointing Back triangle and lettering use the active render scale.
+    // The center face, round X gamepad button and lettering use the active render scale.
     constexpr float glyphWidth = 18.0f, gap = 5.0f, labelMaxWidth = 92.0f;
     float size = 14.0f;
     float width = textWidth(label, size);
@@ -372,7 +405,7 @@ void MenuPainter::backButton(float x, float y, int pressed, int bob, float alpha
     width = textWidth(label, size);
     const float total = glyphWidth + (label.empty() ? 0.0f : gap) + width;
     const float start = x + 56.0f + (120.0f - total) / 2.0f;
-    upTriangle(start + 1.0f, y + 4.0f, 16.0f, 16.0f, alpha);
+    crossButton(start + 1.0f, y + 4.0f, 16.0f, alpha);
 
     if (!label.empty()) {
         // Match the original button's plain black lettering; no menu outline or gradient.
@@ -403,7 +436,7 @@ void MenuPainter::backBar(float x, float y, bool pressed, float alpha, const std
     labelWidth = textWidth(label, size);
     const float totalWidth = arrowWidth + (label.empty() ? 0.0f : gap) + labelWidth;
     const float ax = x + (232.0f - totalWidth) * 0.5f;
-    upTriangle(ax + 2.0f, y + 4.0f, 16.0f, 16.0f, alpha);
+    crossButton(ax + 2.0f, y + 4.0f, 16.0f, alpha);
     if (!label.empty()) {
         const bool savedOutline = outline_, savedCleanOutline = cleanOutline_;
         outline_ = false;
@@ -432,7 +465,7 @@ void MenuPainter::backOkBar(float x, float y, int pressed, float alpha, const st
     labelWidth = textWidth(label, size);
     const float total = arrowWidth + gap + labelWidth;
     const float start = x + 24.0f + (90.0f - total) * 0.5f;
-    upTriangle(start + 1.0f, y + 4.0f, 16.0f, 16.0f, alpha);
+    crossButton(start + 1.0f, y + 4.0f, 16.0f, alpha);
     const bool savedOutline = outline_, savedCleanOutline = cleanOutline_;
     outline_ = false;
     cleanOutline_ = true;
