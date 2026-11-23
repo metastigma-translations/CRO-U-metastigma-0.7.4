@@ -1586,23 +1586,33 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     // (__ComUty_FaceBoardFaceDraw: PictNumDraw(x + 0x30, y + 0x56, level, 3 places, 12, style 1) right-aligned
     // - Part 3 394 s: "LV  10", the digits at the field's right)
     drawShopNumber(m, pm.level, x + 48, y + 86, 3, 12, a, 1);
+
+    // Match the submenu/status panel typography and vertical position. The Russian NEXT caption
+    // is sized once so it ends before the right-side value; original caption X origins are retained.
+    const std::string gaugeLabels[3] = {tr("HP"), tr("MP"), tr("NEXT")};
+    constexpr float kFaceGaugeLabelBaseSize = 14.0f;
+    constexpr float kFaceGaugeLabelWidth = 78.0f;
+    const float nextLabelWidth = m.textWidth(gaugeLabels[2], kFaceGaugeLabelBaseSize);
+    const float faceGaugeLabelSize = nextLabelWidth > kFaceGaugeLabelWidth && nextLabelWidth > 0.0f
+        ? kFaceGaugeLabelBaseSize * kFaceGaugeLabelWidth / nextLabelWidth : kFaceGaugeLabelBaseSize;
+
     for (int k = 0; k < 2; ++k) {
         const float hx = x + 96, hy = y + 50 + 20.0f * float(k);
-        m.picture(k ? 63 : 62, hx, hy, a);
         drawShopNumber(m, k ? mp : hp, hx + 22, hy - 4, 5, 12, a, 2);
         drawShopNumber(m, k ? mpMax : hpMax, hx + 94, hy - 4, 5, 12, a, 2);
         drawShopBar(m, hx + 16, hy + 9, 1, 1, 0, a);
         drawShopBar(m, hx + 15, hy + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
-        // The character-card slash is font-rendered too, after the bars so it cannot be masked.
-        // Keep the original X origin; raise the glyph and use black/white only for the MP row.
+        // Use the selected font for captions and slash, and draw them after the tracks.
+        // HP keeps white/black; the MP slash is black with a white outline.
+        m.textCentred(gaugeLabels[k], hx, hy + 4.0f, false, a, faceGaugeLabelSize);
         m.text("/", hx + 82, hy - 8, k != 0, a, 14);
     }
     const float nx = x + 96, ny = y + 90;
     const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
-    m.picture(64, nx, ny, a);
     drawShopNumber(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), nx + 82, ny - 4, 6, 12, a, 2);
     drawShopBar(m, nx + 16, ny + 9, 1, 1, 0, a);
     drawShopBar(m, nx + 15, ny + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
+    m.textCentred(gaugeLabels[2], nx, ny + 4.0f, false, a, faceGaugeLabelSize);
 }
 
 // The member's HP (full outside battles) and MP as the boards show them
