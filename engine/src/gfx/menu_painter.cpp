@@ -26,6 +26,7 @@ void MenuPainter::release(Renderer& r) {
     gradients_.clear();
     r.destroy(crossButtonTex_);
     crossButtonTexCorePixels_ = 0;
+    crossButtonTexXbox_ = false;
 }
 
 void MenuPainter::piece(float x, float y, float u, float v, float w, float h, float alpha, float r, float g, float b) {
@@ -345,7 +346,7 @@ void MenuPainter::crossButton(float x, float y, float size, float alpha) {
     constexpr int kSamplesPerPixel = kSupersample * kSupersample;
     const float outputScale = r_->pixelScale() * K();
     const int corePixels = std::max(8, int(std::ceil(size * kScale * outputScale)));
-    if (!crossButtonTex_.id || crossButtonTexCorePixels_ != corePixels) {
+    if (!crossButtonTex_.id || crossButtonTexCorePixels_ != corePixels || crossButtonTexXbox_ != xboxPrompts_) {
         r_->destroy(crossButtonTex_);
         crossButtonTexCorePixels_ = 0;
 
@@ -381,11 +382,26 @@ void MenuPainter::crossButton(float x, float y, float size, float alpha) {
                 const float dx = px - centre, dy = py - centre;
                 if (dx * dx + dy * dy > radius * radius) continue;
 
-                const bool onX =
-                    distanceToSegmentSquared(px, py, ax0, ay0, ax1, ay1) <= halfStroke * halfStroke ||
-                    distanceToSegmentSquared(px, py, bx0, by0, bx1, by1) <= halfStroke * halfStroke;
+                bool onGlyph = false;
+                if (xboxPrompts_) {
+                    // Xbox A: two rising legs and a short crossbar in the same round face.
+                    const float topY = centre - radius * 0.50f;
+                    const float bottomY = centre + radius * 0.46f;
+                    const float halfWidth = radius * 0.40f;
+                    const float barY = centre + radius * 0.10f;
+                    onGlyph =
+                        distanceToSegmentSquared(px, py, centre - halfWidth, bottomY, centre, topY) <= halfStroke * halfStroke ||
+                        distanceToSegmentSquared(px, py, centre, topY, centre + halfWidth, bottomY) <= halfStroke * halfStroke ||
+                        distanceToSegmentSquared(px, py, centre - halfWidth * 0.56f, barY,
+                                                centre + halfWidth * 0.56f, barY) <= halfStroke * halfStroke;
+                } else {
+                    // PlayStation X.
+                    onGlyph =
+                        distanceToSegmentSquared(px, py, ax0, ay0, ax1, ay1) <= halfStroke * halfStroke ||
+                        distanceToSegmentSquared(px, py, bx0, by0, bx1, by1) <= halfStroke * halfStroke;
+                }
                 uint8_t* pixel = high.rgba.data() + (size_t(sy) * size_t(high.width) + size_t(sx)) * 4;
-                pixel[0] = pixel[1] = pixel[2] = onX ? 255 : 0;
+                pixel[0] = pixel[1] = pixel[2] = onGlyph ? 255 : 0;
                 pixel[3] = 255;
             }
         }
@@ -423,6 +439,7 @@ void MenuPainter::crossButton(float x, float y, float size, float alpha) {
         crossButtonTex_ = r_->upload(icon);
         if (!crossButtonTex_.id) return;
         crossButtonTexCorePixels_ = corePixels;
+        crossButtonTexXbox_ = xboxPrompts_;
     }
 
     const float padMenu = float(kPadPixels) / (r_->pixelScale() * K() * kScale);

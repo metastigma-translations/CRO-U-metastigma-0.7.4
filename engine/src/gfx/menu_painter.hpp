@@ -23,6 +23,7 @@ public:
         font_ = font;
         cleanOutline_ = cleanOutline;
     }
+    void setXboxPrompts(bool enabled) { xboxPrompts_ = enabled; }
     void release(Renderer& r); // the cached text
     // Everything drawn after this is scaled by k about (x, y) (our denser Options pages draw
     // the game's controls at 85%); k = 1 turns it off
@@ -139,6 +140,8 @@ private:
     std::map<std::array<uint8_t, 8>, Texture> gradients_;
     Texture crossButtonTex_;
     int crossButtonTexCorePixels_ = 0;
+    bool crossButtonTexXbox_ = false;
+    bool xboxPrompts_ = false;
     void arrowTriangle(float x, float y, float w, float h, bool pointsRight, float alpha);
     void crossButton(float x, float y, float size, float alpha);
     Cached& rasterise(const std::string& s, float size, bool perGlyphVerticalGradient = false,

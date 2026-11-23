@@ -668,6 +668,7 @@ struct App {
     // Empty: every pad
     std::vector<SDL_JoystickID> padAllow;
     bool padConfirmEast = true;
+    bool xboxButtonPrompts = false; // visual symbols only: PlayStation X or Xbox A
     // CRO-U's own (Options, Game: Field Speed, Battle Speed): the field - while the player walks it,
     // nothing over it - and the battles run this many times as fast (1, or 2 .. 5)
     int fieldSpeed = 1, battleSpeed = 1;

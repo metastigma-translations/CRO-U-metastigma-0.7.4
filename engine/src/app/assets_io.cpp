@@ -945,7 +945,8 @@ std::string settingsText(const App& app) {
                               std::to_string(int(app.cleanTextOutline)) + "\nlock_orientation=" +
                               std::to_string(int(app.lockOrientation)) + "\nlock_landscape_flipped=" +
                               std::to_string(int(app.lockLandscapeFlipped)) + "\n" + "vita=" + app.vitaPath + "\n" + "android=" + app.androidPath + "\n" + "pad_confirm=" +
-                              (app.padConfirmEast ? "east" : "south") + "\n" + "field_speed=" + std::to_string(app.fieldSpeed) +
+                              (app.padConfirmEast ? "east" : "south") + "\n" + "button_prompts=" +
+                              (app.xboxButtonPrompts ? "xbox" : "playstation") + "\n" + "field_speed=" + std::to_string(app.fieldSpeed) +
                               "\nbattle_speed=" + std::to_string(app.battleSpeed) + "\n";
     const App::Cheats& ch = app.cheats;
     t += "cheats=" + std::to_string(int(ch.hp)) + "," + std::to_string(int(ch.mp)) + "," + std::to_string(int(ch.oz)) + "," +

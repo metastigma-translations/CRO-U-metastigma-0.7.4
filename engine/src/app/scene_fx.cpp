@@ -631,6 +631,9 @@ void loadVideo(App& app, const char* text) {
     app.lockOrientation = keyValue(text, "\nlock_orientation=", app.lockOrientation) != 0;
     app.lockLandscapeFlipped = keyValue(text, "\nlock_landscape_flipped=", app.lockLandscapeFlipped) != 0;
     if (const char* at = SDL_strstr(text, "\npad_confirm=")) app.padConfirmEast = SDL_strncmp(at + 13, "south", 5) != 0;
+    if (const char* at = SDL_strstr(text, "\nbutton_prompts="))
+        app.xboxButtonPrompts = SDL_strncmp(at + SDL_strlen("\nbutton_prompts="), "xbox", 4) == 0;
+    app.menu.setXboxPrompts(app.xboxButtonPrompts);
     app.fieldSpeed = std::clamp(keyValue(text, "\nfield_speed=", app.fieldSpeed), 1, 5);
     if (const char* at = SDL_strstr(text, "\ncheats=")) { // (Options' Cheats: hp,mp,oz,first strike,no battles,one hit,exp)
         int v[8] = {0, 0, 0, 0, 0, 0, 1, 0};
@@ -1168,6 +1171,12 @@ std::vector<OptRow> optionRows(App& app, int page) {
                     (app.padConfirmEast ? tr("\u25cb (the right button) confirms, \u00d7 (the bottom one) goes back - as on the Vita")
                                         : tr("\u00d7 (the bottom button) confirms, \u25cb (the right one) goes back"));
         rows.push_back(swap);
+        pair(tr("Button Layout"), "PlayStation", "Xbox", app.xboxButtonPrompts ? 1 : 0, [&app](int i) {
+            app.xboxButtonPrompts = i == 1;
+            app.menu.setXboxPrompts(app.xboxButtonPrompts);
+            saveMix(app);
+        });
+        rows.back().hint = tr("Changes only the on-screen button symbols; it does not change controller actions.");
         OptRow manual; // the topics and their pages (MuScrList + MsgUty)
         manual.label = sysLabel(app, 58081, "Instruction Manual");
         manual.act = [&app](int) { openManual(app, 0); };
