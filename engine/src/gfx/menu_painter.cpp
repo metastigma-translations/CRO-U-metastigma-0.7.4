@@ -211,20 +211,31 @@ float MenuPainter::textWidth(const std::string& s, float size, float letterSpaci
     return rasterise(s, menuSize(size) * K(), false, false, letterSpacing).w / kScale / K();
 }
 
+float MenuPainter::baselineFromCentre(float size) const {
+    return font_ && font_->loaded() ? menuSize(size) * font_->baselineFromCentreEm() : 0.0f;
+}
+
 // Rebuild the window_hd section headings (World Select, Results, Camp, Shop, Options, Scenarios).
 // The old pictures baked the words into a white strip fading to transparency at the right.
 void MenuPainter::headingStrip(float x, float y, const std::string& label, float alpha, float width, float textSize, float textOffset) {
     if (!r_ || label.empty() || alpha <= 0.001f || width <= 20.0f) return;
+    (void)textOffset; // sprite-specific baked-title offsets are replaced by baseline alignment.
     const float solid[4] = {1, 1, 1, alpha}, clear[4] = {1, 1, 1, 0};
-    // window_hd's strip: 32 px high at double scale, 204 menu units wide, alpha-faded to the right.
-    quad(x, y + 16.0f, std::min(204.0f, width - 12.0f), 16.0f, solid, clear);
+    const float stripY = y + 16.0f;
+    // window_hd's Camp sprite: a 2-unit vertical start mark, a 2-unit transparent gap,
+    // a 28-unit opaque section, then the 158.5-unit fade to transparency.
+    quad(x, stripY, 2.0f, 16.0f, solid, solid);
+    quad(x + 4.0f, stripY, std::min(28.0f, width - 4.0f), 16.0f, solid, solid);
+    const float fadeWidth = std::max(0.0f, std::min(158.5f, width - 57.5f));
+    if (fadeWidth > 0.0f) quad(x + 32.0f, stripY, fadeWidth, 16.0f, solid, clear);
+
     float size = textSize;
     const float maxTextWidth = std::max(8.0f, width - 18.0f);
     const float measured = textWidth(label, size);
     if (measured > maxTextWidth && measured > 0.0f)
         size = std::max(9.0f, std::floor(size * maxTextWidth / measured));
-    // The original title starts 9 menu units from the left and sits slightly above the strip centre.
-    textCentred(label, x + 9.0f, y + textOffset, true, alpha, size, false);
+    // The baseline of the uppercase glyph sits on the strip's vertical centre line.
+    textCentred(label, x + 9.0f, y + 24.0f - baselineFromCentre(size), true, alpha, size, false);
 }
 
 void MenuPainter::rowBar(float x, float y, const std::string& label, float alpha, bool highlight, float shade, float cap) {

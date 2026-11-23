@@ -76,6 +76,8 @@ public:
     void text(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
               bool verticalGradient = false, bool darkGradient = false, bool noOutline = false, float letterSpacing = 0);
     float textWidth(const std::string& s, float size = 14, float letterSpacing = 0);
+    // Vertical offset from a centred line box to the actual font baseline, in menu units.
+    float baselineFromCentre(float size = 14) const;
     // ... in a colour (MuComFontPlateDisp's colours: the plates' yellow, grey)
     void textTint(const std::string& s, float x, float y, float r, float g, float b, float alpha = 1, float size = 14,
                   bool verticalGradient = false);

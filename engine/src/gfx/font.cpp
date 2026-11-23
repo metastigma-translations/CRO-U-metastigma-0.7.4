@@ -142,6 +142,20 @@ bool Font::load(const std::string& path) {
 
 bool Font::loaded() const { return face_ != nullptr; }
 
+float Font::baselineFromCentreEm() const {
+    if (!face_) return 0.3f;
+    const stbtt_fontinfo& info = face_->info;
+    int ascent = 0, descent = 0, gap = 0;
+    stbtt_GetFontVMetrics(&info, &ascent, &descent, &gap);
+    if (boxAscent_ != 0 || boxDescent_ != 0) {
+        const float unitScale = stbtt_ScaleForMappingEmToPixels(&info, 1.0f);
+        const float upm = unitScale > 0.0f ? 1.0f / unitScale : 1000.0f;
+        ascent = int(std::lround(boxAscent_ * upm));
+        descent = int(std::lround(boxDescent_ * upm));
+    }
+    return 0.5f * float(ascent + descent) * stbtt_ScaleForMappingEmToPixels(&info, 1.0f);
+}
+
 bool Font::selectRegion(const char* region) {
     if (!loaded()) return false;
     const int n = stbtt_GetNumberOfFonts(data_.data());

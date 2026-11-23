@@ -959,6 +959,21 @@ void drawStatusNumber(cr::MenuPainter& m, int value, float x, float y, int digit
     m.textCentred(text, textX, y + 7.0f, dark, alpha, size);
 }
 
+// Numeric text whose visible baseline is locked to a supplied menu coordinate.
+void drawStatusNumberAtBaseline(cr::MenuPainter& m, int value, float x, float baselineY, int digits, float step,
+                                float alpha, bool left, bool dark = false) {
+    const std::string text = std::to_string(std::abs(value));
+    float size = 14.0f;
+    const float slotWidth = float(digits) * step;
+    float width = m.textWidth(text, size);
+    if (width > slotWidth - 2.0f && width > 0.0f) {
+        size *= (slotWidth - 2.0f) / width;
+        width = m.textWidth(text, size);
+    }
+    const float textX = left ? x : x + slotWidth - width;
+    m.textCentred(text, textX, baselineY - m.baselineFromCentre(size), dark, alpha, size);
+}
+
 // __ComUty_SubColorBar: a 140-wide bar, `type` 0 the black track, 1 HP red -> orange, 2 MP green
 // -> orange, 3 experience blue -> lilac (0xc8800), filled to value / most
 void drawShopBar(cr::MenuPainter& m, float x, float y, float value, float most, int type, float alpha) {
@@ -1004,6 +1019,10 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         if (fontNumbers) drawStatusNumber(m, value, x, y, digits, step, a, left);
         else drawShopNumber(m, value, x, y, digits, step, a, style, left);
     };
+    auto gaugeNumber = [&](int value, float x, float baselineY, int digits, float step, int style, bool left) {
+        if (fontNumbers) drawStatusNumberAtBaseline(m, value, x, baselineY, digits, step, a, left);
+        else drawShopNumber(m, value, x, baselineY - 14.0f, digits, step, a, style, left);
+    };
     // One common font size for every Status-board label. Pick the largest size that
     // fits the narrowest label cell, and reserve the number column beside NEXT.
     const std::string statusLabels[9] = {
@@ -1017,9 +1036,9 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     const float gaugeLabelSize = nextWidth > kGaugeLabelWidth && nextWidth > 0.0f
         ? kGaugeLabelBaseSize * kGaugeLabelWidth / nextWidth : kGaugeLabelBaseSize;
     auto gaugeLabel = [&](const std::string& label, float x, float trackY) {
-        // First glyph starts at the coloured fill's left edge; the glyph box overlaps
-        // the top of the track slightly and is drawn after the track so the text stays on top.
-        m.textCentred(label, x, trackY + 4.0f, false, a, gaugeLabelSize);
+        // Baseline is the coloured fill's top edge (trackY + 9), not the black track's top.
+        m.textCentred(label, x, trackY + 9.0f - m.baselineFromCentre(gaugeLabelSize),
+                      false, a, gaugeLabelSize);
     };
 
     // The five white stat chips share one font size. Negative tracking tightens the long
@@ -1070,8 +1089,8 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
         // Current and maximum values must stay visible over the coloured gauge fill.
-        boardNumber(k ? mp : hp, x + 22, y - 4, 5, 12, 0, false);
-        boardNumber(k ? mpMax : hpMax, x + 94, y - 4, 5, 12, 0, false);
+        gaugeNumber(k ? mp : hp, x + 22, y + 9.0f, 5, 12, 0, false);
+        gaugeNumber(k ? mpMax : hpMax, x + 94, y + 9.0f, 5, 12, 0, false);
         // HP stays white/black; MP is black with a white outline for contrast on the dark track.
         m.text("/", x + 82, y - 8, k != 0, a, 14);
         gaugeLabel(statusLabels[k ? 2 : 1], bx + 14.0f, y);
@@ -1081,7 +1100,8 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
-        boardNumber(pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), x + 82, y - 4, 6, 12, 0, false);
+        gaugeNumber(pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp),
+                     x + 82, y + 9.0f, 6, 12, 0, false);
         gaugeLabel(statusLabels[3], bx + 14.0f, y);
     }
     // Rebuild the five white atlas label chips without their baked English lettering.
@@ -1615,7 +1635,8 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     m.quad(underlineX, underlineY, underlineWidth, 1.0f, underlineWhite, underlineWhite);
     m.quad(underlineX + underlineWidth, underlineY, 1.0f, 1.0f, underlineBlack, underlineBlack);
     m.quad(underlineX - 1.0f, underlineY + 1.0f, underlineWidth + 2.0f, 1.0f, underlineBlack, underlineBlack);
-    m.textCentred(name, nameX, y + 34, false, a, nameSize, false);
+    m.textCentred(name, nameX, underlineY + 2.0f - m.baselineFromCentre(nameSize),
+                   false, a, nameSize, false);
     m.picture(facePicture(app, c), x, y, a);
     const cr::GameState& g = gs ? *gs : app.game;
     if (g.scenario == 1 && c == g.leaders[1]) m.picture(164, x + 238, y + 26, a); // the leader's mark
@@ -1640,9 +1661,10 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
         drawShopBar(m, hx + 16, hy + 9, 1, 1, 0, a);
         drawShopBar(m, hx + 15, hy + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
         // Values and labels are rendered after the gauge fill so the coloured bar cannot mask them.
-        drawStatusNumber(m, k ? mp : hp, hx + 22, hy - 4, 5, 12, a, false);
-        drawStatusNumber(m, k ? mpMax : hpMax, hx + 94, hy - 4, 5, 12, a, false);
-        m.textCentred(gaugeLabels[k], hx + 15.0f, hy + 4.0f, false, a, faceGaugeLabelSize);
+        drawStatusNumberAtBaseline(m, k ? mp : hp, hx + 22, hy + 9.0f, 5, 12, a, false);
+        drawStatusNumberAtBaseline(m, k ? mpMax : hpMax, hx + 94, hy + 9.0f, 5, 12, a, false);
+        m.textCentred(gaugeLabels[k], hx + 15.0f,
+                      hy + 9.0f - m.baselineFromCentre(faceGaugeLabelSize), false, a, faceGaugeLabelSize);
         // HP keeps white/black; the MP slash is black with a white outline.
         m.text("/", hx + 82, hy - 8, k != 0, a, 14);
     }
@@ -1650,8 +1672,10 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
     drawShopBar(m, nx + 16, ny + 9, 1, 1, 0, a);
     drawShopBar(m, nx + 15, ny + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
-    drawStatusNumber(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), nx + 82, ny - 4, 6, 12, a, false);
-    m.textCentred(gaugeLabels[2], nx + 15.0f, ny + 4.0f, false, a, faceGaugeLabelSize);
+    drawStatusNumberAtBaseline(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp),
+                                nx + 82, ny + 9.0f, 6, 12, a, false);
+    m.textCentred(gaugeLabels[2], nx + 15.0f,
+                  ny + 9.0f - m.baselineFromCentre(faceGaugeLabelSize), false, a, faceGaugeLabelSize);
 }
 
 // The member's HP (full outside battles) and MP as the boards show them

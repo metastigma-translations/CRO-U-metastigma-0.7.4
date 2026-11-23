@@ -23,6 +23,8 @@ public:
     // Reads a .ttf / .otf / .ttc; false if it isn't one stb_truetype can use.
     bool load(const std::string& path);
     bool loaded() const;
+    // Baseline offset from the raster line-box centre, measured in em units.
+    float baselineFromCentreEm() const;
     const std::string& path() const { return path_; }
     int generation() const { return generation_; } // changes with the face
     // In a collection, the face whose name ends with `region` ("JP", "KR", "SC", "TC");
