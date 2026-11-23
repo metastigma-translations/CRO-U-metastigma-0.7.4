@@ -1058,13 +1058,17 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
         // Draw the slash last, above both bars. Preserve its X origin and lift it clear of the track.
         // HP stays white/black; MP is black with a white outline for contrast on the dark track.
         m.text("/", x + 82, y - 8, k != 0, a, 14);
-undefined
+        gaugeLabel(statusLabels[k ? 2 : 1], bx - 11.0f, y);
+    }
+    { // __ComUty_FaceBoardNextExp
         const float x = bx - 1, y = by + 96;
         const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
         boardNumber(pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), x + 82, y - 4, 6, 12, 0, false);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
-undefined without their baked English lettering.
+        gaugeLabel(statusLabels[3], bx - 11.0f, y);
+    }
+    // Rebuild the five white atlas label chips without their baked English lettering.
     const std::string* kBoardStatLabel = statusLabels + 4;
     const int values[5] = {pm.exp, cr::memberStat(app.game, c, cr::kAttack, app.itemTable), cr::memberStat(app.game, c, cr::kDefense, app.itemTable),
                            cr::memberStat(app.game, c, cr::kSpeed, app.itemTable), cr::memberStat(app.game, c, cr::kLuck, app.itemTable)};
@@ -1578,7 +1582,12 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     m.picture(facePicture(app, c), x, y, a);
     const cr::GameState& g = gs ? *gs : app.game;
     if (g.scenario == 1 && c == g.leaders[1]) m.picture(164, x + 238, y + 26, a); // the leader's mark
-undefined
+    // Replace the atlas level badge and its digits with the selected font.
+    // Keep the original 28x14 label cell and right-aligned three-digit level slot.
+    constexpr float kLevelBadgeWidth = 28.0f;
+    const float levelBadgeTextWidth = m.textWidth("УР", 14);
+    m.text("УР", x + 24 + (kLevelBadgeWidth - levelBadgeTextWidth) * 0.5f, y + 86, false, a, 14);
+    drawStatusNumber(m, pm.level, x + 48, y + 86, 3, 12, a, false);
 
     // Match the submenu/status panel typography and vertical position. The Russian NEXT caption
     // is sized once so it ends before the right-side value; original caption X origins are retained.
@@ -1591,7 +1600,8 @@ undefined
 
     for (int k = 0; k < 2; ++k) {
         const float hx = x + 96, hy = y + 50 + 20.0f * float(k);
-undefined
+        drawStatusNumber(m, k ? mp : hp, hx + 22, hy - 4, 5, 12, a, false);
+        drawStatusNumber(m, k ? mpMax : hpMax, hx + 94, hy - 4, 5, 12, a, false);
         drawShopBar(m, hx + 16, hy + 9, 1, 1, 0, a);
         drawShopBar(m, hx + 15, hy + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
         // Use the selected font for captions and slash, and draw them after the tracks.
@@ -1601,7 +1611,7 @@ undefined
     }
     const float nx = x + 96, ny = y + 90;
     const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
-undefined
+    drawStatusNumber(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), nx + 82, ny - 4, 6, 12, a, false);
     drawShopBar(m, nx + 16, ny + 9, 1, 1, 0, a);
     drawShopBar(m, nx + 15, ny + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
     m.textCentred(gaugeLabels[2], nx, ny + 4.0f, false, a, faceGaugeLabelSize);
@@ -3703,7 +3713,9 @@ void drawCamp(App& app) {
         const bool gene = c.slot >= 3;
         if (w.plates.e > 0) memberPlates(c.phase == App::Camp::Member, std::min(ease, w.plates.e)); // (the face boards above)
         // the state board (window 10): what the gear list's focus row would make of the member's numbers
-undefined
+        if (w.board.e > 0) drawShopBoard(app, 12 + w.board.dx, 92, sch,
+                                           c.phase == App::Camp::List && !gene && item > 0 ? item : 0,
+                                           w.board.e, true, 0, true); // equipment board: selected-font labels and numbers
         if (w.gene.e > 0) { // the gene board (0xb): the plate list's focus row by its entries, a chosen plate by its picture
             const bool picture = c.phase == App::Camp::Entries || (c.phase == App::Camp::Slot && c.prevPhase == App::Camp::Entries);
             const int plate = c.phase == App::Camp::Entries ? c.plate : picture ? pm.genes[std::clamp(c.slot - 3, 0, 2)] : item;
