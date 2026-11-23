@@ -1052,7 +1052,7 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     for (int k = 0; k < 2; ++k) { // __ComUty_FaceBoardHpMp
         const float x = bx - 1, y = by + 56 + 20 * k;
         boardNumber(k ? mp : hp, x + 22, y - 4, 5, 12, 0, false);
-        m.picture(k ? 65 : 66, x + 82, y - 4, a); // the slash remains the atlas glyph
+        m.text("/", x + 82, y - 4, false, a, 14); // selected font; preserve the atlas slash's exact top-left origin
         boardNumber(k ? mpMax : hpMax, x + 94, y - 4, 5, 12, 0, false);
         drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
         drawShopBar(m, x + 15, y + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
