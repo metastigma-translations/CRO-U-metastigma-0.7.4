@@ -7,6 +7,7 @@ std::string menuWordText(int word) {
     switch (word) {
     case 0: return tr("Yes");
     case 1: return tr("No");
+    case 5: return tr("OK");
     case 2: return tr("Start Game");
     case 3: return tr("Options");
     case 6: return tr("New");
@@ -3914,7 +3915,7 @@ void drawCamp(App& app) {
     if (campBackShown(app)) { // (lit while a touch holds it - the boxes campClick tests)
         const float ux = app.renderer.uiX() + 2 * v43, by = campBackY(app);
         if (campOkBar(app))
-            m.backOkBar(kBackX, by, campPressIn(app, ux, 0xc0, by, 0x72, 34) ? 1 : campPressIn(app, ux, 0x137, by, 0x72, 34) ? 5 : 0, barA, tr("Back"));
+            m.backOkBar(kBackX, by, campPressIn(app, ux, 0xc0, by, 0x72, 34) ? 1 : campPressIn(app, ux, 0x137, by, 0x72, 34) ? 5 : 0, barA, tr("Back"), menuWordText(5));
         else if (campArrows(app))
             m.backButton(kBackX, by, campPressIn(app, ux, 0xf8, by, 0x78, 34) ? 1 : campPressIn(app, ux, 0x175, by, 0x33, 34) ? 2
                                      : campPressIn(app, ux, 0xc0, by, 0x33, 34) ? 3 : 0, 0, barA, tr("Back"));
