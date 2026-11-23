@@ -1021,7 +1021,7 @@ void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool 
     };
     auto gaugeNumber = [&](int value, float x, float baselineY, int digits, float step, int style, bool left) {
         if (fontNumbers) drawStatusNumberAtBaseline(m, value, x, baselineY, digits, step, a, left);
-        else drawShopNumber(m, value, x, baselineY - 14.0f, digits, step, a, style, left);
+        else drawShopNumber(m, value, x, baselineY - 13.0f, digits, step, a, style, left);
     };
     // One common font size for every Status-board label. Pick the largest size that
     // fits the narrowest label cell, and reserve the number column beside NEXT.
