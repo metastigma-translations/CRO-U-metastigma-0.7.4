@@ -1564,23 +1564,23 @@ void drawClockAndOz(App& app, cr::MenuPainter& m, float a) {
     const float clockX = 363.0f + vx;
     // Bottom of the wider TIME plate aligns with the bottom of the 4-unit underline (y=16..20).
     clockPlateLabel(tr("TIME"), clockX, 4.0f, true, 40.0f);
-    m.picture(74, clockX + 40.0f, 16.0f, a); // rule starts at the widened plate's right edge
+    m.quad(clockX + 40.0f, 16.0f, 110.0f, 4.0f, white, white); // font-rendered rule
     const int digit[4] = {tm.tm_hour / 10, tm.tm_hour % 10, tm.tm_min / 10, tm.tm_min % 10};
     static const float kAt[4] = {0, 12, 36, 48};
     for (int i = 0; i < 4; ++i)
         if (i || digit[0])
-            drawStatusNumber(m, digit[i], clockX + 47.0f + kAt[i], 6.0f, 1, 12.0f, a, false);
+            drawStatusNumber(m, digit[i], clockX + 47.0f + kAt[i], 5.0f, 1, 12.0f, a, false);
     // (__ComUty_RealTimeDraw: one second on, one second off at 20 Hz - keep the original phase.)
     if (SDL_GetTicks() / 1000 % 2 == 0) {
         const float colonWidth = m.textWidth(":", 14.0f);
         m.textCentred(":", clockX + 71.0f + (14.0f - colonWidth) * 0.5f,
-                      13.0f, false, a, 14.0f, false, false, false);
+                      12.0f, false, a, 14.0f, false, false, false);
     }
 
     const float ozX = 326.0f + vx;
     clockPlateLabel(tr("OZ"), ozX, 24.0f, false);
-    m.picture(74, 362.0f + vx, 36.0f, a); // underline behind the value glyphs
-    drawStatusNumber(m, app.game.oz, 362.0f + vx, 26.0f, 9, 12.0f, a, false);
+    m.quad(362.0f + vx, 36.0f, 110.0f, 4.0f, white, white); // font-rendered rule behind the value
+    drawStatusNumber(m, app.game.oz, 362.0f + vx, 25.0f, 9, 12.0f, a, false);
 }
 
 // ComUty_FaceBoardDraw at (x, y): the face (29 + n), the board (28) and the name (37 + n and the
