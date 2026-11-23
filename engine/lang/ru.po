@@ -65,6 +65,10 @@ msgid "No"
 msgstr "Нет"
 
 #: src/app/menus.cpp
+msgid "OK"
+msgstr "Да"
+
+#: src/app/menus.cpp
 msgid "Start Game"
 msgstr "Начать"
 
