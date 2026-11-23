@@ -382,6 +382,24 @@ void MenuPainter::promptButton(float x, float y, float size, bool secondary, flo
         auto line = [&](float px, float py, float x0, float y0, float x1, float y1) {
             return distanceToSegmentSquared(px, py, x0, y0, x1, y1) <= halfStroke * halfStroke;
         };
+        auto cubicLine = [&](float px, float py,
+                             float x0, float y0, float cx0, float cy0,
+                             float cx1, float cy1, float x1, float y1) {
+            constexpr int kCurveSegments = 16;
+            float previousX = x0, previousY = y0;
+            for (int segment = 1; segment <= kCurveSegments; ++segment) {
+                const float t = float(segment) / float(kCurveSegments);
+                const float u = 1.0f - t;
+                const float nextX = u * u * u * x0 + 3.0f * u * u * t * cx0 +
+                                    3.0f * u * t * t * cx1 + t * t * t * x1;
+                const float nextY = u * u * u * y0 + 3.0f * u * u * t * cy0 +
+                                    3.0f * u * t * t * cy1 + t * t * t * y1;
+                if (line(px, py, previousX, previousY, nextX, nextY)) return true;
+                previousX = nextX;
+                previousY = nextY;
+            }
+            return false;
+        };
         // The same round face is used in every layout. Colour the glyph, not the dark button face:
     // PlayStation X: pale violet, O: red; Xbox A: green, B: red.
     uint8_t glyphRed = 0, glyphGreen = 0, glyphBlue = 0;
@@ -395,7 +413,7 @@ void MenuPainter::promptButton(float x, float y, float size, bool secondary, flo
         if (secondary) { // PlayStation O
             glyphRed = 0xE5; glyphGreen = 0x39; glyphBlue = 0x35;
         } else { // PlayStation X
-            glyphRed = 0xC7; glyphGreen = 0xA6; glyphBlue = 0xE8;
+            glyphRed = 0xB8; glyphGreen = 0xBC; glyphBlue = 0xF2;
         }
     }
         for (int sy = 0; sy < high.height; ++sy) {
@@ -422,27 +440,28 @@ void MenuPainter::promptButton(float x, float y, float size, bool secondary, flo
                         line(px, py, centre - halfWidth * 0.56f, barY,
                                   centre + halfWidth * 0.56f, barY);
                 } else {
-                    const float leftX = centre - radius * 0.32f;
-                    const float middleX = centre + radius * 0.015f;
-                    const float rightX = centre + radius * 0.34f;
-                    const float topY = centre - radius * 0.48f;
+                    const float leftX = centre - radius * 0.34f;
+                    const float innerX = centre + radius * 0.035f;
+                    const float upperRightX = centre + radius * 0.39f;
+                    const float lowerRightX = centre + radius * 0.42f;
+                    const float topY = centre - radius * 0.52f;
                     const float middleY = centre;
-                    const float bottomY = centre + radius * 0.48f;
-                    const float upperShoulder = topY + radius * 0.12f;
-                    const float upperInner = middleY - radius * 0.10f;
-                    const float lowerInner = middleY + radius * 0.10f;
-                    const float lowerShoulder = bottomY - radius * 0.12f;
+                    const float bottomY = centre + radius * 0.52f;
+                    // A straight stem and two smooth bowls. The cubic curves remove the
+                    // flat, kinked shoulders from the first vector version of B.
                     onGlyph =
                         line(px, py, leftX, topY, leftX, bottomY) ||
-                        line(px, py, leftX, topY, middleX, topY) ||
-                        line(px, py, middleX, topY, rightX, upperShoulder) ||
-                        line(px, py, rightX, upperShoulder, rightX, upperInner) ||
-                        line(px, py, rightX, upperInner, middleX, middleY) ||
-                        line(px, py, middleX, middleY, leftX, middleY) ||
-                        line(px, py, middleX, middleY, rightX, lowerInner) ||
-                        line(px, py, rightX, lowerInner, rightX, lowerShoulder) ||
-                        line(px, py, rightX, lowerShoulder, middleX, bottomY) ||
-                        line(px, py, middleX, bottomY, leftX, bottomY);
+                        line(px, py, leftX, topY, innerX, topY) ||
+                        cubicLine(px, py, innerX, topY,
+                                  upperRightX, topY + radius * 0.015f,
+                                  upperRightX, middleY - radius * 0.025f,
+                                  innerX, middleY) ||
+                        line(px, py, leftX, middleY, innerX, middleY) ||
+                        cubicLine(px, py, innerX, middleY,
+                                  lowerRightX, middleY + radius * 0.025f,
+                                  lowerRightX, bottomY - radius * 0.015f,
+                                  innerX, bottomY) ||
+                        line(px, py, leftX, bottomY, innerX, bottomY);
                 }
                 uint8_t* pixel = high.rgba.data() + (size_t(sy) * size_t(high.width) + size_t(sx)) * 4;
                 pixel[0] = onGlyph ? glyphRed : 0;
