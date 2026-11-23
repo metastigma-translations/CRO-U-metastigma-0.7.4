@@ -1662,7 +1662,7 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
         ? kFaceGaugeLabelBaseSize * kFaceGaugeLabelWidth / nextLabelWidth : kFaceGaugeLabelBaseSize;
 
     for (int k = 0; k < 2; ++k) {
-        const float hx = x + 96, hy = y + 50 + 20.0f * float(k);
+        const float hx = x + 93, hy = y + 50 + 20.0f * float(k); // card gauge group: 3 units left of the atlas edge
         drawShopBar(m, hx + 16, hy + 9, 1, 1, 0, a);
         drawShopBar(m, hx + 15, hy + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
         // Values and labels are rendered after the gauge fill so the coloured bar cannot mask them.
@@ -1673,7 +1673,7 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
                       false, a, faceGaugeLabelSize, true);
         m.text("/", hx + 82, hy - 9, true, a, 14);
     }
-    const float nx = x + 96, ny = y + 90;
+    const float nx = x + 93, ny = y + 90; // keep NEXT label, value and bars aligned with HP / MP
     const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
     drawShopBar(m, nx + 16, ny + 9, 1, 1, 0, a);
     drawShopBar(m, nx + 15, ny + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
