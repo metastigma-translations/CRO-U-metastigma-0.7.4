@@ -1562,9 +1562,9 @@ void drawClockAndOz(App& app, cr::MenuPainter& m, float a) {
                       true, a, size, false, false, noOutline);
     };
     const float clockX = 363.0f + vx;
-    // Bottom of the wider TIME plate aligns with the bottom of the 4-unit underline (y=16..20).
+    // Bottom of the wider TIME plate aligns with the bottom of the thin 2-unit underline (y=18..20).
     clockPlateLabel(tr("TIME"), clockX, 4.0f, true, 40.0f);
-    m.quad(clockX + 40.0f, 16.0f, 110.0f, 4.0f, white, white); // font-rendered rule
+    m.quad(clockX + 40.0f, 18.0f, 110.0f, 2.0f, white, white); // thin font-rendered rule
     const int digit[4] = {tm.tm_hour / 10, tm.tm_hour % 10, tm.tm_min / 10, tm.tm_min % 10};
     static const float kAt[4] = {0, 12, 36, 48};
     for (int i = 0; i < 4; ++i)
@@ -1579,7 +1579,7 @@ void drawClockAndOz(App& app, cr::MenuPainter& m, float a) {
 
     const float ozX = 326.0f + vx;
     clockPlateLabel(tr("OZ"), ozX, 24.0f, false);
-    m.quad(362.0f + vx, 36.0f, 110.0f, 4.0f, white, white); // font-rendered rule behind the value
+    m.quad(362.0f + vx, 38.0f, 110.0f, 2.0f, white, white); // thin font-rendered rule behind the value
     drawStatusNumber(m, app.game.oz, 362.0f + vx, 25.0f, 9, 12.0f, a, false);
 }
 
