@@ -1549,7 +1549,7 @@ void drawClockAndOz(App& app, cr::MenuPainter& m, float a) {
     localtime_r(&now, &tm);
 #endif
     const float white[4] = {1, 1, 1, a};
-    auto clockPlateLabel = [&](const std::string& label, float x, float y) {
+    auto clockPlateLabel = [&](const std::string& label, float x, float y, bool noOutline) {
         // Keep each original 36x16 white atlas plate, but draw its lettering with the selected font.
         m.quad(x, y, 36, 16, white, white);
         float size = 14.0f;
@@ -1557,10 +1557,12 @@ void drawClockAndOz(App& app, cr::MenuPainter& m, float a) {
         if (width > 34.0f && width > 0.0f) size *= 34.0f / width;
         width = m.textWidth(label, size);
         m.textCentred(label, x + (36.0f - width) * 0.5f, y + 8.0f,
-                      true, a, size, false, false, false);
+                      true, a, size, false, false, noOutline);
     };
     const float clockX = 363.0f + vx;
-    clockPlateLabel(tr("TIME"), clockX, 8.0f);
+    // The white plate ends exactly at the original rule; TIME is plain black text without outline.
+    clockPlateLabel(tr("TIME"), clockX, 0.0f, true);
+    m.picture(74, clockX + 36.0f, 16.0f, a); // rule behind the time glyphs
     const int digit[4] = {tm.tm_hour / 10, tm.tm_hour % 10, tm.tm_min / 10, tm.tm_min % 10};
     static const float kAt[4] = {0, 12, 36, 48};
     for (int i = 0; i < 4; ++i)
@@ -1572,12 +1574,11 @@ void drawClockAndOz(App& app, cr::MenuPainter& m, float a) {
         m.textCentred(":", clockX + 71.0f + (14.0f - colonWidth) * 0.5f,
                       13.0f, false, a, 14.0f, false, false, false);
     }
-    m.picture(74, clockX + 36.0f, 16.0f, a);
 
     const float ozX = 326.0f + vx;
-    clockPlateLabel(tr("OZ"), ozX, 24.0f);
+    clockPlateLabel(tr("OZ"), ozX, 24.0f, false);
+    m.picture(74, 362.0f + vx, 36.0f, a); // underline behind the value glyphs
     drawStatusNumber(m, app.game.oz, 362.0f + vx, 26.0f, 9, 12.0f, a, false);
-    m.picture(74, 362.0f + vx, 36.0f, a);
 }
 
 // ComUty_FaceBoardDraw at (x, y): the face (29 + n), the board (28) and the name (37 + n and the
