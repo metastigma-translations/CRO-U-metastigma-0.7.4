@@ -221,7 +221,7 @@ float MenuPainter::baselineFromCentre(float size) const {
 
 // Rebuild the window_hd section headings (World Select, Results, Camp, Shop, Options, Scenarios).
 // The old pictures baked the words into a white strip fading to transparency at the right.
-void MenuPainter::headingStrip(float x, float y, const std::string& label, float alpha, float width, float textSize, float textOffset) {
+void MenuPainter::headingStrip(float x, float y, const std::string& label, float alpha, float width, float textSize, float textOffset, bool fullWidthFade) {
     if (!r_ || label.empty() || alpha <= 0.001f || width <= 20.0f) return;
     (void)textOffset; // sprite-specific baked-title offsets are replaced by baseline alignment.
     const float solid[4] = {1, 1, 1, alpha}, clear[4] = {1, 1, 1, 0};
@@ -230,7 +230,8 @@ void MenuPainter::headingStrip(float x, float y, const std::string& label, float
     // 84 units of solid white, then the 116-unit fade to transparency (204 units total).
     quad(x, stripY, 2.0f, 16.0f, solid, solid);
     quad(x + 4.0f, stripY, std::min(84.0f, width - 4.0f), 16.0f, solid, solid);
-    const float fadeWidth = std::max(0.0f, std::min(116.0f, width - 88.0f));
+    const float fadeLimit = fullWidthFade ? width - 88.0f : 116.0f;
+    const float fadeWidth = std::max(0.0f, std::min(fadeLimit, width - 88.0f));
     if (fadeWidth > 0.0f) quad(x + 88.0f, stripY, fadeWidth, 16.0f, solid, clear);
 
     float size = textSize;
@@ -248,8 +249,11 @@ void MenuPainter::rowBar(float x, float y, const std::string& label, float alpha
     // R 0x4B, G 0xFF, B 0xEB - Part 4 1174.45 s, the tapped Back bar)
     const float r = highlight ? 0x4B / 255.0f : shade, g = highlight ? 1 : shade, b = highlight ? 0xEB / 255.0f : shade;
     const float solid[4] = {r, g, b, a}, clear[4] = {r, g, b, 0};
-    quad(x, y, 100, 24, solid, solid);
-    quad(x + 100, y, 123, 24, solid, clear);
+    // Same segmented treatment as the section heading: thin start mark, 2-unit gap,
+    // solid continuation, then a long fade. The text is drawn last, over every strip segment.
+    quad(x, y, 2, 24, solid, solid);
+    quad(x + 4, y, 84, 24, solid, solid);
+    quad(x + 88, y, 135, 24, solid, clear);
     textCentred(label, x + 8, y + 12, true, alpha, 14, false, true);
 }
 

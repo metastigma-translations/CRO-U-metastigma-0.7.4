@@ -1546,19 +1546,25 @@ void drawOptions(App& app, float, float) {
     // The windows slide in: rows from the left, controls from the right (WinDispOn -240 / +240)
     const float t = std::min(1.0f, app.optionsAnim / 8.0f), ease = 1 - (1 - t) * (1 - t);
     const float rowsX = -240 * (1 - ease), ctrlX = 240 * (1 - ease), a = t;
-    m.headingStrip(8, 4, tr("Options"), 1, 216, 22, 20.5f); // Options: rebuilt white strip + selected font
     const std::vector<OptRow> rows = optionRows(app, app.optionsPage);
     const int n = int(rows.size()), shown = std::min(n, kOptVisible);
     optionsScrollFix(app, n, false);
-    { // (the port's: a darker panel under the page's name, the rows and the help line - readable
-      // over any scene - and the help's lines)
+    const std::string pageName = tr(kOptionPageName[app.optionsPage]);
+    constexpr float pageTitleSize = 22.0f;
+    const float pageTitleWidth = m.textWidth(pageName, pageTitleSize);
+    const float pageTitleX = 256.0f - pageTitleWidth * 0.5f;
+    { // (the port's darker page panel and rows, readable over every scene)
         const float shade[4] = {0, 0, 0, 0.5f * a}, fade[4] = {0, 0, 0, 0.2f * a};
-        const float nameW = m.textWidth(tr(kOptionPageName[app.optionsPage]), 16);
-        m.quad(228, 10, nameW + 16, 24, shade, shade);
+        m.quad(pageTitleX - 8.0f, 10, pageTitleWidth + 16.0f, 24, shade, shade);
         m.quad(12, kOptRowTop - 8, 250, optRowY(shown) + 42 - kOptRowTop, shade, shade);
         m.quad(262, kOptRowTop - 8, 238, optRowY(shown) + 42 - kOptRowTop, shade, fade);
     }
-    m.text(tr(kOptionPageName[app.optionsPage]), 236, 14, false, a, 16, true);
+    // Draw the white heading after its backing panel so neither its strip nor the label is covered.
+    // Its 480-unit width ends at the right edge of the dark menu panel (x = 500).
+    m.headingStrip(20, 4, tr("Options"), 1, 480, 22, 20.5f, true);
+    // Page names use the same dark selected-font style, size and baseline as "Options".
+    m.textCentred(pageName, pageTitleX, 4 + 24 - m.baselineFromCentre(pageTitleSize),
+                  true, a, pageTitleSize, false);
     for (int i = app.optionsScroll; i < n && i < app.optionsScroll + kOptVisible; ++i) {
         const OptRow& row = rows[size_t(i)];
         const float y = optRowY(i - app.optionsScroll), mid = y + 12;
