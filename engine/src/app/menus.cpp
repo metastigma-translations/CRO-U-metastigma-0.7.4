@@ -481,7 +481,7 @@ void drawSaveDate(App& app, cr::MenuPainter& m, const cr::SaveData& d, float a, 
     // Rebuild the date and played-time labels from the selected menu font; retain the original
     // dark panels, rules, number slots and separators' positions.
     m.quad(324 + dx, 12, 148, 64, dark, dark);
-    centredLabel(tr("Date"), 372 + dx, 12, 52, 16, 20.0f);
+    centredLabel(tr("DATE"), 372 + dx, 12, 52, 16, 20.0f);
     m.quad(325 + dx, 28, 146, 1, white, white);
 
     static const char* const kMonth[12] = {
@@ -503,7 +503,7 @@ void drawSaveDate(App& app, cr::MenuPainter& m, const cr::SaveData& d, float a, 
     const int secs = int(std::max(0.0, d.playSeconds));
     const int hours = std::min(999, secs / 3600), mins = std::min(59, secs / 60 % 60);
     m.quad(324 + dx, 84, 148, 40, dark, dark);
-    centredLabel(tr("Played in game"), 344 + dx, 88, 108, 12, 14.0f);
+    centredLabel(tr("TOTAL PLAYTIME"), 344 + dx, 88, 108, 12, 14.0f);
     m.quad(325 + dx, 100, 146, 1, white, white);
     const int pd[5] = {hours / 100, hours % 100 / 10, hours % 10, mins / 10, mins % 10};
     static const float kPlay[5] = {32, 44, 56, 80, 92};
