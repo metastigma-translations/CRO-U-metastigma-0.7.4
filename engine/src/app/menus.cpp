@@ -2822,10 +2822,10 @@ void drawGeneBoard(App& app, cr::MenuPainter& m, float x, float y, int plate, fl
     const std::string name = itemName(app, plate);
     m.textCentred(name, x + (163 - m.textWidth(name, 14)) / 2, y + 8, true, a, 14);
     m.quad(x, y + 24, 163, 16, white, white);
-    m.picture(95, x + 24, y + 27, a);
-    drawShopNumber(m, cr::plateLearned(app.game, plate), x + 90, y + 24, 1, 12, a, 2);
-    m.picture(65, x + 102, y + 24, a);
-    drawShopNumber(m, 6, x + 114, y + 24, 1, 12, a, 2);
+    m.text("SKILL", x + 24, y + 36, false, a, 11);
+    drawStatusNumber(m, cr::plateLearned(app.game, plate), x + 90, y + 24, 1, 12, a, true);
+    m.text("/", x + 102, y + 36, false, a, 12);
+    drawStatusNumber(m, 6, x + 114, y + 24, 1, 12, a, true);
     // __MuCamp_GeneTexRead (_gkpachGenePlateImage): gene_m001c..m007c, then m201c..m224c
     static const std::array<std::string, cr::kPlates> kArt = [] {
         std::array<std::string, cr::kPlates> a;
