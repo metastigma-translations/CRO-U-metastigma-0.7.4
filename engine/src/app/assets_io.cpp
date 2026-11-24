@@ -114,7 +114,7 @@ void updateTitle(App& app) {
                      : "no camera  ") + std::to_string(app.mapIndex + 1) + "/" +
                 std::to_string(app.maps.size());
     }
-    SDL_SetWindowTitle(app.window, title.c_str());
+    SDL_SetWindowTitle(app.window, app.viewer ? title.c_str() : "Chaos Rings Omega");
     app.status = title.substr(std::string("Chaos Rings — ").size());
     SDL_Log("%s", title.c_str());
 }
