@@ -336,8 +336,32 @@ void MenuPainter::arrowTriangle(float x, float y, float w, float h, bool pointsR
         X(baseX) * kScale, Y(pointsRight ? y : y + h) * kScale,
         X(tipX) * kScale, Y(tipY) * kScale,
     };
-    // A solid black triangle, built by the renderer rather than sampled from window_hd.
-    r_->fillQuad(xy, 0, 0, 0, alpha);
+    // One physical output pixel: expand the triangle around its centroid by 1 px of inradius.
+    const float cx = (xy[0] + xy[2] + xy[4]) / 3.0f;
+    const float cy = (xy[1] + xy[3] + xy[5]) / 3.0f;
+    const float ab = std::hypot(xy[2] - xy[0], xy[3] - xy[1]);
+    const float bc = std::hypot(xy[4] - xy[2], xy[5] - xy[3]);
+    const float ca = std::hypot(xy[0] - xy[4], xy[1] - xy[5]);
+    const float area = std::fabs((xy[2] - xy[0]) * (xy[5] - xy[1]) -
+                                 (xy[3] - xy[1]) * (xy[4] - xy[0])) * 0.5f;
+    const float inradius = area > 0.0f ? 2.0f * area / (ab + bc + ca) : 1.0f;
+    const float expand = (inradius + 1.0f) / inradius;
+    float outline[8];
+    for (int i = 0; i < 3; ++i) {
+        outline[i * 2] = cx + (xy[i * 2] - cx) * expand;
+        outline[i * 2 + 1] = cy + (xy[i * 2 + 1] - cy) * expand;
+    }
+    outline[6] = outline[0];
+    outline[7] = outline[1];
+    r_->fillQuad(outline, 1, 1, 1, alpha); // white 1-pixel outer stroke
+    r_->fillQuad(xy, 0, 0, 0, alpha);     // black triangle face
+}
+
+void MenuPainter::pickerArrows(float leftX, float rightX, float y, float size, int bob, float alpha) {
+    // ComUty_CmdBack's original motion: both arrows slide inward by 0..5 pixels and back.
+    bob = std::clamp(bob, 0, 5);
+    arrowTriangle(leftX + float(bob), y, size, size, false, alpha);
+    arrowTriangle(rightX - float(bob), y, size, size, true, alpha);
 }
 
 void MenuPainter::buttonPrompt(float x, float y, float size, bool secondary, float alpha) {

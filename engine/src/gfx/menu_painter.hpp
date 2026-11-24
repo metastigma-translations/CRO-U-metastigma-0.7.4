@@ -111,6 +111,8 @@ public:
     void gauge(float x, float y, int value, float alpha, bool active, float fill = -1);
     // ComUty_CmdBack type 2: the Back bar at (x, y), `pressed` lights it, `bob` 0..5 moves the arrows
     void backButton(float x, float y, int pressed, int bob, float alpha, const std::string& label = std::string()); // pressed: 0 none, 1 Back, 2 right, 3 left; optional font label
+    // The value picker's arrows: vector triangles with the Back bar's original 0..5 bob.
+    void pickerArrows(float leftX, float rightX, float y, float size, int bob, float alpha);
     // ComUty_CmdBack type 1 (the shop's): a 232-wide fading bar with a vector up-pointing triangle and a font-rendered label
     void backBar(float x, float y, bool pressed, float alpha, const std::string& label);
     // ComUty_CmdBack type 3: Back (x .. x + 114, faded in over 24, the word at + 36) and OK (x + 118 .. x + 208,

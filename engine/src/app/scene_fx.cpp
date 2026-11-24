@@ -1604,8 +1604,7 @@ void drawOptions(App& app, float, float) {
             break;
         case OptControl::Value: // our picker: the value on a button with the Back arrows either side
             m.button(cx + 60, y - 8, -1, row.valueText, false, dim, cursor && row.enabled, true);
-            m.piece(cx + 36, y + 4, 336, 880, 16, 16, dim);
-            m.piece(cx + 180, y + 4, 352, 880, 16, 16, dim);
+            m.pickerArrows(cx + 36, cx + 180, y + 4, 16, app.menuArrowBob, dim);
             break;
         }
         m.setScale(0, 0, 1);
