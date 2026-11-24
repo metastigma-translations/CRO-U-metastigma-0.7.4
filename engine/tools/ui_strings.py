@@ -13,6 +13,7 @@ English, in any order. Leave a string untranslated (msgstr "") to show the Engli
 import os
 import re
 import sys
+import difflib
 
 ENGINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ENGINE, "src")
@@ -224,6 +225,12 @@ def main():
             done = sum(1 for e in entries if e[2] and not e[3])
             print("%-12s %d of %d translated" % (f, done, len(entries)))
     if check and stale:
+        for f in ("template.pot", "ru.po"):
+            if f in stale:
+                path = os.path.join(LANG, f)
+                old = open(path, encoding="utf-8", newline="").read().replace("\\r\\n", "\\n")
+                print("UI-STRINGS-DIFF " + f)
+                print("".join(difflib.unified_diff(old.splitlines(True), wanted[f].splitlines(True), fromfile=f+" (current)", tofile=f+" (generated)")))
         print("out of date: " + ", ".join(stale) + " (run tools/ui_strings.py)")
         sys.exit(1)
     print("%d strings%s" % (len(order), "" if check or not stale else "; written: " + ", ".join(stale)))
