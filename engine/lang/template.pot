@@ -247,7 +247,6 @@ msgstr ""
 msgid "Skill"
 msgstr ""
 
-
 #: src/app/menus.cpp
 msgid "World Select"
 msgstr ""

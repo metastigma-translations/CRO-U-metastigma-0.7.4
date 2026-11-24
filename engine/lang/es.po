@@ -248,7 +248,6 @@ msgstr "OZ"
 msgid "Skill"
 msgstr ""
 
-
 #: src/app/menus.cpp
 msgid "World Select"
 msgstr ""

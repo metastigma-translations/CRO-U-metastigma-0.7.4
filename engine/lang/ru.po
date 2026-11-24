@@ -248,7 +248,6 @@ msgstr "ОЗ"
 msgid "Skill"
 msgstr "НАВЫК"
 
-
 #: src/app/menus.cpp
 msgid "World Select"
 msgstr "Выбор мира"
