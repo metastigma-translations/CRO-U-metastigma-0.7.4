@@ -245,6 +245,11 @@ msgid "OZ"
 msgstr "ОЗ"
 
 #: src/app/menus.cpp
+msgid "Skill"
+msgstr "НАВЫК"
+
+
+#: src/app/menus.cpp
 msgid "World Select"
 msgstr "Выбор мира"
 
@@ -1412,7 +1417,3 @@ msgstr "Предыдущие сохранения сохранены в резе
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "Загрузите сохранение с главного экрана."
-
-#: src/app/menus.cpp
-msgid "Skill"
-msgstr "НАВЫК"
