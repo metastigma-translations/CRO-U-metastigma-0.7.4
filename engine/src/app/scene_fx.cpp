@@ -1351,9 +1351,8 @@ std::vector<OptRow> optionRows(App& app, int page) {
         rows.back().enabled = scalable && v.upscaler != 0;
         {
             const float ratio = kUpscaleModes[v.upscaleMode].ratio;
-            char h[96];
-            SDL_snprintf(h, sizeof h, "The scene at %d%% of the frame per side", int(100.0f / ratio + 0.5f));
-            rows.back().hint = h;
+            rows.back().hint = trf("The scene at {0}% of the frame per side",
+                                   {std::to_string(int(100.0f / ratio + 0.5f))});
         }
         value(tr("Sharpness"), std::to_string(v.sharpness) + "%", [&app](int dir) {
             if (app.video.upscaler == 1 || app.video.upscaler == 4) adjustVideo(app, 11, dir ? dir : 1);
@@ -1624,24 +1623,26 @@ void drawOptions(App& app, float, float) {
         m.quad(kOptBarX, top, kOptBarW, height, track, track);
         m.quad(kOptBarX + 1, ty + 1, kOptBarW - 2, th - 2, lit, deep);
     }
-    // "n / total" from the game's 14 x 14 digits, and Back
-    m.digit(app.optionsPage + 1, 20, kOptPageY, a);
-    m.digit(-1, 34, kOptPageY, a);
-    m.digit(kOptionPages, 48, kOptPageY, a);
+    // "n / total" in the selected menu font, fitted to the original 42-unit atlas slots.
+    const std::string pageCount = std::to_string(app.optionsPage + 1) + " / " + std::to_string(kOptionPages);
+    float pageCountSize = 14.0f;
+    const float pageCountWidth = m.textWidth(pageCount, pageCountSize);
+    if (pageCountWidth > 42.0f && pageCountWidth > 0.0f) pageCountSize *= 42.0f / pageCountWidth;
+    m.text(pageCount, 20, kOptPageY, false, a, pageCountSize);
     m.backButton(192, kOptBackY, app.optionsRow == kOptionsBackRow, app.menuArrowBob, a, tr("Back")); // shared animated arrows; up-pointing triangle and selected-font label
     if (app.optionsRow >= 0 && app.optionsRow < n && !rows[size_t(app.optionsRow)].hint.empty()) { // (under the rows shown, clear of Back)
         const std::vector<std::string> lines = wrapText(m, rows[size_t(app.optionsRow)].hint, 470, 11, 2);
         for (size_t l = 0; l < lines.size(); ++l) m.text(lines[l], 20, optRowY(shown) + 2 + 13 * float(l), false, a, 11);
     }
     if (app.showHud) // (our key hints: off in a Release build, F3)
-        m.text("Up/Down  Left/Right  Enter  Q/E or PgUp/PgDn: page  Esc: back", 20, 372, false, a * 0.8f, 9);
+        m.text(tr("Up/Down  Left/Right  Enter  Q/E or PgUp/PgDn: page  Esc: back"), 20, 372, false, a * 0.8f, 9);
     if (app.saveImport.active()) {
         r.setOrigin(0);
         r.fillRect(0, 0, r.screenW(), cr::Renderer::kLogicalH, 0, 0, 0, 0.75f);
         r.setOrigin(r.uiX());
         m.picture(12, 0, 220, 1);
         std::string message = app.saveImport.state == vitaimport::Session::Picking
-            ? "Choose the folder containing your decrypted Vita saves." : app.saveImport.message;
+            ? tr("Choose the folder containing your decrypted Vita saves.") : app.saveImport.message;
         std::replace(message.begin(), message.end(), '\n', ' ');
         const auto lines = wrapText(m, message, 455, 13, 8);
         for (size_t l = 0; l < lines.size(); ++l) m.text(lines[l], 24, 234 + 16 * float(l), false, 1, 13);
@@ -1649,7 +1650,7 @@ void drawOptions(App& app, float, float) {
             m.plate(336, 104, 0, -1, app.saveImport.focus == 0, 1, false, tr("Yes"), true);
             m.plate(336, 160, 1, -1, app.saveImport.focus == 1, 1, false, tr("No"), true);
         } else if (app.saveImport.state == vitaimport::Session::Result) {
-            m.plate(336, 104, -1, -1, true, 1, false, "OK", true);
+            m.plate(336, 104, -1, -1, true, 1, false, tr("OK"), true);
         }
     }
     if (app.resetAsk) { // OptionPrc 9 / 10: the message board (57078, then 57079), Yes / No at (336, 104 / 160)

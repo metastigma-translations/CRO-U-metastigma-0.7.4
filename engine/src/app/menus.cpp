@@ -572,7 +572,7 @@ void drawSaveScreen(App& app) {
         m.picture(12, 0, 220, a);
         const short* mark = cr::kMenuPicture[13];
         m.piece(458, 298, float(mark[0] + 20 * pictAnimFrame(ss.anim, 1, 4)), mark[1], mark[2], mark[3], a);
-        const std::string msg = ss.message > 0 ? sysText(app, ss.message) : std::string("The save couldn't be written.");
+        const std::string msg = ss.message > 0 ? sysText(app, ss.message) : std::string(tr("The save couldn't be written."));
         m.text(msg.empty() ? "?" : msg, 24, 234, false, a, 13);
         int extra = 0;
         for (int l : ss.lines)
@@ -585,7 +585,7 @@ void drawSaveScreen(App& app) {
     }
     r.setOrigin(wideLeft(app));
     if (keyHints(app)) // (our key hints)
-        m.text(ss.phase == 1 ? "Up/Down  Enter  Esc: no" : ss.phase == 0 ? "Up/Down  Enter  Esc: back" : "", 20, 372, false,
+        m.text(ss.phase == 1 ? tr("Up/Down  Enter  Esc: no") : ss.phase == 0 ? tr("Up/Down  Enter  Esc: back") : "", 20, 372, false,
            a * 0.8f, 9);
     r.setOrigin(r.uiX());
 }
@@ -1367,10 +1367,10 @@ void drawShop(App& app) {
     } else {
         m.backBar(kBackX + v, kBackY, shopPressIn(app, false, kBackX, kBackY, 232, 24, v), a, tr("Back")); // (lit while held: DAT_000ec80c)
     }
-    const char* help = s.phase == App::Shop::Count     ? "Left/Right: 1  Shift: 10  Up/Down: Yes / No  Enter  Esc"
-                       : s.phase == App::Shop::EquipAsk ? "Up/Down  Enter  Esc: no"
-                       : list && shopEquipment(app)     ? "Up/Down  Left/Right: character  Enter  Esc: back"
-                                                        : "Up/Down  Enter  Esc: back";
+    const char* help = s.phase == App::Shop::Count     ? tr("Left/Right: 1  Shift: 10  Up/Down: Yes / No  Enter  Esc")
+                       : s.phase == App::Shop::EquipAsk ? tr("Up/Down  Enter  Esc: no")
+                       : list && shopEquipment(app)     ? tr("Up/Down  Left/Right: character  Enter  Esc: back")
+                                                        : tr("Up/Down  Enter  Esc: back");
     if (keyHints(app)) // (our key hints)
         m.text(help, 20, 372, false, a * 0.8f, 9);
     r.setOrigin(r.uiX());
@@ -3728,7 +3728,7 @@ void drawCamp(App& app) {
 
                 // (MuScrList_Start / DispActive: WinDispOn / Off(.., 0x1e0) - in from 480 to the right and out to it)
                 const float lx = kRowX + 480 * (1 - e);
-                if (c.list.empty()) m.text("Nothing here.", lx + 56, kFocusY + 16, false, e, 15);
+                if (c.list.empty()) m.text(tr("Nothing here."), lx + 56, kFocusY + 16, false, e, 15);
                 // MuScrList_Draw type 10 (__ChkCampItem): white for what can be used here (its table: 1 while
                 // MuCom_CheckExitItem, 3..6, 24..27), yellow for what either member wears, else grey; no count for a
                 // plate (Part 13 1172.5 s: "Emergency Exit" white, "Key" and the Collection grey)
@@ -3857,7 +3857,7 @@ void drawCamp(App& app) {
         }
         drawGeneBoard(app, m, 14, 92, item, ease, 1); // (browsing: the cursor's known entries by name)
         rightV();
-        if (c.list.empty()) m.text("No gene plates.", kRowX + 56, kFocusY + 16, false, ease, 15);
+        if (c.list.empty()) m.text(tr("No gene plates."), kRowX + 56, kFocusY + 16, false, ease, 15);
         // (MuScrList_Draw type 0xb: yellow for a plate either member wears; its HELP the plate's own text -
         // SetIdInfo(0xb, 0xe, .., 1, ..) - Part 5 1132 s "Gene Plate used to record / Dragon abilities")
         scrollList(kRowX, int(c.list.size()), [&](int k, float x, float y, bool lit) {
@@ -5139,7 +5139,7 @@ void drawManual(App& app) {
             if (app.manualTop > 0) m.text("...", 100, 40, false, la, 12);
             if (app.manualTop + kManualRows < int(topics.size())) m.text("...", 100, 52 + 32.0f * kManualRows - 6, false, la, 12);
             m.backButton(192, 344, false, app.menuArrowBob, la, tr("Back"));
-            if (app.showHud) m.text("Up/Down  Enter: read  Esc: back", 20, 372, false, la * 0.8f, 9); // (our key hints)
+            if (app.showHud) m.text(tr("Up/Down  Enter: read  Esc: back"), 20, 372, false, la * 0.8f, 9); // (our key hints)
         }
     }
     if (mm.state < 2) return;
@@ -5587,7 +5587,7 @@ void drawTitleMenu(App& app) {
         }
     }
     if (keyHints(app) && !app.resumeNotice && !app.resumePrompt) // (our key hints)
-        m.text("Up/Down  Enter  V: Options  A: Achievements  Esc: quit", 20, 360, false, t * 0.8f, 9);
+        m.text(tr("Up/Down  Enter  V: Options  A: Achievements  Esc: quit"), 20, 360, false, t * 0.8f, 9);
     app.renderer.setOrigin(app.renderer.uiX());
 }
 
@@ -5887,7 +5887,7 @@ void drawAchievementList(App& app) {
     const int n = int(a.listRows.size());
     if (n > 1) drawScrGauge(m, 460, 34, 244, n, -a.listScroll, kRowH, 0, t);
     m.backBar(192, 288, pressIn(app, kPressCollection, app.renderer.uiX(), 192, 286, 256, 34), t, tr("Back")); // (lit while held: DAT_000ed638)
-    if (keyHints(app)) m.text("Up/Down  Esc: back", 8, 300, false, t * 0.8f, 9); // (our key hints)
+    if (keyHints(app)) m.text(tr("Up/Down  Esc: back"), 8, 300, false, t * 0.8f, 9); // (our key hints)
     r.setOrigin(r.uiX());
 }
 

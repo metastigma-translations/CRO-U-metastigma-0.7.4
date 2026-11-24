@@ -64,7 +64,7 @@ msgstr "是"
 msgid "No"
 msgstr "否"
 
-#: src/app/menus.cpp
+#: src/app/menus.cpp src/app/scene_fx.cpp
 msgid "OK"
 msgstr "OK"
 
@@ -173,6 +173,18 @@ msgid "TOTAL PLAYTIME"
 msgstr "TOTAL PLAYTIME"
 
 #: src/app/menus.cpp
+msgid "The save couldn't be written."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  Esc: no"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  Esc: back"
+msgstr ""
+
+#: src/app/menus.cpp
 msgid "LV"
 msgstr ""
 
@@ -213,6 +225,14 @@ msgid "Shop"
 msgstr ""
 
 #: src/app/menus.cpp
+msgid "Left/Right: 1  Shift: 10  Up/Down: Yes / No  Enter  Esc"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Left/Right: character  Enter  Esc: back"
+msgstr ""
+
+#: src/app/menus.cpp
 msgid "TIME"
 msgstr "TIME"
 
@@ -228,9 +248,29 @@ msgstr ""
 msgid "Camp"
 msgstr ""
 
+#: src/app/menus.cpp
+msgid "Nothing here."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "No gene plates."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter: read  Esc: back"
+msgstr ""
+
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
 msgstr "結束"
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  V: Options  A: Achievements  Esc: quit"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Esc: back"
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Game"
@@ -684,6 +724,10 @@ msgid "Upscale Mode"
 msgstr "超解析度模式"
 
 #: src/app/scene_fx.cpp
+msgid "The scene at {0}% of the frame per side"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Sharpness"
 msgstr "銳利度"
 
@@ -706,6 +750,14 @@ msgstr "原始方式繪製八次偏移副本；修正方式只繪製一次抗鋸
 #: src/app/scene_fx.cpp
 msgid "and"
 msgstr "與"
+
+#: src/app/scene_fx.cpp
+msgid "Up/Down  Left/Right  Enter  Q/E or PgUp/PgDn: page  Esc: back"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "Choose the folder containing your decrypted Vita saves."
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Quit the game?"
