@@ -4008,6 +4008,29 @@ int runSelfTest(App& app) {
             resetAnswer(app, false);
             problems += !asked || app.resetAsk != 0 || !app.optionsOpen;
         }
+        { // Voice Volume's sample line (battle clip 0x2b1, __MuOptionSetInfo) for a key's step and a click on the track
+            openOptions(app, 1);
+            const std::vector<OptRow> sound = optionRows(app, 1);
+            int voice = -1;
+            for (size_t i = 0; i < sound.size(); ++i)
+                if (sound[i].label == tr("Voice Volume")) voice = int(i);
+            auto sampled = [&app]() { return !app.sound.battleLineLog.empty() && app.sound.battleLineLog.back() == 0x2b1; };
+            app.sound.battleLineLog.clear();
+            app.optionsRow = voice;
+            optionsKey(app, SDLK_LEFT);
+            const bool byKey = sampled();
+            app.sound.battleLineLog.clear();
+            float l0x, l0y, l1x, l1y; // frame pixels for a menu point: toLogical is linear
+            app.renderer.toLogical(0, 0, l0x, l0y);
+            app.renderer.toLogical(1, 1, l1x, l1y);
+            const float mx = optCtrlX(235 + 30 * 2.03f), my = optRowY(voice - app.optionsScroll) + 12;
+            const float lx = mx * 2 + app.renderer.uiX(), ly = my * 2;
+            optionsClick(app, (lx - l0x) / (l1x - l0x), (ly - l0y) / (l1y - l0y));
+            const bool byClick = sampled() && app.mix.voice == 30;
+            if (voice < 0 || !byKey || !byClick) std::printf("voice sample: row %d, key %d, click %d (voice %d)\n", voice, int(byKey), int(byClick), app.mix.voice);
+            problems += voice < 0 || !byKey || !byClick;
+            openOptions(app, 0);
+        }
         { // Menu Language (platform/ui_text): Auto first; a step right names English or a catalog, and the port's text follows
             const std::string keepLang = app.uiLang;
             int at = -1;
@@ -8707,6 +8730,30 @@ int runExportTextures(App& app, const char* dirArg) {
     return failed ? 1 : 0;
 }
 
+// Start a new game through the title as a player would, so the boot script sets up the opening.
+// stopAt is used by captures to pause at Character Select, the save screen, or the confirmation.
+void titleToNewGame(App& app, int pair, const std::string& stopAt) {
+    app.saveDirOverride = userDir() + "capture-empty/";
+    bootTitle(app);
+    for (int f = 0; f < 1000 && !app.titleOpen; ++f) stepEvents(app);
+    if (pair == 2) app.game.setFlag(31, true); // scenario 1 cleared: show the Extra page
+    titleChoose(app, 0);
+    for (int f = 0; f < 300 && !app.charSelectOpen; ++f) stepEvents(app);
+    app.charSelectCursor = pair - 1;
+    app.charSelectPage = pair - 1;
+    if (stopAt == "chars") { app.charSelectAnim = 100; return; }
+    charSelectKey(app, SDLK_RETURN);
+    for (int f = 0; f < 300 && !app.saveScreen.open; ++f) stepEvents(app);
+    if (stopAt == "ask") {
+        saveScreenKey(app, SDLK_RETURN);
+        app.saveScreen.anim = 100;
+    } else if (stopAt != "save") {
+        saveScreenKey(app, SDLK_RETURN);
+        saveScreenKey(app, SDLK_RETURN);
+        app.saveDirOverride.clear();
+    } else app.saveScreen.anim = 100;
+}
+
 int runCapture(App& app, const char* mapName, const char* outPath) {
     app.persist = false;
     if (const char* sz = SDL_getenv("CR_CAPTURE_SIZE")) { // CR_CAPTURE_SIZE=WxH: the window's size (e.g. 1280x720, a phone's 16:9)
@@ -8732,29 +8779,8 @@ int runCapture(App& app, const char* mapName, const char* outPath) {
         return 1;
     }
     if (app.captureTitlePair) { // --title-new p: through the title as a player would
-        app.saveDirOverride = userDir() + "capture-empty/"; // (no saves: New)
-        bootTitle(app);
-        for (int f = 0; f < 1000 && !app.titleOpen; ++f) stepEvents(app);
-        // (CR_TITLE_NEW_STOP=chars / save: stays on Character Select / the save screen)
         const char* stop = SDL_getenv("CR_TITLE_NEW_STOP");
-        const std::string stopAt = stop ? stop : "";
-        if (app.captureTitlePair == 2) app.game.setFlag(31, true); // (the second page open: scenario 1 cleared)
-        titleChoose(app, 0);
-        for (int f = 0; f < 300 && !app.charSelectOpen; ++f) stepEvents(app);
-        app.charSelectCursor = app.captureTitlePair - 1;
-        app.charSelectPage = app.captureTitlePair - 1; // (pair 2: the second page, "Extra" - the choice is the page's)
-        if (stopAt != "chars") {
-            charSelectKey(app, SDLK_RETURN);
-            for (int f = 0; f < 300 && !app.saveScreen.open; ++f) stepEvents(app);
-            if (stopAt == "ask") { // (CR_TITLE_NEW_STOP=ask: on New's "Begin new game?")
-                saveScreenKey(app, SDLK_RETURN);
-                app.saveScreen.anim = 100;
-            } else if (stopAt != "save") {
-                saveScreenKey(app, SDLK_RETURN);
-                saveScreenKey(app, SDLK_RETURN);
-                app.saveDirOverride.clear();
-            } else app.saveScreen.anim = 100; // (faded in: a capture draws one frame)
-        } else app.charSelectAnim = 100;
+        titleToNewGame(app, app.captureTitlePair, stop ? stop : "");
     } else if (app.captureTitle) bootTitle(app); // --title: the boot script, --frames n into it
     else if (app.newGame) startNewGame(app, app.captureScenario);
     else {

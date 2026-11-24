@@ -45,6 +45,10 @@ msgid "Quit Game"
 msgstr "Salir del juego"
 
 #: src/app/explore.cpp src/app/scene_fx.cpp
+msgid "Voice Volume"
+msgstr "Volumen de voces"
+
+#: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Menu Language"
 msgstr "Idioma de los menús"
 
@@ -439,10 +443,6 @@ msgstr ""
 #: src/app/scene_fx.cpp
 msgid "Master Volume"
 msgstr "Volumen general"
-
-#: src/app/scene_fx.cpp
-msgid "Voice Volume"
-msgstr "Volumen de voces"
 
 #: src/app/scene_fx.cpp
 msgid "Sound Test"

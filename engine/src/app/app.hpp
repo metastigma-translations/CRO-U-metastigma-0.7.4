@@ -2085,6 +2085,8 @@ void resetAnswer(App& app, bool yes);
 void optionsKey(App& app, SDL_Keycode key);
 int optionsBackPart(float mx, float my);
 void optionsClick(App& app, float px, float py);
+float optRowY(int i);       // Options: row i's bar top, in menu units
+float optCtrlX(float x);    // Options: a control's design x on screen
 std::string savePath(const App& app, const char* file);
 cr::SaveData captureSave(const App& app);
 bool applySave(App& app, const cr::SaveData& s);
@@ -2299,6 +2301,7 @@ bool stepVoiceCue(App& app);
 bool fieldToLogical(const App& app, cr::Vec3 p, float& lx, float& ly);
 void logicalToTex2d(const App& app, float lx, float ly, float& tx, float& ty);
 void stepEvents(App& app);
+void titleToNewGame(App& app, int pair, const std::string& stopAt = "");
 void fieldWalked(App& app, float dist);
 void playFootsteps(App& app);
 bool same(const cr::Vec3& a, const cr::Vec3& b);
