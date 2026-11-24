@@ -245,6 +245,11 @@ msgid "OZ"
 msgstr "OZ"
 
 #: src/app/menus.cpp
+msgid "Skill"
+msgstr ""
+
+
+#: src/app/menus.cpp
 msgid "World Select"
 msgstr ""
 
@@ -1370,7 +1375,3 @@ msgstr "以前のセーブをバックアップしました。"
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "タイトル画面からロードしてください。"
-
-#: src/app/menus.cpp
-msgid "Skill"
-msgstr ""
