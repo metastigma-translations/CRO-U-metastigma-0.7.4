@@ -1437,7 +1437,11 @@ std::vector<std::string> wrapText(cr::MenuPainter& m, const std::string& s, floa
 
 void openOptions(App& app, int page) {
     const bool first = !app.optionsOpen;
-    if (first) app.optionsFromTitle = app.titleOpen, app.resetAsk = 0;
+    if (first) {
+        app.optionsFromTitle = app.titleOpen, app.resetAsk = 0;
+        app.swapPromptTicks = 0;
+        app.swapPromptReversed = false;
+    }
     app.optionsOpen = true;
     app.optionsPage = (page + kOptionPages) % kOptionPages;
     app.optionsRow = 0;
@@ -1576,11 +1580,12 @@ void drawOptions(App& app, float, float) {
         if (row.promptPair) {
             const std::string conjunction = tr("and");
             const float firstPromptX = 28.0f + rowsX + m.textWidth(row.label, 14.0f) + 6.0f;
-            m.buttonPrompt(firstPromptX, y + 4.0f, 16.0f, false, dim);
+            const bool firstIsSecondary = app.swapPromptReversed;
+            m.buttonPrompt(firstPromptX, y + 4.0f, 16.0f, firstIsSecondary, dim);
             const float conjunctionX = firstPromptX + 20.0f;
             const float conjunctionWidth = m.textWidth(conjunction, 14.0f);
             m.textCentred(conjunction, conjunctionX, y + 12.0f, true, dim, 14.0f, false, true);
-            m.buttonPrompt(conjunctionX + conjunctionWidth + 4.0f, y + 4.0f, 16.0f, true, dim);
+            m.buttonPrompt(conjunctionX + conjunctionWidth + 4.0f, y + 4.0f, 16.0f, !firstIsSecondary, dim);
         }
         // The control in the original's design units (buttons 8 above the bar, gauges 4 below),
         // scaled about (kOptCtrlX, the bar's middle)
@@ -1670,6 +1675,10 @@ void stepOptions(App& app) {
     takeAndroidFolder(app);
     if (!app.optionsOpen) return;
     if (optionsAbout(app)) { app.optionsAnim = 0; return; } // (the page slides in once "About Option" has shut)
+    if (++app.swapPromptTicks >= kFramesPerSecond) {
+        app.swapPromptTicks = 0;
+        app.swapPromptReversed = !app.swapPromptReversed;
+    }
     for (auto& [setting, e] : app.gaugeEase) // (SideGuageDraw's count: one a frame)
         if (e.left > 0) --e.left;
     ++app.optionsAnim;

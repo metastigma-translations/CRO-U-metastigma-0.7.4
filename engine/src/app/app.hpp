@@ -228,6 +228,8 @@ struct App {
     int optionsAnim = 0;                   // frames since the page appeared (windows slide in)
     int menuArrowBob = 0, menuArrowBobDir = 1; // shared 0..5 bob for the menu Back arrows
     float menuArrowClock = 0;              // shared 20 Hz animation clock, active in every menu
+    int swapPromptTicks = 0;                // 20 options ticks per one-second icon exchange
+    bool swapPromptReversed = false;        // false: X/A left; true: O/B left
     struct GaugeEase { int from = -1, to = -1, left = 0; }; // SideGuageProc / Draw: the fill 10 frames from the old
     std::map<const int*, GaugeEase> gaugeEase;           // knob to the new (#17), by the setting it shows
     float optionsClock = 0;
