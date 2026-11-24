@@ -390,8 +390,6 @@ void MenuPainter::promptButton(float x, float y, float size, bool secondary, flo
         high.width = (corePixels + 2 * kPadPixels) * kSupersample;
         high.height = high.width;
         high.rgba.resize(size_t(high.width) * size_t(high.height) * 4, 0);
-        const size_t highPixelCount = size_t(high.width) * size_t(high.height);
-        std::vector<uint8_t> glyphMask(highPixelCount, 0);
         const float centre = float(corePixels) * 0.5f + float(kPadPixels);
         const float radius = float(corePixels) * 0.48f;
         const float endOffset = radius * 0.46f;
@@ -493,51 +491,17 @@ void MenuPainter::promptButton(float x, float y, float size, bool secondary, flo
                                   innerX, bottomY) ||
                         line(px, py, leftX, bottomY, innerX, bottomY);
                 }
-                const size_t pixelIndex = size_t(sy) * size_t(high.width) + size_t(sx);
-                glyphMask[pixelIndex] = onGlyph ? 255 : 0;
-                uint8_t* pixel = high.rgba.data() + pixelIndex * 4;
-                pixel[0] = onGlyph ? glyphRed : 0;
-                pixel[1] = onGlyph ? glyphGreen : 0;
-                pixel[2] = onGlyph ? glyphBlue : 0;
+                // White outline is on the outside of the black circular button face,
+                // not around the coloured X / O / A / B glyph.
+                const bool onButtonOutline = std::sqrt(dx * dx + dy * dy) >= radius - 1.0f;
+                uint8_t* pixel = high.rgba.data() +
+                    (size_t(sy) * size_t(high.width) + size_t(sx)) * 4;
+                pixel[0] = onButtonOutline ? 255 : (onGlyph ? glyphRed : 0);
+                pixel[1] = onButtonOutline ? 255 : (onGlyph ? glyphGreen : 0);
+                pixel[2] = onButtonOutline ? 255 : (onGlyph ? glyphBlue : 0);
                 pixel[3] = 255;
             }
         }
-        // Dilate the glyph mask by exactly one final output pixel at 8x working resolution.
-        // A separable 17-sample max filter yields a consistent white keyline without changing the face.
-        constexpr int kOutlineRadius = kSupersample;
-        std::vector<uint8_t> horizontalMask(highPixelCount, 0);
-        std::vector<uint8_t> outlinedMask(highPixelCount, 0);
-        for (int y = 0; y < high.height; ++y) {
-            int covered = 0;
-            for (int x = 0; x <= kOutlineRadius && x < high.width; ++x)
-                covered += glyphMask[size_t(y) * size_t(high.width) + size_t(x)] != 0;
-            for (int x = 0; x < high.width; ++x) {
-                horizontalMask[size_t(y) * size_t(high.width) + size_t(x)] = covered > 0 ? 255 : 0;
-                const int addX = x + kOutlineRadius + 1;
-                const int removeX = x - kOutlineRadius;
-                if (addX < high.width) covered += glyphMask[size_t(y) * size_t(high.width) + size_t(addX)] != 0;
-                if (removeX >= 0) covered -= glyphMask[size_t(y) * size_t(high.width) + size_t(removeX)] != 0;
-            }
-        }
-        for (int x = 0; x < high.width; ++x) {
-            int covered = 0;
-            for (int y = 0; y <= kOutlineRadius && y < high.height; ++y)
-                covered += horizontalMask[size_t(y) * size_t(high.width) + size_t(x)] != 0;
-            for (int y = 0; y < high.height; ++y) {
-                outlinedMask[size_t(y) * size_t(high.width) + size_t(x)] = covered > 0 ? 255 : 0;
-                const int addY = y + kOutlineRadius + 1;
-                const int removeY = y - kOutlineRadius;
-                if (addY < high.height) covered += horizontalMask[size_t(addY) * size_t(high.width) + size_t(x)] != 0;
-                if (removeY >= 0) covered -= horizontalMask[size_t(removeY) * size_t(high.width) + size_t(x)] != 0;
-            }
-        }
-        for (size_t i = 0; i < highPixelCount; ++i) {
-            if (outlinedMask[i] && !glyphMask[i]) {
-                uint8_t* pixel = high.rgba.data() + i * 4;
-                if (pixel[3]) pixel[0] = pixel[1] = pixel[2] = 255;
-            }
-        }
-
         Image icon;
         icon.width = corePixels + 2 * kPadPixels;
         icon.height = icon.width;
