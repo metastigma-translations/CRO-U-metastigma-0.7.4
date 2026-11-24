@@ -1370,3 +1370,7 @@ msgstr "以前のセーブをバックアップしました。"
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "タイトル画面からロードしてください。"
+
+#: src/app/menus.cpp
+msgid "Skill"
+msgstr ""
