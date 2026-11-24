@@ -202,6 +202,7 @@ msgstr "×（下方鍵）確定，○（右側鍵）返回"
 #: src/app/scene_fx.cpp
 msgid "Master Volume"
 msgstr "主音量"
+
 #: src/app/scene_fx.cpp
 msgid "Sound Test"
 msgstr "聲音測試"

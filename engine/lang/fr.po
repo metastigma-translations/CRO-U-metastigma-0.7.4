@@ -208,6 +208,7 @@ msgstr "× (bouton du bas) valide, ○ (celui de droite) annule"
 #: src/app/scene_fx.cpp
 msgid "Master Volume"
 msgstr "Volume général"
+
 #: src/app/scene_fx.cpp
 msgid "Sound Test"
 msgstr "Test sonore"

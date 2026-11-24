@@ -202,6 +202,7 @@ msgstr "×（下ボタン）で決定、○（右ボタン）で戻る"
 #: src/app/scene_fx.cpp
 msgid "Master Volume"
 msgstr "マスター音量"
+
 #: src/app/scene_fx.cpp
 msgid "Sound Test"
 msgstr "サウンドテスト"

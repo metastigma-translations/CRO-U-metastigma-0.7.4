@@ -209,6 +209,7 @@ msgstr "× (нижняя кнопка) подтверждает, ○ (права
 #: src/app/scene_fx.cpp
 msgid "Master Volume"
 msgstr "Общая громкость"
+
 #: src/app/scene_fx.cpp
 msgid "Sound Test"
 msgstr "Проверка звука"

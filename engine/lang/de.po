@@ -209,6 +209,7 @@ msgstr "× (untere Taste) bestätigt, ○ (rechte Taste) geht zurück"
 #: src/app/scene_fx.cpp
 msgid "Master Volume"
 msgstr "Gesamtlautstärke"
+
 #: src/app/scene_fx.cpp
 msgid "Sound Test"
 msgstr "Soundtest"
