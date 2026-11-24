@@ -1555,7 +1555,6 @@ void drawOptions(App& app, float, float) {
     const float pageTitleX = 256.0f - pageTitleWidth * 0.5f;
     { // (the port's darker page panel and rows, readable over every scene)
         const float shade[4] = {0, 0, 0, 0.5f * a}, fade[4] = {0, 0, 0, 0.2f * a};
-        m.quad(pageTitleX - 8.0f, 10, pageTitleWidth + 16.0f, 24, shade, shade);
         m.quad(12, kOptRowTop - 8, 250, optRowY(shown) + 42 - kOptRowTop, shade, shade);
         m.quad(262, kOptRowTop - 8, 238, optRowY(shown) + 42 - kOptRowTop, shade, fade);
     }

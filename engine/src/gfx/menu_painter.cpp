@@ -254,7 +254,7 @@ void MenuPainter::rowBar(float x, float y, const std::string& label, float alpha
     quad(x, y, 2, 24, solid, solid);
     quad(x + 4, y, 84, 24, solid, solid);
     quad(x + 88, y, 135, 24, solid, clear);
-    textCentred(label, x + 8, y + 12, true, alpha, 14, false, true);
+    textCentred(label, x + 8, y + 12, true, alpha, 14, false);
 }
 
 void MenuPainter::button(float x, float y, int word, const std::string& label, bool selected, float alpha, bool highlight,
