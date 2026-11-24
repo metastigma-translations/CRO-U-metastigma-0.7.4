@@ -4027,7 +4027,7 @@ int runSelfTest(App& app) {
             const float lx = mx * 2 + app.renderer.uiX(), ly = my * 2;
             optionsClick(app, (lx - l0x) / (l1x - l0x), (ly - l0y) / (l1y - l0y));
             const bool byClick = sampled() && app.mix.voice == 30;
-            if (voice < 0 || !byKey || !byClick) std::printf("voice sample: row %d, key %d, click %d (voice %d)\\n", voice, int(byKey), int(byClick), app.mix.voice);
+            if (voice < 0 || !byKey || !byClick) std::printf("voice sample: row %d, key %d, click %d (voice %d)\n", voice, int(byKey), int(byClick), app.mix.voice);
             problems += voice < 0 || !byKey || !byClick;
             openOptions(app, 0);
         }
