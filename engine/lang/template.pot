@@ -244,6 +244,11 @@ msgid "OZ"
 msgstr ""
 
 #: src/app/menus.cpp
+msgid "Skill"
+msgstr ""
+
+
+#: src/app/menus.cpp
 msgid "World Select"
 msgstr ""
 
@@ -1354,8 +1359,4 @@ msgstr ""
 
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
-msgstr ""
-
-#: src/app/menus.cpp
-msgid "Skill"
 msgstr ""
