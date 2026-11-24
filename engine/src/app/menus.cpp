@@ -2822,7 +2822,7 @@ void drawGeneBoard(App& app, cr::MenuPainter& m, float x, float y, int plate, fl
     const std::string name = itemName(app, plate);
     m.textCentred(name, x + (163 - m.textWidth(name, 14)) / 2, y + 8, true, a, 14);
     m.quad(x, y + 24, 163, 16, white, white);
-    m.text("SKILL", x + 24, y + 36, false, a, 11);
+    m.text(tr("Skill"), x + 24, y + 36, false, a, 11);
     drawStatusNumber(m, cr::plateLearned(app.game, plate), x + 90, y + 24, 1, 12, a, true);
     m.text("/", x + 102, y + 36, false, a, 12);
     drawStatusNumber(m, 6, x + 114, y + 24, 1, 12, a, true);
