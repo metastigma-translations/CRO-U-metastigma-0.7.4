@@ -509,22 +509,26 @@ void MenuPainter::promptButton(float x, float y, float size, bool secondary, flo
         std::vector<uint8_t> outlinedMask(highPixelCount, 0);
         for (int y = 0; y < high.height; ++y) {
             int covered = 0;
+            for (int x = 0; x <= kOutlineRadius && x < high.width; ++x)
+                covered += glyphMask[size_t(y) * size_t(high.width) + size_t(x)] != 0;
             for (int x = 0; x < high.width; ++x) {
-                const int addX = x + kOutlineRadius;
-                const int removeX = x - kOutlineRadius - 1;
+                horizontalMask[size_t(y) * size_t(high.width) + size_t(x)] = covered > 0 ? 255 : 0;
+                const int addX = x + kOutlineRadius + 1;
+                const int removeX = x - kOutlineRadius;
                 if (addX < high.width) covered += glyphMask[size_t(y) * size_t(high.width) + size_t(addX)] != 0;
                 if (removeX >= 0) covered -= glyphMask[size_t(y) * size_t(high.width) + size_t(removeX)] != 0;
-                horizontalMask[size_t(y) * size_t(high.width) + size_t(x)] = covered > 0 ? 255 : 0;
             }
         }
         for (int x = 0; x < high.width; ++x) {
             int covered = 0;
+            for (int y = 0; y <= kOutlineRadius && y < high.height; ++y)
+                covered += horizontalMask[size_t(y) * size_t(high.width) + size_t(x)] != 0;
             for (int y = 0; y < high.height; ++y) {
-                const int addY = y + kOutlineRadius;
-                const int removeY = y - kOutlineRadius - 1;
+                outlinedMask[size_t(y) * size_t(high.width) + size_t(x)] = covered > 0 ? 255 : 0;
+                const int addY = y + kOutlineRadius + 1;
+                const int removeY = y - kOutlineRadius;
                 if (addY < high.height) covered += horizontalMask[size_t(addY) * size_t(high.width) + size_t(x)] != 0;
                 if (removeY >= 0) covered -= horizontalMask[size_t(removeY) * size_t(high.width) + size_t(x)] != 0;
-                outlinedMask[size_t(y) * size_t(high.width) + size_t(x)] = covered > 0 ? 255 : 0;
             }
         }
         for (size_t i = 0; i < highPixelCount; ++i) {
