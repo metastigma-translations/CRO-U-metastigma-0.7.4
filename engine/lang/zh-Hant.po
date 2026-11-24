@@ -1368,3 +1368,7 @@ msgstr "原有存檔已備份。"
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "請在標題畫面讀取。"
+
+#: src/app/menus.cpp
+msgid "Skill"
+msgstr ""
