@@ -1419,3 +1419,7 @@ msgstr "Partidas anteriores respaldadas."
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "Carga desde la pantalla de título."
+
+#: src/app/menus.cpp
+msgid "Skill"
+msgstr ""
