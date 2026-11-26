@@ -4621,8 +4621,16 @@ void drawScenarios(App& app) {
         m.quad(398.0f, labelY + 25.0f, 76.0f, 1.0f, lineMid, lineRight);
 
         if (which) {
-            // Extra keeps its original left inset and vertical placement.
-            m.textCentred(tr("Extra"), 5.5f, 269.5f, false, alpha, 28.0f, true);
+            // Extra replaces its 128 x 35 atlas tile, centred in that original rectangle.
+            const std::string extra = tr("Extra");
+            float extraSize = 28.0f;
+            float extraWidth = m.textWidth(extra, extraSize);
+            if (extraWidth > 124.0f && extraWidth > 0.0f) {
+                extraSize *= 124.0f / extraWidth;
+                extraWidth = m.textWidth(extra, extraSize);
+            }
+            m.textCentred(extra, 4.0f + (128.0f - extraWidth) * 0.5f, 265.5f,
+                          false, alpha, extraSize, true);
         } else {
             // The first row's character label is an illustration in the atlas, not UI copy.
             sheet(2, 8, 138, alpha);
