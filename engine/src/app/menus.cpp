@@ -5475,10 +5475,15 @@ void drawCharSelect(App& app) {
     { // window 0: the first page's art (z -20)
         const int page = app.charSelectPage;
         app.charSelectPage = 0;
+        const int keepLayer = r.layer();
+        r.setLayer(3); // the Vita's full-width artwork uses the original painting layer
         drawCharArt(app, t, false);
+        r.setLayer(keepLayer);
         app.charSelectPage = page;
     }
     if (later && sp.shown) { // window 1: the second page's, falling (chara3 24 and 32 under it; iPhone 22 / 31)
+        const int keepLayer = r.layer();
+        r.setLayer(3); // keep the falling character artwork on the Vita's full-width picture layer
         if (r.androidScreen()) { // (22 fitted as the first page's; 31, its foot, + oy: _PictTexNoDrawFull2W)
             drawFullPicture(app, app.charSelectArt2, 22, 0, sp.y, t);
             outPicture(m, app.charSelectArt2, 31, 0, sp.y + 320 + androidEdgeY(app), t);
@@ -5489,6 +5494,7 @@ void drawCharSelect(App& app) {
             outPicture(m, app.charSelectArt2, 24, -32, sp.y - 64, t);
             outPicture(m, app.charSelectArt2, 32, -16, sp.y + 352, t);
         }
+        r.setLayer(keepLayer);
     }
     m.backBar(124, 288, pressIn(app, kPressCharSelect, app.renderer.uiX(), 124, 288, 232, 24), t, tr("Back")); // ComUty_BackButtonPosSetXYDraw(124, 288), mode 1; lit while held
     const int word = kScenarioWord[app.charSelectPage & 1];
@@ -5512,7 +5518,10 @@ void drawCharSelect(App& app) {
     { // window 3: the banner over it all (z -4) - chara3's once the second page is open
         const int page = app.charSelectPage;
         app.charSelectPage = later ? 1 : 0;
+        const int keepLayer = r.layer();
+        r.setLayer(3);
         drawCharArt(app, t, true);
+        r.setLayer(keepLayer);
         app.charSelectPage = page;
     }
     if (keyHints(app)) // (our key hints)
