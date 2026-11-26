@@ -2820,7 +2820,7 @@ void drawGeneBoard(App& app, cr::MenuPainter& m, float x, float y, int plate, fl
     const float white[4] = {1, 1, 1, a};
     m.quad(x, y, 163, 16, white, white);
     const std::string name = itemName(app, plate);
-    m.textCentred(name, x + (163 - m.textWidth(name, 14)) / 2, y + 8 - 0.5f * m.baselineFromCentre(14), true, a, 14);
+    m.textCentred(name, x + (163 - m.textWidth(name, 14)) / 2, y + 9 - 0.5f * m.baselineFromCentre(14), true, a, 14);
     m.quad(x, y + 24, 163, 16, white, white);
     // Centre every glyph on the second white strip (y + 24 .. y + 40) and use
     // the same dark fill / white outline as the plate name above.
