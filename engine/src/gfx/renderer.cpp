@@ -120,7 +120,7 @@ void Renderer::begin3DRect(float x, float y, float w, float h) {
     x += originX_;
     if (phone_) {
         layoutToScreen(x, y);
-        w *= layoutScaleX(), h *= layoutScaleY();
+        w *= layoutScale(), h *= layoutScale();
     }
     interfaceRect(x, y, w, h); // (a camera cutout reaching into the interface: drawn smaller, clear of it)
     dev_->setViewport(offX_ + x * scaleX_, offY_ + y * scaleY_, w * scaleX_, h * scaleY_);
