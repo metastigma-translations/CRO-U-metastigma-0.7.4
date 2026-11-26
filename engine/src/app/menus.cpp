@@ -4604,21 +4604,23 @@ void drawScenarios(App& app) {
         const float labelY = which ? 254.0f : 136.0f;
         constexpr float digitSize = 26.0f;
         const float digitWidth = m.textWidth(digits, digitSize);
-        m.textCentred(digits, 385.0f + (72.0f - digitWidth) * 0.5f, labelY + 13.0f,
+        m.textCentred(digits, 385.0f + (72.0f - digitWidth) * 0.5f, labelY + 12.0f,
                       false, alpha, digitSize, true);
 
         const std::string achievement = tr("Achievement");
         constexpr float achievementSize = 16.0f;
         const float achievementX = 315.0f + 7.0f;
-        m.textCentred(achievement, achievementX, labelY + 19.5f, false, alpha, achievementSize, true);
-        m.textCentred("%", 315.0f + 140.5f, labelY + 17.0f, false, alpha, 18.0f, true);
 
-        // The underline baked into the Achievement/% sprite is preserved as a grey-white-grey rule.
+        // Preserve the original underline, but draw it before its label so the text stays on top.
         const float lineLeft[4] = {0xd1 / 255.0f, 0xcf / 255.0f, 0xd1 / 255.0f, alpha};
         const float lineMid[4] = {0x6b / 255.0f, 0x6b / 255.0f, 0x6c / 255.0f, alpha};
         const float lineRight[4] = {0xb8 / 255.0f, 0xb7 / 255.0f, 0xb8 / 255.0f, alpha};
         m.quad(322.0f, labelY + 25.0f, 76.0f, 1.0f, lineLeft, lineMid);
         m.quad(398.0f, labelY + 25.0f, 76.0f, 1.0f, lineMid, lineRight);
+
+        // Text after the underline: keep Achievement and % in front of the rule.
+        m.textCentred(achievement, achievementX, labelY + 17.5f, false, alpha, achievementSize, true);
+        m.textCentred("%", 315.0f + 140.5f, labelY + 16.0f, false, alpha, 18.0f, true);
 
         if (which) {
             // Extra replaces its 128 x 35 atlas tile, centred in that original rectangle.
@@ -4641,7 +4643,7 @@ void drawScenarios(App& app) {
                 viegSize *= 140.0f / viegWidth;
                 viegWidth = m.textWidth(vieg, viegSize);
             }
-            m.textCentred(vieg, 8.0f + (144.0f - viegWidth) * 0.5f, 138.0f + 17.5f,
+            m.textCentred(vieg, 8.0f + (144.0f - viegWidth) * 0.5f, 138.0f + 14.5f,
                           false, alpha, viegSize, true);
         }
     };
