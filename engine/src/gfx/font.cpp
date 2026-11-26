@@ -319,10 +319,10 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
                             const float position = (perGlyphVerticalGradient || darkVerticalGradient) && gh > 1
                                                        ? float(y) / float(gh - 1) : 0.0f;
                             const float t = std::clamp((position - 0.50f) / 0.50f, 0.0f, 1.0f);
-                            const float top = darkVerticalGradient ? 85.0f : 255.0f;
-                            const float bottom = darkVerticalGradient ? 0.0f : 85.0f;
+                            const float top = darkVerticalGradient ? 128.0f : 255.0f;
+                            const float bottom = darkVerticalGradient ? 64.0f : 85.0f;
                             const uint8_t shade = uint8_t(std::lround(top + (bottom - top) * t));
-                            p[0] = p[1] = p[2] = shade; // light: white -> #555; dark: #555 -> black
+                            p[0] = p[1] = p[2] = shade; // light: white -> #555; Scenario dark: #808080 -> #404040
                             p[3] = coverage;
                         }
                     }

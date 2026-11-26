@@ -4607,22 +4607,22 @@ void drawScenarios(App& app) {
         const float digitWidth = m.textWidth(digits, digitSize);
         const float digitX = percentX - digitWidth; // digits end exactly where the percent sign begins
         m.textCentred(digits, digitX, labelY + 12.0f,
-                      false, alpha, digitSize, true);
+                      false, alpha, digitSize, true, true);
 
         const std::string achievement = tr("Achievement");
         constexpr float achievementSize = 14.0f;
-        const float achievementX = 315.0f + 7.0f;
+        const float achievementX = 315.0f + 9.0f;
 
         // Preserve the original underline, but draw it before its label so the text stays on top.
         const float lineLeft[4] = {0xd1 / 255.0f, 0xcf / 255.0f, 0xd1 / 255.0f, alpha};
         const float lineMid[4] = {0x6b / 255.0f, 0x6b / 255.0f, 0x6c / 255.0f, alpha};
-        const float lineRight[4] = {0xb8 / 255.0f, 0xb7 / 255.0f, 0xb8 / 255.0f, alpha};
+        const float lineRight[4] = {0xd1 / 255.0f, 0xcf / 255.0f, 0xd1 / 255.0f, alpha};
         m.quad(322.0f, labelY + 25.0f, 76.0f, 1.0f, lineLeft, lineMid);
         m.quad(398.0f, labelY + 25.0f, 76.0f, 1.0f, lineMid, lineRight);
 
         // Text after the underline: keep Achievement and % in front of the rule.
-        m.textCentred(achievement, achievementX, labelY + 16.5f, false, alpha, achievementSize, true);
-        m.textCentred("%", percentX, labelY + 16.0f, false, alpha, 18.0f, true);
+        m.textCentred(achievement, achievementX, labelY + 17.5f, false, alpha, achievementSize, true, true);
+        m.textCentred("%", percentX, labelY + 16.0f, false, alpha, 18.0f, true, true);
 
         if (which) {
             // Extra replaces its 128 x 35 atlas tile, centred in that original rectangle.
@@ -4634,7 +4634,7 @@ void drawScenarios(App& app) {
                 extraWidth = m.textWidth(extra, extraSize);
             }
             m.textCentred(extra, 4.0f + (128.0f - extraWidth) * 0.5f, 265.5f,
-                          false, alpha, extraSize, true);
+                          false, alpha, extraSize, true, true);
         } else {
             // The first row's character label is an illustration in the atlas, not UI copy.
             // Vieg replaces the original 144 x 35 atlas wordmark.
@@ -4645,8 +4645,8 @@ void drawScenarios(App& app) {
                 viegSize *= 140.0f / viegWidth;
                 viegWidth = m.textWidth(vieg, viegSize);
             }
-            m.textCentred(vieg, 8.0f + (144.0f - viegWidth) * 0.5f, 138.0f + 12.5f,
-                          false, alpha, viegSize, true);
+            m.textCentred(vieg, 40.5f - viegWidth * 0.5f, 138.0f + 12.5f,
+                          false, alpha, viegSize, true, true);
         }
     };
     if (s.card < 0) { // __menuu_SccnariosPut, windows 0..5
