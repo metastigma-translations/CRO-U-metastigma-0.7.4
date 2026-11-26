@@ -251,6 +251,32 @@ bool savePngImage(const std::string& path, const Image& img) {
     return SDL_SaveFile(path.c_str(), png.data(), png.size());
 }
 
+bool loadNamedHdImage(const std::string& dir, const std::string& stem, Image& out, std::string* why) {
+    if (why) why->clear();
+    if (dir.empty() || stem.empty()) return false;
+    const std::string path = dir + stem + ".png";
+    size_t size = 0;
+    void* data = SDL_LoadFile(path.c_str(), &size);
+    if (!data) return false;
+    int w = 0, h = 0, channels = 0;
+    stbi_uc* px = stbi_load_from_memory(static_cast<const stbi_uc*>(data), int(std::min(size, size_t(1) << 30)), &w, &h, &channels, 4);
+    SDL_free(data);
+    if (!px) return leftOut(why, stem + ".png", "not a PNG this build can read");
+    // Vita's 960x544 screen (approximately 16:9); allow the usual 16:9 artwork ratio too.
+    const double aspect = h > 0 ? double(w) / double(h) : 0.0;
+    if (w < 1 || h < 1 || w > 8192 || h > 8192 || std::abs(aspect - (960.0 / 544.0)) > 0.02) {
+        stbi_image_free(px);
+        return leftOut(why, stem + ".png", "expected a widescreen 16:9 Vita artwork layer");
+    }
+    out = Image();
+    out.width = w;
+    out.height = h;
+    out.rgba.assign(px, px + size_t(w) * size_t(h) * 4);
+    out.mipmaps = true;
+    stbi_image_free(px);
+    return true;
+}
+
 bool loadHdImage(const std::string& dir, const Image& original, Image& out, std::string* why) {
     if (why) why->clear();
     if (dir.empty() || original.width <= 0) return false;
