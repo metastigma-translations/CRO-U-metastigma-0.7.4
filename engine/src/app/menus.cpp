@@ -4550,8 +4550,12 @@ void drawScenarios(App& app) {
         const float black[4] = {0, 0, 0, 1};
         const float ex = androidEdgeX(app), ey = androidEdgeY(app);
         if (s.mode == 0) {
-            m.quad(-ex, -ey, 480 + 2 * ex, 48 + ey, black, black);
-            m.quad(-ex, 284, 480 + 2 * ex, 36 + ey, black, black);
+            // The Vita is wider than the 3:2 menu layout. Extend the title-mode black bands
+            // beyond the 480-unit menu width so the field cannot show through at either edge.
+            const float maskX = r.vitaScreen() ? -48.0f : -ex;
+            const float maskW = r.vitaScreen() ? 576.0f : 480.0f + 2 * ex;
+            m.quad(maskX, -ey, maskW, 48 + ey, black, black);
+            m.quad(maskX, 284, maskW, 36 + ey, black, black);
         } else if (r.vitaScreen()) { // Vita layout: masks stay behind the TIME and OZ digits
             m.quad(-48, -32, 576, 80, black, black);
             m.quad(-48, 284, 576, 100, black, black);
