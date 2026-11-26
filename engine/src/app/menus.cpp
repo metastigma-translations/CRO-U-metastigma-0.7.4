@@ -4604,6 +4604,7 @@ void drawScenarios(App& app) {
         const float labelY = which ? 254.0f : 136.0f;
         constexpr float digitSize = 26.0f;
         const float percentX = 315.0f + 140.5f;
+        const float digitWidth = m.textWidth(digits, digitSize);
         const float digitX = percentX - digitWidth; // digits end exactly where the percent sign begins
         m.textCentred(digits, digitX, labelY + 12.0f,
                       false, alpha, digitSize, true);
