@@ -4652,7 +4652,7 @@ void drawScenarios(App& app) {
                 viegSize *= 140.0f / viegWidth;
                 viegWidth = m.textWidth(vieg, viegSize);
             }
-            scenarioText(vieg, 80.0f - viegWidth * 0.5f, 138.0f + 12.5f, viegSize);
+            scenarioText(vieg, 70.0f - viegWidth * 0.5f, 138.0f + 12.5f, viegSize);
         }
     };
     if (s.card < 0) { // __menuu_SccnariosPut, windows 0..5
@@ -5452,7 +5452,7 @@ void drawCharArt(App& app, float alpha, bool banner, float grey) {
         const float k = sheetScale(tex);
         m.imagePieceTo(tex, x + dx, y + dy, p[2], p[3], p[0] * k, p[1] * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
     };
-    if (banner) draw(phone ? 26 : 27, -10.0f, -androidEdgeY(app));
+    if (banner) draw(phone ? 26 : 27, 0.0f, -androidEdgeY(app));
     else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
     else draw(phone ? 22 : 24, 0.0f, 0.0f);
 }
