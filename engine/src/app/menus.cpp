@@ -5447,14 +5447,14 @@ void drawCharArt(App& app, float alpha, bool banner, float grey) {
     cr::MenuPainter& m = app.menu;
     const bool phone = app.renderer.phoneLayout();
     const float x = phone ? 0.0f : -32.0f, y = phone ? 0.0f : -64.0f;
-    const auto draw = [&](int pict, float dy) {
+    const auto draw = [&](int pict, float dx, float dy) {
         const short* p = cr::kOutReadPicture[pict];
         const float k = sheetScale(tex);
-        m.imagePieceTo(tex, x, y + dy, p[2], p[3], p[0] * k, p[1] * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
+        m.imagePieceTo(tex, x + dx, y + dy, p[2], p[3], p[0] * k, p[1] * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
     };
-    if (banner) draw(phone ? 26 : 27, -androidEdgeY(app));
+    if (banner) draw(phone ? 26 : 27, -10.0f, -androidEdgeY(app));
     else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
-    else draw(phone ? 22 : 24, 0);
+    else draw(phone ? 22 : 24, 0.0f, 0.0f);
 }
 
 void drawCharSelect(App& app) {
