@@ -294,6 +294,7 @@ struct App {
         int upscaleMode = 0;               // kUpscaleModes: 0 native AA (DLAA) .. 4 ultra performance
         int sharpness = 25;                // % (FSR's RCAS pass; 0 = none)
         bool hdTextures = false;           // upscaled replacements from hdDir (what loads next)
+        bool vitaOutpaint = false;         // Vita's outpaint fit for HD chara1-3 / title1-2 sheets only
         bool avoidCutout = true;           // phones: the layout kept clear of a camera's notch / punch hole (Options, Display)
         bool cutoutBars = false;           // ... and the picture too: boxed inside the safe area, black bars over the cutout
         int smoothModels = 0;              // 0 off, 2 / 3: PN-triangle level for characters and monsters
