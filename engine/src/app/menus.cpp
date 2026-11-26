@@ -4603,12 +4603,13 @@ void drawScenarios(App& app) {
                                    std::to_string(value % 10);
         const float labelY = which ? 254.0f : 136.0f;
         constexpr float digitSize = 26.0f;
-        const float digitWidth = m.textWidth(digits, digitSize);
-        m.textCentred(digits, 385.0f + (72.0f - digitWidth) * 0.5f, labelY + 12.0f,
+        const float percentX = 315.0f + 140.5f;
+        const float digitX = percentX - digitWidth; // digits end exactly where the percent sign begins
+        m.textCentred(digits, digitX, labelY + 12.0f,
                       false, alpha, digitSize, true);
 
         const std::string achievement = tr("Achievement");
-        constexpr float achievementSize = 16.0f;
+        constexpr float achievementSize = 14.0f;
         const float achievementX = 315.0f + 7.0f;
 
         // Preserve the original underline, but draw it before its label so the text stays on top.
@@ -4619,8 +4620,8 @@ void drawScenarios(App& app) {
         m.quad(398.0f, labelY + 25.0f, 76.0f, 1.0f, lineMid, lineRight);
 
         // Text after the underline: keep Achievement and % in front of the rule.
-        m.textCentred(achievement, achievementX, labelY + 17.5f, false, alpha, achievementSize, true);
-        m.textCentred("%", 315.0f + 140.5f, labelY + 16.0f, false, alpha, 18.0f, true);
+        m.textCentred(achievement, achievementX, labelY + 16.5f, false, alpha, achievementSize, true);
+        m.textCentred("%", percentX, labelY + 16.0f, false, alpha, 18.0f, true);
 
         if (which) {
             // Extra replaces its 128 x 35 atlas tile, centred in that original rectangle.
@@ -4643,7 +4644,7 @@ void drawScenarios(App& app) {
                 viegSize *= 140.0f / viegWidth;
                 viegWidth = m.textWidth(vieg, viegSize);
             }
-            m.textCentred(vieg, 8.0f + (144.0f - viegWidth) * 0.5f, 138.0f + 14.5f,
+            m.textCentred(vieg, 8.0f + (144.0f - viegWidth) * 0.5f, 138.0f + 12.5f,
                           false, alpha, viegSize, true);
         }
     };
