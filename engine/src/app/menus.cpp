@@ -4597,8 +4597,8 @@ void drawScenarios(App& app) {
             m.textCentred(text, x, y, false, alpha, size, true, false, false, 0, true);
         };
         const float y = which ? 248 : 131;
-        // The original atlas tile is a uniform black RGBA(0, 0, 0, 156) strip.
-        // Rebuild it as the original muted grey in the renderer, preserving its alpha.
+        // The source atlas tile is uniform black RGBA(0, 0, 0, 156).
+        // Use the requested muted grey in the renderer, preserving the source alpha.
         const float bandGrey[4] = {
             0x56 / 255.0f, 0x58 / 255.0f, 0x53 / 255.0f,
             alpha * (156.0f / 255.0f)
