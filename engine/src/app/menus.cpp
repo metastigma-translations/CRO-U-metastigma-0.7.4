@@ -4652,7 +4652,7 @@ void drawScenarios(App& app) {
                 viegSize *= 140.0f / viegWidth;
                 viegWidth = m.textWidth(vieg, viegSize);
             }
-            scenarioText(vieg, 70.0f - viegWidth * 0.5f, 138.0f + 12.5f, viegSize);
+            scenarioText(vieg, 54.0f - viegWidth * 0.5f, 138.0f + 12.5f, viegSize);
         }
     };
     if (s.card < 0) { // __menuu_SccnariosPut, windows 0..5
