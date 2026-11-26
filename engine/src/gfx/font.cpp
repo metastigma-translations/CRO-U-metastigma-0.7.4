@@ -208,7 +208,8 @@ bool Font::covers(const std::string& utf8) const {
 }
 
 bool Font::rasterise(const std::vector<std::string>& lines, float em, float lineStep, int pad, Image& out,
-                     bool perGlyphVerticalGradient, bool darkVerticalGradient, float letterSpacing) const {
+                     bool perGlyphVerticalGradient, bool darkVerticalGradient, float letterSpacing,
+                     bool scenarioVerticalGradient) const {
     if (!loaded() || lines.empty()) return false;
     const stbtt_fontinfo& info = face_->info;
     const float scale = stbtt_ScaleForMappingEmToPixels(&info, em);
@@ -316,13 +317,13 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
                             // Each character receives its own vertical ramp, based on its own bitmap.
                             // Lowercase letters therefore get a complete ramp, not a leftover section
                             // of the uppercase letter's taller shared line gradient.
-                            const float position = (perGlyphVerticalGradient || darkVerticalGradient) && gh > 1
+                            const float position = (perGlyphVerticalGradient || darkVerticalGradient || scenarioVerticalGradient) && gh > 1
                                                        ? float(y) / float(gh - 1) : 0.0f;
                             const float t = std::clamp((position - 0.50f) / 0.50f, 0.0f, 1.0f);
-                            const float top = darkVerticalGradient ? 128.0f : 255.0f;
-                            const float bottom = darkVerticalGradient ? 64.0f : 85.0f;
+                            const float top = scenarioVerticalGradient ? 128.0f : darkVerticalGradient ? 85.0f : 255.0f;
+                            const float bottom = scenarioVerticalGradient ? 64.0f : darkVerticalGradient ? 0.0f : 85.0f;
                             const uint8_t shade = uint8_t(std::lround(top + (bottom - top) * t));
-                            p[0] = p[1] = p[2] = shade; // light: white -> #555; Scenario dark: #808080 -> #404040
+                            p[0] = p[1] = p[2] = shade; // light: white -> #555; dark: #555 -> black; Scenario: #808080 -> #404040
                             p[3] = coverage;
                         }
                     }

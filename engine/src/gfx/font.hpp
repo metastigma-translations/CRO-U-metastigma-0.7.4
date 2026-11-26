@@ -39,7 +39,7 @@ public:
     // pixels of margin.
     bool rasterise(const std::vector<std::string>& lines, float em, float lineStep, int pad, Image& out,
                    bool perGlyphVerticalGradient = false, bool darkVerticalGradient = false,
-                   float letterSpacing = 0) const;
+                   float letterSpacing = 0, bool scenarioVerticalGradient = false) const;
     // The line box (ascent and descent in ems, descent negative) the glyphs are placed in, in place of the
     // face's own (hhea) - a face standing in for another keeps the text where the other put it; 0, 0: the face's
     void setLineBox(float ascentEm, float descentEm) {

@@ -127,13 +127,15 @@ void MenuPainter::slant(float x, float y, float w, float h, float lean, const fl
     }
 }
 
-MenuPainter::Cached& MenuPainter::rasterise(const std::string& s, float size, bool perGlyphVerticalGradient, bool darkVerticalGradient, float letterSpacing) {
+MenuPainter::Cached& MenuPainter::rasterise(const std::string& s, float size, bool perGlyphVerticalGradient,
+                                                     bool darkVerticalGradient, float letterSpacing,
+                                                     bool scenarioVerticalGradient) {
     const float density = std::max(1.0f, std::round(r_->pixelScale() * 4.0f) / 4.0f);
     // The fixed edge is one menu unit wide. Rasterise with that transparent border at the
     // actual pixel density, then combine the glyph alpha into a single antialiased outline.
     const int pad = cleanOutline_ && outline_ ? std::max(1, int(std::ceil(kScale * K() * density))) : 0;
     const std::string key = s + '\x01' + std::to_string(int(size * 10)) + '\x02' + std::to_string(pad) +
-                            (darkVerticalGradient ? "\x03d" : perGlyphVerticalGradient ? "\x03g" : "\x03p") +
+                            (scenarioVerticalGradient ? "\x03s" : darkVerticalGradient ? "\x03d" : perGlyphVerticalGradient ? "\x03g" : "\x03p") +
                             std::string("\x04") + std::to_string(int(std::lround(letterSpacing * 1000)));
     Cached& c = text_[key];
     const int generation = font_ ? font_->generation() : -2;
@@ -145,7 +147,7 @@ MenuPainter::Cached& MenuPainter::rasterise(const std::string& s, float size, bo
     Image img;
     const float em = size * kScale * density;
     if (!font_->rasterise({s}, em, em * 1.2f, pad, img, perGlyphVerticalGradient, darkVerticalGradient,
-                          letterSpacing * kScale * K() * density)) return c;
+                          letterSpacing * kScale * K() * density, scenarioVerticalGradient)) return c;
 
     c.tex = r_->upload(img);
     c.pad = float(pad) / density;
@@ -168,9 +170,11 @@ void MenuPainter::edge(const Texture& tex, float x, float y, float w, float h, f
             if (dx || dy) r_->drawQuad(tex, X(x + float(dx)) * kScale, Y(y + float(dy)) * kScale, w, h, k, k, k, alpha);
 }
 
-void MenuPainter::text(const std::string& s, float x, float y, bool dark, float alpha, float size, bool verticalGradient, bool darkGradient, bool noOutline, float letterSpacing) {
+void MenuPainter::text(const std::string& s, float x, float y, bool dark, float alpha, float size,
+                       bool verticalGradient, bool darkGradient, bool noOutline, float letterSpacing,
+                       bool scenarioVerticalGradient) {
     if (!r_ || s.empty() || alpha <= 0.001f) return;
-    Cached& c = rasterise(s, menuSize(size) * K(), verticalGradient, darkGradient, letterSpacing);
+    Cached& c = rasterise(s, menuSize(size) * K(), verticalGradient, darkGradient, letterSpacing, scenarioVerticalGradient);
     if (!c.tex.id) return;
     const float x0 = X(x) * kScale - c.pad, y0 = Y(y) * kScale - c.pad;
     const float w = c.w + 2 * c.pad, h = c.h + 2 * c.pad;
@@ -204,10 +208,11 @@ void MenuPainter::textTint(const std::string& s, float x, float y, float r, floa
 }
 
 void MenuPainter::textCentred(const std::string& s, float x, float y, bool dark, float alpha, float size,
-                                bool verticalGradient, bool darkGradient, bool noOutline, float letterSpacing) {
+                                bool verticalGradient, bool darkGradient, bool noOutline, float letterSpacing,
+                                bool scenarioVerticalGradient) {
     if (!r_ || s.empty()) return;
-    const Cached& c = rasterise(s, menuSize(size) * K(), verticalGradient, darkGradient, letterSpacing);
-    text(s, x, y - c.h / kScale / K() / 2, dark, alpha, size, verticalGradient, darkGradient, noOutline, letterSpacing);
+    const Cached& c = rasterise(s, menuSize(size) * K(), verticalGradient, darkGradient, letterSpacing, scenarioVerticalGradient);
+    text(s, x, y - c.h / kScale / K() / 2, dark, alpha, size, verticalGradient, darkGradient, noOutline, letterSpacing, scenarioVerticalGradient);
 }
 
 float MenuPainter::textWidth(const std::string& s, float size, float letterSpacing) {

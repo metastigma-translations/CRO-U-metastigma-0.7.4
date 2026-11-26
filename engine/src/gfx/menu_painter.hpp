@@ -77,7 +77,8 @@ public:
     void setCleanOutline(bool on) { cleanOutline_ = on; }
     // Text with its top-left at (x, y), 14 units high; dark = black (style 1), else white
     void text(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
-              bool verticalGradient = false, bool darkGradient = false, bool noOutline = false, float letterSpacing = 0);
+              bool verticalGradient = false, bool darkGradient = false, bool noOutline = false, float letterSpacing = 0,
+              bool scenarioVerticalGradient = false);
     float textWidth(const std::string& s, float size = 14, float letterSpacing = 0);
     // Vertical offset from a centred line box to the actual font baseline, in menu units.
     float baselineFromCentre(float size = 14) const;
@@ -88,7 +89,7 @@ public:
     // taller than the iOS system font's, so a fixed top offset would sit low)
     void textCentred(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
                      bool verticalGradient = false, bool darkGradient = false, bool noOutline = false,
-                     float letterSpacing = 0);
+                     float letterSpacing = 0, bool scenarioVerticalGradient = false);
 
     // Rebuild a window_hd section's fading white strip and draw its label with the selected font.
     void headingStrip(float x, float y, const std::string& label, float alpha = 1, float width = 216, float textSize = 20, float textOffset = 20, bool fullWidthFade = false);
@@ -150,7 +151,8 @@ private:
     void promptButton(float x, float y, float size, bool secondary, float alpha);
     void crossButton(float x, float y, float size, float alpha);
     Cached& rasterise(const std::string& s, float size, bool perGlyphVerticalGradient = false,
-                      bool darkVerticalGradient = false, float letterSpacing = 0);
+                      bool darkVerticalGradient = false, float letterSpacing = 0,
+                      bool scenarioVerticalGradient = false);
 };
 
 } // namespace cr
