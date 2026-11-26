@@ -18,6 +18,7 @@ struct Image {
     int logicalW = 0, logicalH = 0; // the size the game lays it out at, when larger (HD): 0 = its own
     bool cutout = false;       // (HD) the original's alpha all 0 or 255: drawn as a cut-out, not blended
     bool hdSheet = false;      // read from a _hd / _ipad file (chk_hd_name): its pictures at twice their units (#14)
+    bool vitaOutpaint = false; // an HD replacement made for the Vita's outpainted wide artwork
     uint8_t format = 0;        // the MCT's pixel format (mceTexture_getPixelFormat: 1 RGB888, 6 PAL8_RGB8, ...); 0 unknown
     // How the file kept it (for tools/hd_textures.py, through the .crraw): 0 unknown, 1 lossless (8 bits
     // a channel, or 8-bit palettes / L8 / A8 / LA88 - the Vita's all), 2 PVRTC, 3 16-bit colour (RGB565,
