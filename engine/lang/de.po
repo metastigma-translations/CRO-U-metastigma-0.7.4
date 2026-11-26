@@ -269,6 +269,10 @@ msgid "Achievement"
 msgstr ""
 
 #: src/app/menus.cpp
+msgid "Vieg"
+msgstr ""
+
+#: src/app/menus.cpp
 msgid "Up/Down  Enter: read  Esc: back"
 msgstr ""
 

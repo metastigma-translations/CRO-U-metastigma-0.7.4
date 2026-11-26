@@ -4633,7 +4633,16 @@ void drawScenarios(App& app) {
                           false, alpha, extraSize, true);
         } else {
             // The first row's character label is an illustration in the atlas, not UI copy.
-            sheet(2, 8, 138, alpha);
+            // Vieg replaces the original 144 x 35 atlas wordmark.
+            const std::string vieg = tr("Vieg");
+            float viegSize = 28.0f;
+            float viegWidth = m.textWidth(vieg, viegSize);
+            if (viegWidth > 140.0f && viegWidth > 0.0f) {
+                viegSize *= 140.0f / viegWidth;
+                viegWidth = m.textWidth(vieg, viegSize);
+            }
+            m.textCentred(vieg, 8.0f + (144.0f - viegWidth) * 0.5f, 138.0f + 17.5f,
+                          false, alpha, viegSize, true);
         }
     };
     if (s.card < 0) { // __menuu_SccnariosPut, windows 0..5
