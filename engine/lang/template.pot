@@ -264,6 +264,10 @@ msgid "No gene plates."
 msgstr ""
 
 #: src/app/menus.cpp
+#: src/app/menus.cpp
+msgid "Achievement"
+msgstr ""
+
 msgid "Up/Down  Enter: read  Esc: back"
 msgstr ""
 

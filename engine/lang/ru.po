@@ -265,6 +265,10 @@ msgid "No gene plates."
 msgstr "Генопластин нет."
 
 #: src/app/menus.cpp
+#: src/app/menus.cpp
+msgid "Achievement"
+msgstr "Достижения"
+
 msgid "Up/Down  Enter: read  Esc: back"
 msgstr "Вверх/Вниз  Enter: читать  Esc: назад"
 

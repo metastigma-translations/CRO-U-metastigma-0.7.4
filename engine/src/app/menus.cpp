@@ -4596,15 +4596,37 @@ void drawScenarios(App& app) {
         const float y = which ? 248 : 131;
         for (int k = 0; k < 24; ++k) sheet(15, 20.0f * float(k), y, alpha);
         rateLine(which, alpha);
-        // (__Birthday_PictNumDraw: three digits from (385, y), the first at z -2, under the label)
-        const int d[3] = {value / 100 % 10, value / 10 % 10, value % 10};
-        const short* q = kSheetPict[5];
-        const float k = sheetScale(s.sheet);
-        for (int i = 0; i < 3; ++i)
-            m.imagePieceTo(s.sheet, 385 + 24.0f * float(i), which ? 254 : 136, q[2], q[3], (q[0] + q[2] * d[i]) * k, q[1] * k,
-                           q[2] * k, q[3] * k, alpha);
-        sheet(4, 315, which ? 254 : 136, alpha);
-        sheet(which ? 3 : 2, which ? 4 : 8, which ? 248 : 138, alpha);
+        // The three digits, Achievement and percent are rendered with the selected menu font.
+        // Keep the original three fixed digit slots (including leading zeroes).
+        const std::string digits = std::to_string(value / 100 % 10) +
+                                   std::to_string(value / 10 % 10) +
+                                   std::to_string(value % 10);
+        const float labelY = which ? 254.0f : 136.0f;
+        constexpr float digitSize = 26.0f;
+        const float digitWidth = m.textWidth(digits, digitSize);
+        m.textCentred(digits, 385.0f + (72.0f - digitWidth) * 0.5f, labelY + 13.0f,
+                      false, alpha, digitSize, true);
+
+        const std::string achievement = tr("Achievement");
+        constexpr float achievementSize = 16.0f;
+        const float achievementX = 315.0f + 7.0f;
+        m.textCentred(achievement, achievementX, labelY + 19.5f, false, alpha, achievementSize, true);
+        m.textCentred("%", 315.0f + 140.5f, labelY + 17.0f, false, alpha, 18.0f, true);
+
+        // The underline baked into the Achievement/% sprite is preserved as a grey-white-grey rule.
+        const float lineLeft[4] = {0xd1 / 255.0f, 0xcf / 255.0f, 0xd1 / 255.0f, alpha};
+        const float lineMid[4] = {0x6b / 255.0f, 0x6b / 255.0f, 0x6c / 255.0f, alpha};
+        const float lineRight[4] = {0xb8 / 255.0f, 0xb7 / 255.0f, 0xb8 / 255.0f, alpha};
+        m.quad(322.0f, labelY + 25.0f, 76.0f, 1.0f, lineLeft, lineMid);
+        m.quad(398.0f, labelY + 25.0f, 76.0f, 1.0f, lineMid, lineRight);
+
+        if (which) {
+            // Extra keeps its original left inset and vertical placement.
+            m.textCentred(tr("Extra"), 5.5f, 269.5f, false, alpha, 28.0f, true);
+        } else {
+            // The first row's character label is an illustration in the atlas, not UI copy.
+            sheet(2, 8, 138, alpha);
+        }
     };
     if (s.card < 0) { // __menuu_SccnariosPut, windows 0..5
         drawClockAndOz(app, m, a);
