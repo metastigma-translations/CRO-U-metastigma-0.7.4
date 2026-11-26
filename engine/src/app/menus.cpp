@@ -5476,14 +5476,14 @@ void drawCharSelect(App& app) {
         const int page = app.charSelectPage;
         app.charSelectPage = 0;
         const int keepLayer = r.layer();
-        r.setLayer(3); // the Vita's full-width artwork uses the original painting layer
+        r.setLayer(8); // fill Vita width while keeping the texture's title at its original vertical scale
         drawCharArt(app, t, false);
         r.setLayer(keepLayer);
         app.charSelectPage = page;
     }
     if (later && sp.shown) { // window 1: the second page's, falling (chara3 24 and 32 under it; iPhone 22 / 31)
         const int keepLayer = r.layer();
-        r.setLayer(3); // keep the falling character artwork on the Vita's full-width picture layer
+        r.setLayer(8); // same horizontal-only Vita fit for the second character texture
         if (r.androidScreen()) { // (22 fitted as the first page's; 31, its foot, + oy: _PictTexNoDrawFull2W)
             drawFullPicture(app, app.charSelectArt2, 22, 0, sp.y, t);
             outPicture(m, app.charSelectArt2, 31, 0, sp.y + 320 + androidEdgeY(app), t);
@@ -5519,7 +5519,7 @@ void drawCharSelect(App& app) {
         const int page = app.charSelectPage;
         app.charSelectPage = later ? 1 : 0;
         const int keepLayer = r.layer();
-        r.setLayer(3);
+        r.setLayer(8); // the banner/title is part of this texture: don't scale it vertically off-screen
         drawCharArt(app, t, true);
         r.setLayer(keepLayer);
         app.charSelectPage = page;
