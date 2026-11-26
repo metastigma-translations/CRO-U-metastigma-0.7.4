@@ -3274,7 +3274,8 @@ void drawFrame(App& app, bool present) {
                 // Widescreen: side portraits keep to the screen's edges (as the later widescreen
                 // release does), centre images to the middle
                 // (Android's __EvtTex2d: the side ones 2 ex further out, to the phone's edges)
-                const float edge = r.vitaScreen() ? 0.0f
+                const float vx = 2 * vitaEdgeX(app);
+                const float edge = r.vitaScreen() ? (p.side < 0 ? -vx : p.side > 0 ? vx : 0.0f)
                                    : p.side < 0  ? wideLeft(app) - r.uiX() - 2 * androidEdgeX(app)
                                    : p.side > 0  ? wideRight(app) - r.uiX() + 2 * androidEdgeX(app)
                                                  : 0.0f; // (inside the safe area)
