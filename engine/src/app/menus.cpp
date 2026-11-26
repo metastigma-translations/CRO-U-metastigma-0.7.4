@@ -4597,7 +4597,13 @@ void drawScenarios(App& app) {
             m.textCentred(text, x, y, false, alpha, size, true, false, false, 0, true);
         };
         const float y = which ? 248 : 131;
-        for (int k = 0; k < 24; ++k) sheet(15, 20.0f * float(k), y, alpha);
+        // The original atlas tile is a uniform black RGBA(0, 0, 0, 156) strip.
+        // Rebuild it as the original muted grey in the renderer, preserving its alpha.
+        const float bandGrey[4] = {
+            0x56 / 255.0f, 0x58 / 255.0f, 0x53 / 255.0f,
+            alpha * (156.0f / 255.0f)
+        };
+        m.quad(0, y, 480, 34, bandGrey, bandGrey);
         rateLine(which, alpha);
         // The three digits, Achievement and percent are rendered with the selected menu font.
         // Keep the original three fixed digit slots (including leading zeroes).
