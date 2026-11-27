@@ -3727,7 +3727,7 @@ void drawBattleHudNumber(cr::MenuPainter& m, int value, float x, float y, int di
     }
     const float textX = x + slotWidth - width;
     // White digits, black outline: no status-dependent tint or vertical gradient.
-    m.textCentred(text, textX, y + 6.0f, false, a, size, false);
+    m.textCentred(text, textX, y + 5.0f, false, a, size, false);
 }
 
 // cmd_bottom: a battle button (`x` and `y` its corner): base, face (lit when selected), icon, word
@@ -3820,17 +3820,18 @@ void drawBattleRow(App& app, cr::MenuPainter& m, int k, bool dimmed, float a) {
     const float c = dimmed ? 0.25f : 1.0f;
     const int face = f.character == 0 && viegIsOlgar(app) ? 4 : f.character; // __menub_mainPut: record 0 as Olgar is face 4
     m.piece((k == 0 ? 52 : 0) + (phone ? 16 : 0), 328 + dy, float(face * 48), 440, 48, 48, a, c, c, c);
-    auto drawHudLabel = [&](const std::string& label, float x) {
+    auto drawHudLabel = [&](const std::string& label, float x, float centreY) {
         float size = 11.0f;
         float width = m.textWidth(label, size);
         if (width > 22.0f && width > 0.0f) {
             size *= 22.0f / width;
             width = m.textWidth(label, size);
         }
-        m.textCentred(label, x + (22.0f - width) * 0.5f, 375.0f + dy, false, a, size, true);
+        m.textCentred(label, x + (22.0f - width) * 0.5f, centreY + dy, false, a, size, true);
     };
-    drawHudLabel(tr("HP"), 1.0f + dx);
-    drawHudLabel(tr("MP"), 83.0f + dx);
+    drawHudLabel(tr("HP"), 1.0f + dx, 375.0f);
+    // Raise MP to the numeric line so the green gauge cannot cross the glyphs.
+    drawHudLabel(tr("MP"), 83.0f + dx, 370.0f);
     drawBattleHudNumber(m, b.rollHp[k], 24 + dx, 364 + dy, 5, a);
     drawBattleHudNumber(m, b.rollMp[k], 108 + dx, 364 + dy, 4, a);
     drawBattleHpBar(m, 20 + dx, 376 + dy, 59, b.rollHp[k], f.hpMax, false, a);
