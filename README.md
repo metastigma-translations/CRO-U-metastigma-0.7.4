@@ -65,7 +65,8 @@ First-start notes per system:
   It runs at the display's rate (120 Hz on ProMotion screens), keeps the menus clear of the camera's notch
   or punch hole, and with Layout on *Auto* takes the iPhone layout on a small screen and the iPad layout on
   a large one - on a foldable (iPhone Duo) it changes as you fold or open it.
-- **Android:** install the APK. The setup can pick files on the phone (an `.ipa`, the APK and OBB,
+- **Android:** install the APK. The launcher identifies the app as `CRO-U — Chaos Rings Omega` and
+  uses CRO-U-specific icons. The setup can pick files on the phone (an `.ipa`, the APK and OBB,
   a Vita dump archive). Folders have to be copied over USB into
   `Android/data/local.preservation.chaosringsomega/files/`, in an `ios/`, `android/` or `vita/`
   folder. From v0.5.0 on, each release installs over the one before it; coming from an older build,
@@ -120,7 +121,14 @@ CR3-U) find their copies the same way.
 
 A controller plays as the Vita does. The face buttons go by position, so on an Xbox pad ○ is B,
 × is A, △ is Y and □ is X. ○ confirms and × cancels, as in the Japanese release; Options, Game,
-"Swap ○ and ×" turns that round. Tested with a Steam Controller (through Steam Input).
+**Swap** changes which face button confirms and which goes back. The separate **Button Layout**
+setting chooses PlayStation or Xbox symbols for on-screen prompts only; it does not change
+controller actions. Tested with a Steam Controller (through Steam Input).
+
+With a gamepad connected, the system mouse cursor is hidden. Physical mouse movement or a click
+shows it again; the next gamepad input hides it again. The cursor is restored when the last
+gamepad disconnects, the window loses focus, or the game exits. Touch and the R3 virtual pointer
+in puzzle rooms are not treated as physical mouse activity.
 
 | Button | On the field | In menus and dialogue | In puzzle rooms |
 |---|---|---|---|
@@ -192,11 +200,19 @@ Everything is in **Options** (START, or V). Settings and saves live in the profi
 - **DLSS** isn't in the downloads: NVIDIA's library is proprietary and can't ship with GPL code. You
   can build it in for your own use (see [Building](#building-from-source)).
 - **HD Textures**, **HD Models**, **Smooth Models**, **Anisotropic Filtering**, **Texture Filtering**.
+- **Vita HD Artwork Layers** is available only in the Vita layout when HD Textures are enabled and
+  the HD texture folder exists. It uses optional 16:9 layer pairs in `textures/hd/`: `chara1_hd1`
+  + `chara1_hd2`, `chara2_hd1` + `chara2_hd2`, `chara3_hd1` + `chara3_hd2`,
+  `title1_hd1` + `title1_hd2`, and `title2_hd1` + `title2_hd2`. In each pair, `hd1` is the
+  artwork and `hd2` is the transparent banner/text layer. Each file can be PNG or DDS, including
+  mixed-format pairs; both files are required for that artwork. Without a complete pair, the
+  original Vita atlas rendering remains in use.
 
 **Game**
 - **Field Speed** / **Battle Speed:** Off or 2x-5x (scenes, talk and menus keep their pace).
   `--field-speed n` / `--battle-speed n` for one run.
-- **Swap ○ and ×**, **Control Hints**, **Vita Assets** / **Android Assets**, **Import Vita Saves**.
+- **Swap** (confirm / back button), **Button Layout** (PlayStation or Xbox on-screen symbols;
+  visual prompts only), **Control Hints**, **Vita Assets** / **Android Assets**, **Import Vita Saves**.
 
 **Language:** chosen in Options. The 3.1.0, Android and Vita data carry eight languages; the 1.0.0
 data has Japanese and English.
@@ -281,9 +297,8 @@ The game plays its own animations; up to four weights a vertex and 255 joints a 
   Vulkan renderer; the option's hint says why it's off. FSR 4 also needs the files in `fsr4/`.
 - **Android, an update won't install:** builds before v0.5.0 were each signed with a different key.
   Uninstall the old one first (back up your game files and saves).
-- **Tested on:** Linux (played) and Windows (under Wine, Vulkan and OpenGL). The macOS and Android
-  builds are made by CI but haven't been played on real hardware yet. Reports are welcome in
-  [Issues](https://github.com/DuIslingr/CRO-U/issues).
+- **Tested on:** Linux, Windows and Android. The macOS build is made by CI but has not been played
+  on real hardware. Reports are welcome in [Issues](https://github.com/DuIslingr/CRO-U/issues).
 
 ## Building from source
 
