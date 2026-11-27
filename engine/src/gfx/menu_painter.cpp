@@ -231,6 +231,10 @@ float MenuPainter::baselineFromCentre(float size) const {
     return font_ && font_->loaded() ? menuSize(size) * font_->baselineFromCentreEm() : 0.0f;
 }
 
+float MenuPainter::glyphInkCentreFromCentre(const std::string& sample, float size) const {
+    return font_ && font_->loaded() ? menuSize(size) * font_->glyphInkCentreFromCentreEm(sample) : 0.0f;
+}
+
 // Rebuild the window_hd section headings (World Select, Results, Camp, Shop, Options, Scenarios).
 // The old pictures baked the words into a white strip fading to transparency at the right.
 void MenuPainter::headingStrip(float x, float y, const std::string& label, float alpha, float width, float textSize, float textOffset, bool fullWidthFade) {

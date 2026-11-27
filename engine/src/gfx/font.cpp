@@ -156,6 +156,44 @@ float Font::baselineFromCentreEm() const {
     return 0.5f * float(ascent + descent) * stbtt_ScaleForMappingEmToPixels(&info, 1.0f);
 }
 
+// First visible glyph's ink-centre offset from the line-box centre. Match rasterise's
+// CJK-line and proportional-Cyrillic fallback rules so capital letters are centred by
+// their actual visible ink, not by the full font line box.
+float Font::glyphInkCentreFromCentreEm(const std::string& sample) const {
+    if (!face_ || sample.empty()) return 0.0f;
+    bool cjkLine = false;
+    size_t i = 0;
+    while (i < sample.size()) {
+        const uint32_t c = nextUtf8(sample, i);
+        cjkLine |= (c >= 0x3040 && c <= 0x30FF) || (c >= 0x4E00 && c <= 0x9FFF) ||
+                   (c >= 0xAC00 && c <= 0xD7AF);
+    }
+    i = 0;
+    uint32_t codepoint = 0;
+    while (i < sample.size()) {
+        const uint32_t c = nextUtf8(sample, i);
+        if (c > 0x20 && c != 0x3000) { codepoint = c; break; }
+    }
+    if (!codepoint) return 0.0f;
+
+    const stbtt_fontinfo* glyphFace = &face_->info;
+    int glyph = 0;
+    if (isCyrillic(codepoint) && !cjkLine && cyrillicFromFallback()) {
+        if (const stbtt_fontinfo* fallback = cyrillicFallback(boldFace(face_->info))) {
+            const int fallbackGlyph = stbtt_FindGlyphIndex(fallback, int(codepoint));
+            if (fallbackGlyph) glyphFace = fallback, glyph = fallbackGlyph;
+        }
+    }
+    if (!glyph) glyph = glyphIndex(face_->info, codepoint);
+    if (!glyph) glyph = stbtt_FindGlyphIndex(&face_->info, '?');
+    if (!glyph) return 0.0f;
+
+    int x0 = 0, y0 = 0, x1 = 0, y1 = 0;
+    if (!stbtt_GetGlyphBox(glyphFace, glyph, &x0, &y0, &x1, &y1)) return 0.0f;
+    const float glyphScale = stbtt_ScaleForMappingEmToPixels(glyphFace, 1.0f);
+    return baselineFromCentreEm() - 0.5f * float(y0 + y1) * glyphScale;
+}
+
 bool Font::selectRegion(const char* region) {
     if (!loaded()) return false;
     const int n = stbtt_GetNumberOfFonts(data_.data());

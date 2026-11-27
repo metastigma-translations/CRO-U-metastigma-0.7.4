@@ -32,6 +32,10 @@ msgstr "Ультра-произв."
 msgid "Off"
 msgstr "Выключить"
 
+#: src/app/battle.cpp
+msgid "Lv"
+msgstr "УР"
+
 #: src/app/battle.cpp src/app/menus.cpp
 msgid "HP"
 msgstr "ОЗ"

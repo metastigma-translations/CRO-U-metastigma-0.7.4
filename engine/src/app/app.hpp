@@ -669,7 +669,6 @@ struct App {
     // and one pad can come as two (CRO-U #4: a Flydigi Vader 4 Pro listed twice as "Xbox 360 Controller", its
     // input on the second while the first was taken). The one pressed or moved last becomes `pad`
     std::vector<SDL_Gamepad*> morePads;
-    bool gamepadCursorHidden = false;    // whether this app hid the OS cursor while a pad is connected
     // The self-test's own controllers (its virtual pads, by joystick id): while it runs, no other is opened or taken -
     // another program's virtual "Xbox 360 Controller" (a session driving an emulator, say) can't take a case over.
     // Empty: every pad

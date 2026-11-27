@@ -1010,11 +1010,8 @@ void stickPointerEvent(App& app, Uint32 type) {
     App::StickPointer& p = app.stickPointer;
     SDL_Event e{};
     e.type = type;
-    if (type == SDL_EVENT_MOUSE_MOTION)
-        e.motion.which = SDL_TOUCH_MOUSEID, e.motion.x = p.x, e.motion.y = p.y, e.motion.state = p.down ? SDL_BUTTON_LMASK : 0;
-    else
-        e.button.which = SDL_TOUCH_MOUSEID, e.button.x = p.x, e.button.y = p.y, e.button.button = SDL_BUTTON_LEFT,
-        e.button.down = type == SDL_EVENT_MOUSE_BUTTON_DOWN;
+    if (type == SDL_EVENT_MOUSE_MOTION) e.motion.x = p.x, e.motion.y = p.y, e.motion.state = p.down ? SDL_BUTTON_LMASK : 0;
+    else e.button.x = p.x, e.button.y = p.y, e.button.button = SDL_BUTTON_LEFT, e.button.down = type == SDL_EVENT_MOUSE_BUTTON_DOWN;
     SDL_AppEvent(&app, &e);
 }
 void stickPointerRelease(App& app) { // the room left or covered: a finger still down lifts, the pointer goes
@@ -1201,26 +1198,6 @@ bool padAllowed(const App& app, SDL_JoystickID id) {
     return app.padAllow.empty() || std::find(app.padAllow.begin(), app.padAllow.end(), id) != app.padAllow.end();
 }
 
-bool hasConnectedGamepad(const App& app) {
-    if (app.pad && SDL_GamepadConnected(app.pad)) return true;
-    return std::any_of(app.morePads.begin(), app.morePads.end(),
-                       [](SDL_Gamepad* pad) { return pad && SDL_GamepadConnected(pad); });
-}
-
-// A connected gamepad hides the OS cursor. Physical mouse activity shows it again;
-// subsequent gamepad input hides it. Touch and the R3-generated mouse pointer are ignored.
-void updateGamepadCursor(App& app, bool mouseActivity = false, bool gamepadActivity = false) {
-    if (!hasConnectedGamepad(app)) {
-        if (app.gamepadCursorHidden && SDL_ShowCursor()) app.gamepadCursorHidden = false;
-        return;
-    }
-    if (mouseActivity && app.gamepadCursorHidden) {
-        if (SDL_ShowCursor()) app.gamepadCursorHidden = false;
-    } else if (gamepadActivity && !app.gamepadCursorHidden) {
-        if (SDL_HideCursor()) app.gamepadCursorHidden = true;
-    }
-}
-
 // A pad among morePads pressed or moved: it becomes the one in use, the one before kept open with the others
 void takePad(App& app, SDL_JoystickID which) {
     if (app.pad && SDL_GetGamepadID(app.pad) == which) return;
@@ -1263,12 +1240,6 @@ SDL_AppResult SDL_AppEvent(void* state, SDL_Event* event) {
     case SDL_EVENT_WINDOW_RESIZED: // (a foldable folded or opened: Auto's layout for the screen now in use)
         if (app.video.layout == 0 && autoPhoneLayout(app) != app.renderer.phoneLayout()) applyVideo(app);
         break;
-    case SDL_EVENT_WINDOW_FOCUS_LOST:
-        if (app.gamepadCursorHidden && SDL_ShowCursor()) app.gamepadCursorHidden = false;
-        break;
-    case SDL_EVENT_WINDOW_FOCUS_GAINED:
-        updateGamepadCursor(app, false, true);
-        break;
     case SDL_EVENT_JOYSTICK_ADDED: { // (logged: what SDL found and whether it maps it as a gamepad - a pad that never
         // takes shows here; as the metastigma fork's diagnostics)
         const SDL_JoystickID id = event->jdevice.which;
@@ -1292,7 +1263,6 @@ SDL_AppResult SDL_AppEvent(void* state, SDL_Event* event) {
                 app.morePads.push_back(pad);
                 SDL_Log("controller: %s (also open: it takes over once it's pressed)", SDL_GetGamepadName(pad));
             }
-        updateGamepadCursor(app, false, true);
         break;
     case SDL_EVENT_GAMEPAD_REMOVED:
         for (size_t k = 0; k < app.morePads.size(); ++k)
@@ -1314,20 +1284,14 @@ SDL_AppResult SDL_AppEvent(void* state, SDL_Event* event) {
                 }
             if (app.pad) SDL_Log("controller: %s", SDL_GetGamepadName(app.pad));
         }
-        updateGamepadCursor(app);
         break;
     case SDL_EVENT_GAMEPAD_AXIS_MOTION: // (a stick or trigger well off its rest on another pad: that one in use now)
-        if (std::abs(int(event->gaxis.value)) > 16000) {
-            takePad(app, event->gaxis.which);
-            if (app.pad && SDL_GetGamepadID(app.pad) == event->gaxis.which)
-                updateGamepadCursor(app, false, true);
-        }
+        if (std::abs(int(event->gaxis.value)) > 16000) takePad(app, event->gaxis.which);
         break;
     case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
         app.pointerLast = false;
         takePad(app, event->gbutton.which); // (a button on another pad: that one in use now)
         if (app.pad && SDL_GetGamepadID(app.pad) == event->gbutton.which) {
-            updateGamepadCursor(app, false, true);
             if (event->gbutton.button == SDL_GAMEPAD_BUTTON_RIGHT_STICK) stickPointerButton(app, true); // R3: a puzzle room's finger
             else padButton(app, event->gbutton.button);
         }
@@ -1559,7 +1523,6 @@ SDL_AppResult SDL_AppEvent(void* state, SDL_Event* event) {
         }
         break;
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
-        if (event->button.which != SDL_TOUCH_MOUSEID) updateGamepadCursor(app, true, false);
         app.pointerLast = true;
         app.pointerCancelled = false;
         if (app.puzzle.pkPointerCancelled && app.puzzle.pkState == 1) {
@@ -1716,7 +1679,6 @@ SDL_AppResult SDL_AppEvent(void* state, SDL_Event* event) {
         app.fingers.held = std::max(0, app.fingers.held - 1);
         break;
     case SDL_EVENT_MOUSE_MOTION:
-        if (event->motion.which != SDL_TOUCH_MOUSEID) updateGamepadCursor(app, true, false);
         if (app.press.down) { // (the held control follows the finger)
             int ww = 0, wh = 0;
             SDL_GetWindowSize(app.window, &ww, &wh);
@@ -1863,7 +1825,6 @@ SDL_AppResult SDL_AppIterate(void* state) {
 void SDL_AppQuit(void* state, SDL_AppResult) {
     auto* app = static_cast<App*>(state);
     if (!app) return;
-    if (app->gamepadCursorHidden && SDL_ShowCursor()) app->gamepadCursorHidden = false;
     app->clock.stop();
     app->inputCancel.stop();
     // (the Progress Tracker: nothing new is written here - the original's ContData_Save, on

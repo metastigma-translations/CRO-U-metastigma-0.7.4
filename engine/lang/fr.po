@@ -32,6 +32,10 @@ msgstr "Ultra perf."
 msgid "Off"
 msgstr "Désactivé"
 
+#: src/app/battle.cpp
+msgid "Lv"
+msgstr "Lv"
+
 #: src/app/battle.cpp src/app/menus.cpp
 msgid "HP"
 msgstr "HP"

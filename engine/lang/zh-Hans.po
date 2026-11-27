@@ -32,6 +32,10 @@ msgstr "极致性能"
 msgid "Off"
 msgstr "关闭"
 
+#: src/app/battle.cpp
+msgid "Lv"
+msgstr "Lv"
+
 #: src/app/battle.cpp src/app/menus.cpp
 msgid "HP"
 msgstr "HP"

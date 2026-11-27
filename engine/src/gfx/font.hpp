@@ -25,6 +25,8 @@ public:
     bool loaded() const;
     // Baseline offset from the raster line-box centre, measured in em units.
     float baselineFromCentreEm() const;
+    // First visible glyph's ink-centre offset from the line-box centre, in em units.
+    float glyphInkCentreFromCentreEm(const std::string& sample) const;
     const std::string& path() const { return path_; }
     int generation() const { return generation_; } // changes with the face
     // In a collection, the face whose name ends with `region` ("JP", "KR", "SC", "TC");

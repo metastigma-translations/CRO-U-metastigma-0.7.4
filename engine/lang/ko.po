@@ -32,6 +32,10 @@ msgstr "울트라 성능"
 msgid "Off"
 msgstr "끄기"
 
+#: src/app/battle.cpp
+msgid "Lv"
+msgstr "Lv"
+
 #: src/app/battle.cpp src/app/menus.cpp
 msgid "HP"
 msgstr "HP"

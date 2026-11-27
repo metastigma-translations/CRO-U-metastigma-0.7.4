@@ -32,6 +32,10 @@ msgstr "ウルトラ性能"
 msgid "Off"
 msgstr "オフ"
 
+#: src/app/battle.cpp
+msgid "Lv"
+msgstr "Lv"
+
 #: src/app/battle.cpp src/app/menus.cpp
 msgid "HP"
 msgstr "HP"
