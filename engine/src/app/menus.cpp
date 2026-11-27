@@ -5487,10 +5487,7 @@ void drawFullPicture(App& app, const cr::Texture& tex, int pict, float x, float 
 void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
     const bool secondPage = app.charSelectPage && app.charSelectArt2.id;
     const auto& hdPair = secondPage ? app.charSelectArt2Hd : app.charSelectArtHd;
-    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint &&
-        hdPair[banner ? 1 : 0].id) {
-        // hd1 replaces the character artwork; hd2 replaces the original text banner.
-        // hd2 is already a transparent 16:9 overlay extracted from the source banner at row 641.
+    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && hdPair[banner ? 1 : 0].id) {
         drawVitaHdLayer(app, hdPair[banner ? 1 : 0], alpha, top, grey);
         return;
     }
@@ -5499,23 +5496,19 @@ void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
     cr::MenuPainter& m = app.menu;
     const bool phone = app.renderer.phoneLayout();
     const float x = phone ? 0.0f : -32.0f, y = phone ? 0.0f : -64.0f;
-    const auto draw = [&](int pict, float dx, float dy) {
+    const auto draw = [&](int pict, float dx, float dy, float sourceY = -1.0f) {
         const short* p = cr::kOutReadPicture[pict];
         const float k = sheetScale(tex);
-        m.imagePieceTo(tex, x + dx, y + dy, p[2], p[3], p[0] * k, p[1] * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
+        const float v = sourceY >= 0.0f ? sourceY : float(p[1]);
+        m.imagePieceTo(tex, x + dx, y + dy, p[2], p[3], p[0] * k, v * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
     };
-    // chara1_hd.png / chara2_hd.png / chara3_hd.png are 1024x1024.
-    // Their text plate starts at the 641st pixel from the top (zero-based y=640):
-    // take x=0..959 and y=640..807. Convert these pixel UVs to the texture's
-    // logical coordinates before imagePieceTo applies its 2x menu-to-screen scale.
-    if (banner) {
-        const float u = float(tex.width) / 1024.0f, v = float(tex.height) / 1024.0f;
-        const float dy = top / (2.0f * app.renderer.layoutScale()) - androidEdgeY(app);
-        m.imagePieceTo(tex, x, y + dy, 480.0f, 84.0f,
-                       0.0f, 640.0f * v * 0.5f, 960.0f * u * 0.5f, 168.0f * v * 0.5f,
-                       alpha, grey, grey, grey);
-    } else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
-    else draw(phone ? 22 : 24, 0.0f, 0.0f);
+    // Vita uses the full original Vita rectangle #26 {0, 320, 480, 84},
+    // whose doubled-sheet source starts at pixel 641 from the top.
+    const bool vitaSheet = app.vita.isOpen() || app.vitaOnly || app.renderer.vitaScreen();
+    if (banner) draw(phone || vitaSheet ? 26 : 27, 0.0f, -androidEdgeY(app),
+                     vitaSheet ? 320.0f : -1.0f);
+    else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
+    else draw(phone ? 22 : 24, 0.0f, 0.0f, -1.0f);
 }
 
 void drawCharSelect(App& app) {
