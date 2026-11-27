@@ -152,8 +152,6 @@ public:
         return androidScreen() ? kAndroidScale : vitaScreen() && (layer_ == 3 || layer_ == 7) ? kPhoneScale / 0.85f : kPhoneScale;
     }
     // Vita's scenario artwork fills the wider screen without enlarging/cropping its vertical title.
-    float layoutScaleX() const { return layoutScale(); }
-    float layoutScaleY() const { return layoutScale(); }
     void layoutToScreen(float& x, float& y) const;
     // The visible screen's right / top edge in the layout's units (toLogical's)
     float layoutRight() const { return phone_ ? screenW_ * 0.5f + screenW_ * 0.5f / layoutScale() : screenW_; }
