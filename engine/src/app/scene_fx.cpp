@@ -615,6 +615,7 @@ void loadVideo(App& app, const char* text) {
     v.upscaleMode = std::clamp(keyValue(text, "\nupscale_mode=", v.upscaleMode), 0, 4);
     v.sharpness = std::clamp(keyValue(text, "\nsharpness=", v.sharpness), 0, 100);
     v.hdTextures = keyValue(text, "\nhd_textures=", v.hdTextures) != 0;
+    v.vitaOutpaint = keyValue(text, "\nvita_outpaint=", v.vitaOutpaint) != 0;
     v.avoidCutout = keyValue(text, "\navoid_cutout=", v.avoidCutout) != 0;
     v.cutoutBars = keyValue(text, "\ncutout_bars=", v.cutoutBars) != 0;
     v.smoothModels = keyValue(text, "\nsmooth_models=", v.smoothModels);
@@ -833,7 +834,7 @@ void stepChoice(int& value, const int* choices, int count, int dir) {
 // adjustVideo's settings: 0 resolution, 1 display, 2 aspect, 3 painted rooms, 4 render scale,
 // 5 MSAA, 6 vsync, 7 the original presentation, 8 anti-aliasing (MSAA / FSR Native AA / DLAA),
 // 9 upscaler, 10 upscale mode, 11 sharpness, 12 HD textures, 13 smoothed models, 14 layout,
-// 15 the frame rate, 16 anisotropic filtering, 17 texture filtering
+// 15 the frame rate, 16 anisotropic filtering, 17 texture filtering, 19 Vita HD art layers
 
 // Anti-aliasing choices: Off, MSAA 2 / 4 / 8, FSR (Native AA), DLSS (DLAA)
 int aaChoice(const App::Video& v) {
@@ -928,6 +929,7 @@ void adjustVideo(App& app, int row, int dir) {
     }
     case 17: v.sharpTextures = !v.sharpTextures; break;
     case 18: v.hdModels = !v.hdModels; break; // (what loads from now on)
+    case 19: v.vitaOutpaint = !v.vitaOutpaint; break;
     case 13: v.smoothModels = (v.smoothModels == 0 ? (dir > 0 ? 2 : 3) : v.smoothModels == 2 ? (dir > 0 ? 3 : 0) : (dir > 0 ? 0 : 2)); break;
     case 12: { // HD textures: what loads from now on (the next room); the UI atlas at once
         v.hdTextures = !v.hdTextures;
@@ -1289,6 +1291,12 @@ std::vector<OptRow> optionRows(App& app, int page) {
             if (app.video.sharpTextures != (i == 1)) adjustVideo(app, 17, 1);
         });
         rows.back().hint = tr("Sharp: the world's textures magnified by the nearest texel (square pixels up close)");
+        onOff(tr("Vita HD Artwork Layers"), &v.vitaOutpaint, nullptr);
+        rows.back().act = [&app](int i) {
+            if (app.video.vitaOutpaint != (i == 0)) adjustVideo(app, 19, 1);
+        };
+        rows.back().enabled = app.renderer.vitaScreen() && !app.hdDir.empty();
+        rows.back().hint = tr("Use paired 16:9 PNG layers from textures/hd: chara1_hd1 + chara1_hd2, title1_hd + title2_hd; originals keep the Vita crop");
         break;
     }
     case 4: { // Cheats (the port's own): the user's - "Infinite HP and MP. Infinite Maxed out Money, xp multipliers. always advantage"
