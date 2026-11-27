@@ -219,6 +219,8 @@ bool loadOriginalImage(App& app, const std::string& mct, cr::Image& img, bool* f
         if (app.fanText && app.fan.isOpen() && (!redrawn || app.vitaOnly) && app.fan.read(names[k] + ".gxt", data) && cr::decodeGxt(data, img)) {
             if (k + 1 < names.size()) ++(k == 0 ? app.ipadImages : app.hdImages);
             img.hdSheet = hdName;
+            img.vitaSource = true; // fan GXT artwork uses the Vita sheet layout
+            if (fromVita) *fromVita = true;
             return true;
         }
         if (app.vita.isOpen() && (!redrawn || app.vitaOnly) && app.vita.read(names[k] + ".gxt", data) && cr::decodeGxt(data, img)) {
