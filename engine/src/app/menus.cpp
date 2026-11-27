@@ -5502,14 +5502,14 @@ void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
         m.imagePieceTo(tex, x + dx, y + dy, p[2], p[3], p[0] * k, p[1] * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
     };
     // chara1_hd.png / chara2_hd.png / chara3_hd.png are 1024x1024.
-    // Their text plate begins at physical source row 641 (zero-based y=640):
-    // take exactly x=0..959, y=641..808. Convert those pixel UVs to the texture's
+    // Their text plate starts at the 641st pixel from the top (zero-based y=640):
+    // take x=0..959 and y=640..807. Convert these pixel UVs to the texture's
     // logical coordinates before imagePieceTo applies its 2x menu-to-screen scale.
     if (banner) {
         const float u = float(tex.width) / 1024.0f, v = float(tex.height) / 1024.0f;
         const float dy = top / (2.0f * app.renderer.layoutScale()) - androidEdgeY(app);
         m.imagePieceTo(tex, x, y + dy, 480.0f, 84.0f,
-                       0.0f, 641.0f * v * 0.5f, 960.0f * u * 0.5f, 168.0f * v * 0.5f,
+                       0.0f, 640.0f * v * 0.5f, 960.0f * u * 0.5f, 168.0f * v * 0.5f,
                        alpha, grey, grey, grey);
     } else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
     else draw(phone ? 22 : 24, 0.0f, 0.0f);
