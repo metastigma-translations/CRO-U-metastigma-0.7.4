@@ -5487,8 +5487,11 @@ void drawFullPicture(App& app, const cr::Texture& tex, int pict, float x, float 
 void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
     const bool secondPage = app.charSelectPage && app.charSelectArt2.id;
     const auto& hdPair = secondPage ? app.charSelectArt2Hd : app.charSelectArtHd;
-    if (!banner && app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && hdPair[0].id) {
-        drawVitaHdLayer(app, hdPair[0], alpha, top, grey);
+    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint &&
+        hdPair[banner ? 1 : 0].id) {
+        // hd1 replaces the character artwork; hd2 replaces the original text banner.
+        // hd2 is already a transparent 16:9 overlay extracted from the source banner at row 641.
+        drawVitaHdLayer(app, hdPair[banner ? 1 : 0], alpha, top, grey);
         return;
     }
     const cr::Texture& tex = secondPage ? app.charSelectArt2 : app.charSelectArt;
