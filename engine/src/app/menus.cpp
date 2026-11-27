@@ -5504,7 +5504,7 @@ void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
     };
     // Vita uses the full original Vita rectangle #26 {0, 320, 480, 84},
     // whose doubled-sheet source starts at pixel 641 from the top.
-    const bool vitaSheet = app.vita.isOpen() || app.vitaOnly || app.renderer.vitaScreen();
+    const bool vitaSheet = tex.vitaSource || app.vitaOnly || app.renderer.vitaScreen();
     if (banner) draw(phone || vitaSheet ? 26 : 27, 0.0f, -androidEdgeY(app),
                      vitaSheet ? 320.0f : -1.0f);
     else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
