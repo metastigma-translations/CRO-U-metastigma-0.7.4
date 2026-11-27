@@ -5496,7 +5496,7 @@ void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
     cr::MenuPainter& m = app.menu;
     const bool phone = app.renderer.phoneLayout();
     const float x = phone ? 0.0f : -32.0f, y = phone ? 0.0f : -64.0f;
-    const auto draw = [&](int pict, float dx, float dy, float sourceY = -1.0f) {
+    const auto draw = [&](int pict, float dx, float dy, float sourceY) {
         const short* p = cr::kOutReadPicture[pict];
         const float k = sheetScale(tex);
         // The original Vita scenario sheet keeps its art above the banner. Its text plate begins
@@ -5507,7 +5507,7 @@ void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
     };
     if (banner) draw(phone ? 26 : 27, 0.0f, -androidEdgeY(app), app.renderer.vitaScreen() ? 320.0f : -1.0f);
     else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
-    else draw(phone ? 22 : 24, 0.0f, 0.0f);
+    else draw(phone ? 22 : 24, 0.0f, 0.0f, -1.0f);
 }
 
 void drawCharSelect(App& app) {
