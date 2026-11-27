@@ -630,6 +630,15 @@ msgid ""
 msgstr "锐利：场景纹理放大时取最近的纹素（近看呈方块像素）"
 
 #: src/app/scene_fx.cpp
+msgid "Vita HD Artwork Layers"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid ""
+"Use paired 16:9 PNG layers from textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 and title2_hd1/2; originals keep the Vita crop"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Infinite HP"
 msgstr "无限HP"
 
