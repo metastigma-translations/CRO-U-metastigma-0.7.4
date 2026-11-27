@@ -5484,7 +5484,7 @@ void drawFullPicture(App& app, const cr::Texture& tex, int pict, float x, float 
                           p[3] * k, alpha, grey, grey, grey);
 }
 
-void drawCharArt(App& app, float alpha, bool banner, float grey, float top = 0) {
+void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
     const bool secondPage = app.charSelectPage && app.charSelectArt2.id;
     const auto& hdPair = secondPage ? app.charSelectArt2Hd : app.charSelectArtHd;
     if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && hdPair[banner ? 1 : 0].id) {
