@@ -43,7 +43,7 @@ is the game; without either, the Android release is.
 ## Install and first start
 
 1. Download the file for your system from the releases page and unzip it.
-2. Start `chaosrings`.
+2. Start `chaosringsomega.exe` on Windows, `chaosringsomega` on Linux, or `chaosrings.app` on macOS.
 3. If it doesn't find your copy, it opens a setup window: pick your `.ipa`, your Android APK and
    OBB, or your Vita folder or dump. The files it needs are **copied into the game folder**, so the
    place you picked them from can be deleted afterwards. A Vita dump is decrypted as Vita3K's
@@ -77,7 +77,8 @@ You can also skip the setup and place the files yourself. The **game folder** is
 
 | Platform | Game folder |
 |---|---|
-| Windows, Linux | the folder holding `chaosrings.exe` / `chaosrings` |
+| Windows | the folder holding `chaosringsomega.exe` |
+| Linux | the folder holding `chaosringsomega` |
 | Linux AppImage | the folder holding the `.AppImage` |
 | macOS | the folder holding `chaosrings.app` (its `Contents/Resources/` works too) |
 | Android | `Android/data/local.preservation.chaosringsomega/files/` on the shared storage |
@@ -87,7 +88,7 @@ Inside it, one folder per release you have (the downloads come with these folder
 
 ```
 <game folder>/
-├── chaosrings                  (or chaosrings.exe, chaosrings.app, the .AppImage)
+├── chaosringsomega             (Linux; Windows: chaosringsomega.exe; macOS: chaosrings.app; or the .AppImage)
 ├── ios/ChaosRingsOmegaHDeng.app/          the iPad .app (1.0.0 or 3.1.0), or Payload/ChaosRingsOmegaHDeng.app/, or the .ipa
 ├── android/                               the .obb and the 1.1.6 APK (or its classes.dex), or the .xapk / .apks
 ├── vita/PCSG00499/                        the installed title (CRO/resources/cro.psarc, CRO/sound/*.psarc)
@@ -245,7 +246,7 @@ You can make sharper textures and better models from your own copy. They are for
 are made from the game's art, so keep them out of anything you share.
 
 **HD textures**
-1. `chaosrings --export-textures` writes every picture the game draws to `textures/export/` in the
+1. `chaosringsomega --export-textures` writes every picture the game draws to `textures/export/` in the
    game folder as `<hash>.png` (`--export-textures <folder>` for somewhere else).
 2. `python3 tools/hd_textures.py <game folder>` upscales them into `textures/hd/`, with waifu2x
    (`waifu2x-ncnn-vulkan`) and Real-ESRGAN (`--esrgan <folder>`) for 16-bit pictures. It needs
@@ -261,7 +262,7 @@ files so one upscale serves the game with or without the Vita's art. `CR_HD_TEXT
 reads them from elsewhere; `--no-hd-textures` runs without.
 
 **HD models**
-1. `chaosrings --export-models` writes every model to `models/export/` as glTF 2.0 (`.glb`, with
+1. `chaosringsomega --export-models` writes every model to `models/export/` as glTF 2.0 (`.glb`, with
    its skeleton, materials, pictures and animations). Blender opens them as they are.
 2. Edit it, keeping the armature (bones are named `node_<n>...`) and the material names
    (`cr_mat_<n>...`). A material can take a picture of your own (PNG or JPEG, packed in the `.glb`).
@@ -292,7 +293,9 @@ The build is CR1:U's: C++17, SDL3, Vulkan or OpenGL.
 cd engine
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build
-build/chaosrings
+build/chaosringsomega  # Linux
+# Windows: build/chaosringsomega.exe
+# macOS: open build/chaosrings.app
 ```
 
 Put your copy in `engine/build/` (or the folder you start it from) as described above.
@@ -312,7 +315,7 @@ Put your copy in `engine/build/` (or the folder you start it from) as described 
   Windows to prove it works but never uploads those builds: a DLSS build is for your own use.
 - Every push is built for all four platforms by `.github/workflows/build.yml`; a `v*` tag publishes
   a release.
-- `chaosrings --selftest` checks the game logic against your data (iPad 1.0.0 and 3.1.0, iPad +
+- `chaosringsomega --selftest` checks the game logic against your data (iPad 1.0.0 and 3.1.0, iPad +
   Vita, Vita alone); `--explore n [scenario]` plays a scenario by itself to its ending.
 
 ### Documentation
