@@ -342,7 +342,7 @@ struct App {
     std::string cutinWideName;
     cr::Texture speedLinesTex;             // syuutyuusen(_ipad).mct (slot 0x2e): scene effect 1
     cr::Texture titleArt[2];               // __menuu_TitleSet: title1.mct (MuCom slot 0x11), chaos.mct (0x12)
-    std::array<cr::Texture, 2> titleArtHd;  // Vita's title1_hd.png (art) and title2_hd.png (text overlay)
+    std::array<std::array<cr::Texture, 2>, 2> titleArtHd; // [title1/title2][art/text]
     bool titleArtHdTried = false;
     bool titleArtIpad = false;             // title1 came from its _ipad sheet (pictures 9 / 10; else 7 / 8)
     float footPrev = 0;                    // player's animation time last frame (footsteps)
