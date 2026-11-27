@@ -3716,7 +3716,7 @@ void drawBattleNumber(cr::MenuPainter& m, int value, float x, float y, int digit
 
 // The live battle HUD's HP / MP values use the selected font. Keep the original
 // right-aligned digit slots and red warning state for low HP / empty MP.
-void drawBattleHudNumber(cr::MenuPainter& m, int value, float x, float y, int digits, bool low, float a) {
+void drawBattleHudNumber(cr::MenuPainter& m, int value, float x, float y, int digits, float a) {
     const std::string text = std::to_string(std::max(0, value));
     float size = 14.0f;
     const float slotWidth = float(digits) * 10.0f;
@@ -3726,10 +3726,8 @@ void drawBattleHudNumber(cr::MenuPainter& m, int value, float x, float y, int di
         width = m.textWidth(text, size);
     }
     const float textX = x + slotWidth - width;
-    if (low)
-        m.textTintCentred(text, textX, y + 7.0f, 1.0f, 0x14 / 255.0f, 0x23 / 255.0f, a, size);
-    else
-        m.textCentred(text, textX, y + 7.0f, false, a, size, true);
+    // White digits, black outline: no status-dependent tint or vertical gradient.
+    m.textCentred(text, textX, y + 6.0f, false, a, size, false);
 }
 
 // cmd_bottom: a battle button (`x` and `y` its corner): base, face (lit when selected), icon, word
@@ -3831,10 +3829,10 @@ void drawBattleRow(App& app, cr::MenuPainter& m, int k, bool dimmed, float a) {
         }
         m.textCentred(label, x + (22.0f - width) * 0.5f, 375.0f + dy, false, a, size, true);
     };
-    drawHudLabel(tr("HP"), 2.0f + dx);
-    drawHudLabel(tr("MP"), 86.0f + dx);
-    drawBattleHudNumber(m, b.rollHp[k], 24 + dx, 364 + dy, 5, b.rollHp[k] <= f.hpMax / 4, a);
-    drawBattleHudNumber(m, b.rollMp[k], 108 + dx, 364 + dy, 4, b.rollMp[k] <= 0, a); // (cmd_number(mp, mp, 4): red at 0)
+    drawHudLabel(tr("HP"), 1.0f + dx);
+    drawHudLabel(tr("MP"), 83.0f + dx);
+    drawBattleHudNumber(m, b.rollHp[k], 24 + dx, 364 + dy, 5, a);
+    drawBattleHudNumber(m, b.rollMp[k], 108 + dx, 364 + dy, 4, a);
     drawBattleHpBar(m, 20 + dx, 376 + dy, 59, b.rollHp[k], f.hpMax, false, a);
     drawBattleHpBar(m, 100 + dx, 376 + dy, 49, b.rollMp[k], f.mpMax, true, a);
     drawBattleStatus(m, f, 152 + dx, 364 + dy, a);
@@ -4077,11 +4075,11 @@ void drawBattleHud(App& app, float W, float H) {
         }
         const float x = (64.0f - width) * 0.5f;
         if (g > 0)
-            m.textTintCentred(label, x, 32.0f, 0x38 / 255.0f, 1.0f, 0xe3 / 255.0f, a, size);
+            m.textTintCentred(label, x, 30.0f, 0x38 / 255.0f, 1.0f, 0xe3 / 255.0f, a, size);
         else if (g < 0)
-            m.textTintCentred(label, x, 32.0f, 1.0f, 0x14 / 255.0f, 0x23 / 255.0f, a, size);
+            m.textTintCentred(label, x, 30.0f, 1.0f, 0x14 / 255.0f, 0x23 / 255.0f, a, size);
         else
-            m.textCentred(label, x, 32.0f, false, a, size, true);
+            m.textCentred(label, x, 30.0f, false, a, size, true);
     }
     m.setOffset(0, 0);
 
