@@ -372,7 +372,7 @@ void Renderer::drawQuad(const Texture& tex, float x, float y, float w, float h, 
     x += originX_;
     if (phone_) {
         layoutToScreen(x, y);
-        w *= layoutScaleX(), h *= layoutScaleY();
+        w *= layoutScale(), h *= layoutScale();
     }
     interfaceRect(x, y, w, h); // (a camera cutout reaching into the interface: drawn smaller, clear of it)
     const float v[24] = {
@@ -391,7 +391,7 @@ void Renderer::drawQuadUV(const Texture& tex, float x, float y, float w, float h
     x += originX_;
     if (phone_) {
         layoutToScreen(x, y);
-        w *= layoutScaleX(), h *= layoutScaleY();
+        w *= layoutScale(), h *= layoutScale();
     }
     interfaceRect(x, y, w, h); // (a camera cutout reaching into the interface: drawn smaller, clear of it)
     float u0 = sx / tex.width, u1 = (sx + sw) / tex.width;
@@ -422,7 +422,7 @@ void Renderer::drawQuadUVRotated(const Texture& tex, float cx, float cy, float w
     cx += originX_;
     if (phone_) {
         layoutToScreen(cx, cy);
-        w *= layoutScaleX(), h *= layoutScaleY();
+        w *= layoutScale(), h *= layoutScale();
     }
     {
         float x = cx - w / 2, y = cy - h / 2;
@@ -484,18 +484,18 @@ void Renderer::toLogical(float px, float py, float& lx, float& ly) const {
 // screen the pictures' layer is larger about the centre, and moved: _tex2d_draw's 24 / -96 halves)
 void Renderer::layoutToScreen(float& x, float& y) const {
     if (!phone_) return;
-    const float kx = layoutScaleX(), ky = layoutScaleY();
+    const float k = layoutScale();
     const float dy = !vitaScreen() ? 0.0f : layer_ == 3 ? -12.0f * kLogicalH / 544.0f : layer_ == 7 ? 48.0f * kLogicalH / 544.0f : 0.0f;
-    x = screenW_ * 0.5f + (x - screenW_ * 0.5f) * kx;
-    y = kLogicalH * 0.5f + (y - kLogicalH * 0.5f) * ky + dy;
+    x = screenW_ * 0.5f + (x - screenW_ * 0.5f) * k;
+    y = kLogicalH * 0.5f + (y - kLogicalH * 0.5f) * k + dy;
 }
 
 void Renderer::screenToLayout(float& x, float& y) const {
     if (!phone_) return;
-    const float kx = layoutScaleX(), ky = layoutScaleY();
+    const float k = layoutScale();
     const float dy = !vitaScreen() ? 0.0f : layer_ == 3 ? -12.0f * kLogicalH / 544.0f : layer_ == 7 ? 48.0f * kLogicalH / 544.0f : 0.0f;
-    x = screenW_ * 0.5f + (x - screenW_ * 0.5f) / kx;
-    y = kLogicalH * 0.5f + (y - dy - kLogicalH * 0.5f) / ky;
+    x = screenW_ * 0.5f + (x - screenW_ * 0.5f) / k;
+    y = kLogicalH * 0.5f + (y - dy - kLogicalH * 0.5f) / k;
 }
 
 void Renderer::setAdditive(bool on) {
