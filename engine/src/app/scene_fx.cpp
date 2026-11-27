@@ -754,7 +754,8 @@ void applyVideo(App& app) {
         if (loadImage(app, "window.mct", wi, &app.androidWindow))
             app.renderer.destroy(app.windowTex), app.windowTex = app.renderer.upload(wi), noteWindowAtlas(app, wi);
         for (cr::Texture& t : app.titleArt) app.renderer.destroy(t);
-        for (cr::Texture& t : app.titleArtHd) app.renderer.destroy(t);
+        for (auto& pair : app.titleArtHd)
+            for (cr::Texture& t : pair) app.renderer.destroy(t);
         app.titleArtHdTried = false;
     }
     r.setRenderScale(v.renderScale / 100.0f);
@@ -992,7 +993,8 @@ void refreshFanArt(App& app) {
     }
     app.renderer.destroy(app.charSheet), app.charSheet = cr::Texture(), app.charSheetTried = false; // (the rest as they next load)
     for (cr::Texture& t : app.titleArt) app.renderer.destroy(t), t = cr::Texture();
-    for (cr::Texture& t : app.titleArtHd) app.renderer.destroy(t), t = cr::Texture();
+    for (auto& pair : app.titleArtHd)
+        for (cr::Texture& t : pair) app.renderer.destroy(t), t = cr::Texture();
     app.titleArtHdTried = false;
 }
 
@@ -1300,7 +1302,7 @@ std::vector<OptRow> optionRows(App& app, int page) {
             if (app.video.vitaOutpaint != (i == 0)) adjustVideo(app, 19, 1);
         };
         rows.back().enabled = app.renderer.vitaScreen() && v.hdTextures && !app.hdDir.empty();
-        rows.back().hint = tr("Use paired 16:9 PNG layers from textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2 and title1_hd/title2_hd; originals keep the Vita crop");
+        rows.back().hint = tr("Use paired 16:9 PNG layers from textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 and title2_hd1/2; originals keep the Vita crop");
         break;
     }
     case 4: { // Cheats (the port's own): the user's - "Infinite HP and MP. Infinite Maxed out Money, xp multipliers. always advantage"
