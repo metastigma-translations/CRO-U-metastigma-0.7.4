@@ -342,6 +342,8 @@ struct App {
     std::string cutinWideName;
     cr::Texture speedLinesTex;             // syuutyuusen(_ipad).mct (slot 0x2e): scene effect 1
     cr::Texture titleArt[2];               // __menuu_TitleSet: title1.mct (MuCom slot 0x11), chaos.mct (0x12)
+    std::array<cr::Texture, 2> titleArtHd;  // Vita's title1_hd.png (art) and title2_hd.png (text overlay)
+    bool titleArtHdTried = false;
     bool titleArtIpad = false;             // title1 came from its _ipad sheet (pictures 9 / 10; else 7 / 8)
     float footPrev = 0;                    // player's animation time last frame (footsteps)
     std::vector<uint32_t> soundLog;        // every sound started (self-test)
@@ -572,7 +574,8 @@ struct App {
         float clock = 0;
         cr::Texture serect;        // slot 0x11: the cord, the arrow
     } startPage;
-    cr::Texture charSelectArt, charSelectArt2; // Select Scenario's sheets: chara1 / chara2 (slot 0x10), chara3 (0x12)
+    cr::Texture charSelectArt, charSelectArt2; // Select Scenario's original sheets
+    std::array<cr::Texture, 2> charSelectArtHd, charSelectArt2Hd; // each pair: _hd1 artwork, _hd2 text overlay
     struct Camp {                          // the Camp menu's page and cursors (__menuu_CampMain*)
         enum Page { Main, Items, Equip, Status, Genes } page = Main;
         enum Phase { List, Member, Slot, Ask, Entries, Result, Exit } phase = List; // Status: Slot = the member's
