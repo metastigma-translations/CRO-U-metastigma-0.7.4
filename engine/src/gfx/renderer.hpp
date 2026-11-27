@@ -64,6 +64,10 @@ public:
     // Draws `tex` into the logical-space rectangle (x, y, w, h), top-left origin.
     void drawQuad(const Texture& tex, float x, float y, float w, float h,
                   float r = 1, float g = 1, float b = 1, float a = 1);
+    // Draws a centre-cropped full-screen layer in logical screen coordinates, bypassing the
+    // phone layout and UI safe-area transforms. Intended for paired Vita 16:9 HD artwork.
+    void drawQuadFullBleed(const Texture& tex, float top = 0, float alpha = 1,
+                           float r = 1, float g = 1, float b = 1);
     // As drawQuad, showing only the texture's pixel rectangle (sx, sy, sw, sh).
     void drawQuadUV(const Texture& tex, float x, float y, float w, float h, float sx, float sy, float sw, float sh,
                     float r = 1, float g = 1, float b = 1, float a = 1);
