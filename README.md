@@ -293,7 +293,8 @@ The build is CR1:U's: C++17, SDL3, Vulkan or OpenGL.
 cd engine
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build
-build/chaosrings
+build/chaosrings        # Linux / macOS
+# Windows: build/chaosringsomega.exe
 ```
 
 Put your copy in `engine/build/` (or the folder you start it from) as described above.
