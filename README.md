@@ -43,7 +43,7 @@ is the game; without either, the Android release is.
 ## Install and first start
 
 1. Download the file for your system from the releases page and unzip it.
-2. Start `chaosrings`.
+2. Start `chaosringsomega.exe` on Windows, `chaosrings` on Linux, or `chaosrings.app` on macOS.
 3. If it doesn't find your copy, it opens a setup window: pick your `.ipa`, your Android APK and
    OBB, or your Vita folder or dump. The files it needs are **copied into the game folder**, so the
    place you picked them from can be deleted afterwards. A Vita dump is decrypted as Vita3K's
@@ -77,7 +77,8 @@ You can also skip the setup and place the files yourself. The **game folder** is
 
 | Platform | Game folder |
 |---|---|
-| Windows, Linux | the folder holding `chaosrings.exe` / `chaosrings` |
+| Windows | the folder holding `chaosringsomega.exe` |
+| Linux | the folder holding `chaosrings` |
 | Linux AppImage | the folder holding the `.AppImage` |
 | macOS | the folder holding `chaosrings.app` (its `Contents/Resources/` works too) |
 | Android | `Android/data/local.preservation.chaosringsomega/files/` on the shared storage |
@@ -87,7 +88,7 @@ Inside it, one folder per release you have (the downloads come with these folder
 
 ```
 <game folder>/
-├── chaosrings                  (or chaosrings.exe, chaosrings.app, the .AppImage)
+├── chaosrings                  (Linux; Windows: chaosringsomega.exe; macOS: chaosrings.app; or the .AppImage)
 ├── ios/ChaosRingsOmegaHDeng.app/          the iPad .app (1.0.0 or 3.1.0), or Payload/ChaosRingsOmegaHDeng.app/, or the .ipa
 ├── android/                               the .obb and the 1.1.6 APK (or its classes.dex), or the .xapk / .apks
 ├── vita/PCSG00499/                        the installed title (CRO/resources/cro.psarc, CRO/sound/*.psarc)
