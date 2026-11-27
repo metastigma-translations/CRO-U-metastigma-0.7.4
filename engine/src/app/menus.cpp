@@ -5503,19 +5503,12 @@ void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
         m.imagePieceTo(tex, x + dx, y + dy, p[2], p[3], p[0] * k, v * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
     };
     // Keep the native atlas banner as its own picture (Vita #26, otherwise the iPad #27).
-    // Android fills the 16:9 width by stretching the banner horizontally like its background,
-    // but keeps the original height and top position. The Vita's layer-3 picture transform
-    // moves the phone layout up; compensate that transform so the entire banner remains visible.
+    // Its source row is 320 in the half-size picture table (pixel 641 on the doubled sheet).
     const bool vitaSheet = tex.vitaSource || app.vitaOnly || app.renderer.vitaScreen();
     if (banner) {
-        const int pict = phone || vitaSheet ? 26 : 27;
-        const short* p = cr::kOutReadPicture[pict];
-        const float k = sheetScale(tex), sx = charArtScale(app);
-        const float bx = 240.0f - (240.0f - x) * sx;
-        float by = y - androidEdgeY(app);
-        if (app.renderer.vitaScreen()) by += 30.0f; // layer 3: restore the 60px lost to its Vita top shift
-        m.imagePieceTo(tex, bx, by, p[2] * sx, p[3],
-                       p[0] * k, p[1] * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
+        const float vitaLayer3Top = app.renderer.vitaScreen() ? 30.0f : 0.0f;
+        draw(phone || vitaSheet ? 26 : 27, 0.0f,
+             -androidEdgeY(app) + vitaLayer3Top, vitaSheet ? 320.0f : -1.0f);
     } else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
     else draw(phone ? 22 : 24, 0.0f, 0.0f, -1.0f);
 }
