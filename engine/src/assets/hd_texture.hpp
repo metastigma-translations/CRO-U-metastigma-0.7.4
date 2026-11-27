@@ -34,8 +34,9 @@ bool savePngImage(const std::string& path, const Image& img);
 // <hash>.crhd, else <hash>.png (any upscale or edit, upright), else <hash>.dds - of a size hdShapeFits; one
 // that doesn't fit is left out, `why` saying why
 bool loadHdImage(const std::string& dir, const Image& original, Image& out, std::string* why = nullptr);
-// A separately authored HD layer in dir: <stem>.png, not hash-matched to an MCT sheet.
-// Used by the Vita's two-layer widescreen artwork; the image keeps its alpha channel.
+// A separately authored HD layer in dir: <stem>.dds or <stem>.png, not hash-matched to an MCT sheet.
+// DDS is preferred, with PNG fallback independently per layer, so a two-layer pair may mix formats.
+// Used by the Vita's named widescreen artwork; the image keeps its alpha channel.
 bool loadNamedHdImage(const std::string& dir, const std::string& stem, Image& out, std::string* why = nullptr);
 
 // A cut-out's see-through pixels (alpha under 250) take the nearest opaque pixel's colour, so
