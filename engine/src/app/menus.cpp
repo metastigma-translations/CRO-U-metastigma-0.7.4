@@ -2,6 +2,41 @@
 
 namespace crapp {
 
+// The text-only entries from the selected window_hd area. Other atlas words deliberately remain raster.
+std::string menuWordText(int word) {
+    switch (word) {
+    case 0: return tr("Yes");
+    case 1: return tr("No");
+    case 5: return tr("OK");
+    case 2: return tr("Start Game");
+    case 3: return tr("Options");
+    case 6: return tr("New");
+    case 7: return tr("Load");
+    case 8: return tr("Items");
+    case 9: return tr("Equipment");
+    case 10: return tr("Genes");
+    case 11: return tr("Status");
+    case 16: return tr("Extra");
+    case 20: return tr("Pair");
+    case 21: return tr("Solo");
+    case 22: return tr("Escape");
+    case 23: return tr("Check");
+    case 24: return tr("Attack");
+    case 25: return tr("Defend");
+    case 26: return tr("Talk");
+    case 27: return tr("Buy");
+    case 28: return tr("Sell");
+    case 29: return tr("Weapons");
+    case 30: return tr("Armor");
+    case 31: return tr("Jewel");
+    case 32: return tr("Scenarios");
+    case 33: return tr("On");
+    case 34: return tr("Off");
+    case 35: return tr("Ohm");
+    default: return {};
+    }
+}
+
 // __RenewalGetSccnariosState: the Camp's "new" mark on Scenarios - flag 0x642 and no cell open on
 // cards 0..3, or flag 0x665 and none open on all five
 bool campScenariosNew(const App& app) {
@@ -179,12 +214,6 @@ const cr::Texture* charSheet(App& app) {
 }
 // 3.1.0's Options and boards: the data's eight languages and its window_char sheet
 bool languageSheet(App& app) { return app.systemText.hasLanguage(2) && charSheet(app); }
-
-int boardNameIndex(const App& app, int c) {
-    if (c == 0 && viegIsOlgar(app)) return 1;
-    if (c == 1 && olgarIsDante(app)) return 3;
-    return c;
-}
 
 std::string playTimeText(double seconds) {
     const long t = long(seconds);
@@ -433,28 +462,44 @@ void drawSaveDate(App& app, cr::MenuPainter& m, const cr::SaveData& d, float a, 
     localtime_r(&when, &tm);
 #endif
     const float dark[4] = {0, 0, 0, 0.5f * a}, white[4] = {1, 1, 1, a};
+    auto centredLabel = [&](const std::string& label, float x, float y, float w, float h, float size) {
+        const float available = std::max(1.0f, w - 2.0f);
+        float width = m.textWidth(label, size);
+        if (width > available && width > 0.0f) size *= available / width;
+        width = m.textWidth(label, size);
+        // Explicitly keep the font outline; draw this text after any rule crossing its line box.
+        m.textCentred(label, x + (w - width) * 0.5f, y + h * 0.5f, false, a, size,
+                      false, false, false);
+    };
+    // The date and time are each rendered as a single string: this preserves natural
+    // word/number spacing and avoids artificial gaps between independently centred glyph cells.
+    // Rebuild the date and played-time labels from the selected menu font. Keep the panel
+    // geometry and rules, but put the rules behind the outlined headings.
     m.quad(324 + dx, 12, 148, 64, dark, dark);
-    m.picture(0x81, 372 + dx, 12, a);
     m.quad(325 + dx, 28, 146, 1, white, white);
-    m.picture(0x82 + std::clamp(tm.tm_mon + 1, 1, 12), 336 + dx, 38, a);
-    drawShopNumber(m, tm.tm_mday, 378 + dx, 38, 2, 12, a);
-    m.picture(0x8f, 400 + dx, 38, a);
-    drawShopNumber(m, tm.tm_year + 1900, 410 + dx, 38, 4, 12, a);
-    const int digit[4] = {tm.tm_hour / 10, tm.tm_hour % 10, tm.tm_min / 10, tm.tm_min % 10};
-    static const float kAt[4] = {0, 12, 36, 48};
-    for (int i = 0; i < 4; ++i)
-        if (i || tm.tm_hour >= 10) drawShopNumber(m, digit[i], 368 + dx + kAt[i], 58, 1, 12, a);
-    m.picture(0x4b, 392 + dx, 58, a);
+    centredLabel(tr("DATE"), 372 + dx, 12, 52, 16, 20.0f);
+
+    static const char* const kMonth[12] = {
+        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+    };
+    const int month = std::clamp(tm.tm_mon, 0, 11);
+    const std::string dateText = std::string(kMonth[month]) + " " +
+        std::to_string(tm.tm_mday) + "." + std::to_string(tm.tm_year + 1900);
+    centredLabel(dateText, 326 + dx, 38, 144, 16, 14.0f);
+
+    const std::string clockText = std::to_string(tm.tm_hour) + ":" +
+        (tm.tm_min < 10 ? "0" : "") + std::to_string(tm.tm_min);
+    centredLabel(clockText, 324 + dx, 56, 148, 18, 20.0f);
+
     const int secs = int(std::max(0.0, d.playSeconds));
     const int hours = std::min(999, secs / 3600), mins = std::min(59, secs / 60 % 60);
     m.quad(324 + dx, 84, 148, 40, dark, dark);
-    m.picture(0x82, 344 + dx, 88, a);
     m.quad(325 + dx, 100, 146, 1, white, white);
-    const int pd[5] = {hours / 100, hours % 100 / 10, hours % 10, mins / 10, mins % 10};
-    static const float kPlay[5] = {32, 44, 56, 80, 92};
-    for (int i = 0; i < 5; ++i)
-        if (i || pd[i]) drawShopNumber(m, pd[i], 324 + dx + kPlay[i], 84 + 22, 1, 12, a);
-    m.picture(0x4b, 324 + dx + 68, 84 + 22, a);
+    centredLabel(tr("TOTAL PLAYTIME"), 344 + dx, 88, 108, 12, 14.0f);
+    const std::string playTime = std::to_string(hours) + ":" +
+        (mins < 10 ? "0" : "") + std::to_string(mins);
+    centredLabel(playTime, 324 + dx, 104, 148, 18, 20.0f);
 }
 
 void drawSaveScreen(App& app) {
@@ -507,13 +552,17 @@ void drawSaveScreen(App& app) {
         const std::vector<int> plates = savePlates(app);
         static const int kWord[3] = {4, 7, 6};
         r.setOrigin(vitaRight(app));
-        for (size_t i = 0; i < plates.size(); ++i)
-            m.plate(328, 136 + 48.0f * float(plates[i]), plateIcon(kWord[plates[i]]), kWord[plates[i]],
+        for (size_t i = 0; i < plates.size(); ++i) {
+            const int word = kWord[plates[i]];
+            const std::string label = menuWordText(word);
+            const bool fontLabel = word == 6 || word == 7; // New / Load; keep the last-battle label as its raster
+            m.plate(328, 136 + 48.0f * float(plates[i]), plateIcon(word), fontLabel ? -1 : word,
                     (ss.cursor == int(i) && !app.pointerLast) || pressIn(app, kPressSave, vitaRight(app), 328, 136 + 48.0f * float(plates[i]), 136, 40),
-                    a, false); // (window 3; the icon is the word's: ComUty_ChoicePlateDraw; lit while held: DAT_000ecca0)
+                    a, false, fontLabel ? label : std::string(), fontLabel);
+        } // (window 3; the icon is the word's: ComUty_ChoicePlateDraw; lit while held: DAT_000ecca0)
         const float bo = app.renderer.uiX() + 2 * vitaEdge43(app);
         r.setOrigin(bo);
-        m.backBar(192, 288, pressIn(app, kPressSave, bo, 192, 288, 232, 24), a); // (Omega's ComUty_BackButtonDraw mode 1: CmdBack at (192, 288), no arrows; lit while held)
+        m.backBar(192, 288, pressIn(app, kPressSave, bo, 192, 288, 232, 24), a, tr("Back")); // (Omega's ComUty_BackButtonDraw mode 1: CmdBack at (192, 288), no arrows; lit while held)
         r.setOrigin(r.uiX());
     } else { // SaveLoadPut, in every layout (Omega's iPad screen is the iPhone's doubled): the message
         // board (ComUty_MsgBoardDraw, picture 12) at (0, 220), lines from (24, 234); Yes / No the
@@ -523,20 +572,20 @@ void drawSaveScreen(App& app) {
         m.picture(12, 0, 220, a);
         const short* mark = cr::kMenuPicture[13];
         m.piece(458, 298, float(mark[0] + 20 * pictAnimFrame(ss.anim, 1, 4)), mark[1], mark[2], mark[3], a);
-        const std::string msg = ss.message > 0 ? sysText(app, ss.message) : std::string("The save couldn't be written.");
+        const std::string msg = ss.message > 0 ? sysText(app, ss.message) : std::string(tr("The save couldn't be written."));
         m.text(msg.empty() ? "?" : msg, 24, 234, false, a, 13);
         int extra = 0;
         for (int l : ss.lines)
             if (l > 0) m.text(sysText(app, l), 24, 234 + 16.0f * float(++extra), false, a, 13);
         if (ss.phase == 1) {
             const bool hy = pressIn(app, kPressSave, wideRight(app), 336, 104, 136, 40), hn = pressIn(app, kPressSave, wideRight(app), 336, 160, 136, 40);
-            m.plate(336, 104, 0, 0, hy || (!hn && ss.confirm == 0), a, false); // (a held plate takes the cursor)
-            m.plate(336, 160, 1, 1, hn || (!hy && ss.confirm == 1), a, false);
+            m.plate(336, 104, 0, -1, hy || (!hn && ss.confirm == 0), a, false, tr("Yes"), true); // (a held plate takes the cursor)
+            m.plate(336, 160, 1, -1, hn || (!hy && ss.confirm == 1), a, false, tr("No"), true);
         }
     }
     r.setOrigin(wideLeft(app));
     if (keyHints(app)) // (our key hints)
-        m.text(ss.phase == 1 ? "Up/Down  Enter  Esc: no" : ss.phase == 0 ? "Up/Down  Enter  Esc: back" : "", 20, 372, false,
+        m.text(ss.phase == 1 ? tr("Up/Down  Enter  Esc: no") : ss.phase == 0 ? tr("Up/Down  Enter  Esc: back") : "", 20, 372, false,
            a * 0.8f, 9);
     r.setOrigin(r.uiX());
 }
@@ -895,6 +944,37 @@ void drawShopNumber(cr::MenuPainter& m, int value, float x, float y, int digits,
                 alpha);
 }
 
+// Status-only numeric values use the selected font: white glyphs with the standard black outline.
+// Preserve each 14x14 atlas number slot's right/left alignment and vertical centre.
+void drawStatusNumber(cr::MenuPainter& m, int value, float x, float y, int digits, float step, float alpha,
+                      bool left, bool dark = false) {
+    const std::string text = std::to_string(std::abs(value));
+    float size = 14.0f;
+    const float slotWidth = float(digits) * step;
+    float width = m.textWidth(text, size);
+    if (width > slotWidth - 2.0f && width > 0.0f) {
+        size *= (slotWidth - 2.0f) / width;
+        width = m.textWidth(text, size);
+    }
+    const float textX = left ? x : x + slotWidth - width;
+    m.textCentred(text, textX, y + 7.0f, dark, alpha, size);
+}
+
+// Numeric text whose visible baseline is locked to a supplied menu coordinate.
+void drawStatusNumberAtBaseline(cr::MenuPainter& m, int value, float x, float baselineY, int digits, float step,
+                                float alpha, bool left, bool dark = false) {
+    const std::string text = std::to_string(std::abs(value));
+    float size = 14.0f;
+    const float slotWidth = float(digits) * step;
+    float width = m.textWidth(text, size);
+    if (width > slotWidth - 2.0f && width > 0.0f) {
+        size *= (slotWidth - 2.0f) / width;
+        width = m.textWidth(text, size);
+    }
+    const float textX = left ? x : x + slotWidth - width;
+    m.textCentred(text, textX, baselineY - m.baselineFromCentre(size), dark, alpha, size);
+}
+
 // __ComUty_SubColorBar: a 140-wide bar, `type` 0 the black track, 1 HP red -> orange, 2 MP green
 // -> orange, 3 experience blue -> lilac (0xc8800), filled to value / most
 void drawShopBar(cr::MenuPainter& m, float x, float y, float value, float most, int type, float alpha) {
@@ -908,7 +988,9 @@ void drawShopBar(cr::MenuPainter& m, float x, float y, float value, float most, 
     const float* b = kColour[type][1];
     const float l[4] = {a[0], a[1], a[2], alpha};
     const float rr[4] = {a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f, alpha};
-    m.quad(x + 4, y + 1, 140 * f, 3, l, rr);
+    // Original SubColorBar ends are clipped at 45 degrees: left tip points down,
+    // right tip points up. Use the same slant for the black track and the coloured fill.
+    m.slant(x + 4, y + 1, 140 * f, 3, 3, l, rr);
 }
 
 // ComUty_HelpWindowDraw: picture 0x11 (the 336 x 68 striped panel) at (144, 8), the "HELP" tag (0x12) at
@@ -930,46 +1012,114 @@ void drawHelpWindow(App& app, cr::MenuPainter& m, int item, float a, float dx, f
 // ComUty_StateBoardDraw at (bx, by) for character c; `item` (if > 0) shows what wearing it changes;
 // `record` draws the small record picture over the name (param_11: the Status page leaves it out);
 // a seed `item` (3..6) marks its stat with `seeds` x 10 (param_9: the Camp's board after use)
-void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool record = true, int seeds = 0) {
+void drawShopBoard(App& app, float bx, float by, int c, int item, float a, bool record = true, int seeds = 0,
+                   bool fontNumbers = false) {
     using namespace shopui;
     cr::MenuPainter& m = app.menu;
     const cr::PartyMember& pm = app.game.party[size_t(c)];
     const float white[4] = {1, 1, 1, a};
+    auto boardNumber = [&](int value, float x, float y, int digits, float step, int style, bool left) {
+        if (fontNumbers) drawStatusNumber(m, value, x, y, digits, step, a, left);
+        else drawShopNumber(m, value, x, y, digits, step, a, style, left);
+    };
+    auto gaugeNumber = [&](int value, float x, float baselineY, int digits, float step, int style, bool left) {
+        // Status and Equipment use white gauge values; other board contexts keep black glyphs.
+        drawStatusNumberAtBaseline(m, value, x, baselineY, digits, step, a, left, !fontNumbers);
+    };
+    // One common font size for every Status-board label. Pick the largest size that
+    // fits the narrowest label cell, and reserve the number column beside NEXT.
+    const std::string statusLabels[9] = {
+        tr("LV"), tr("HP"), tr("MP"), tr("NEXT"),
+        tr("EXP"), tr("ATTACK"), tr("DEFENSE"), tr("SPEED"), tr("LUCK")
+    };
+    // Gauge labels use one common font size and a shared first-glyph origin.
+    constexpr float kGaugeLabelBaseSize = 14.0f;
+    constexpr float kGaugeLabelWidth = 78.0f; // leave a clear gap before the right-side value
+    const float nextWidth = m.textWidth(statusLabels[3], kGaugeLabelBaseSize);
+    const float gaugeLabelSize = nextWidth > kGaugeLabelWidth && nextWidth > 0.0f
+        ? kGaugeLabelBaseSize * kGaugeLabelWidth / nextWidth : kGaugeLabelBaseSize;
+    auto gaugeLabel = [&](const std::string& label, float x, float trackY) {
+        // Baseline is the coloured fill's top edge (trackY + 9), not the black track's top.
+        m.textCentred(label, x, trackY + 8.0f - m.baselineFromCentre(gaugeLabelSize),
+                      false, a, gaugeLabelSize, true);
+    };
+
+    // The five white stat chips share one font size. Negative tracking tightens the long
+    // Russian words without shrinking individual labels or changing their baseline.
+    constexpr float kStatChipBaseSize = 14.0f;
+    constexpr float kStatChipTracking = -0.55f;
+    constexpr float kStatChipMaxWidth = 48.0f;
+    float statChipSize = kStatChipBaseSize;
+    for (int i = 4; i < 9; ++i) {
+        const float width = m.textWidth(statusLabels[i], kStatChipBaseSize, kStatChipTracking);
+        if (width > kStatChipMaxWidth && width > 0.0f)
+            statChipSize = std::min(statChipSize, kStatChipBaseSize * kStatChipMaxWidth / width);
+    }
+    auto statChipLabel = [&](const std::string& label, float x, float y, float w, float h) {
+        const float width = m.textWidth(label, statChipSize, kStatChipTracking);
+        // Horizontal centre of each full white strip; identical font size and tracking for all five.
+        m.textCentred(label, x + (w - width) * 0.5f, y + h * 0.5f,
+                      true, a, statChipSize, false, false, true, kStatChipTracking);
+    };
     m.quad(bx + 12, by, 143, 16, white, white); // the name
     const std::string name = sysText(app, 58000 + charNameId(app, c)); // (ComUty_StateBoardChrName)
-    m.textCentred(name, bx + 12 + (143 - m.textWidth(name, 14)) / 2, by + 8, true, a, 14);
+    // Optical alignment for the configured bold-italic UI font: centre the visible ink, not only its advance box.
+    m.textCentred(name, bx + 12 + (143 - m.textWidth(name, 14)) * 0.5f + 3.1f, by + 5.6f, true, a, 14);
     if (record) m.picture(148 + std::clamp(c, 0, cr::kCharacters - 1), bx - 8, by - 32, a); // ComUty_StateBoardDraw: 0x94 + record
-    m.quad(bx + 12, by + 32, 143, 15, white, white); // LV
-    m.picture(82, bx + 50, by + 36, a);
-    drawShopNumber(m, pm.level, bx + 80, by + 33, 3, 12, a, 2, true);
+    m.quad(bx + 12, by + 32, 143, 15, white, white); // level
+    if (fontNumbers) {
+        const std::string levelValue = std::to_string(std::abs(pm.level));
+        const float labelWidth = m.textWidth(statusLabels[0], 14);
+        const float valueWidth = m.textWidth(levelValue, 14);
+        constexpr float kLevelGroupGap = 8.0f;
+        const float groupWidth = labelWidth + kLevelGroupGap + valueWidth;
+        // Small optical correction for the visible «Уровень» + value ink inside the strip.
+        constexpr float kLevelGroupOpticalX = -1.25f;
+        constexpr float kLevelGroupOpticalY = -1.1f;
+        const float groupX = bx + 12 + (143.0f - groupWidth) * 0.5f + kLevelGroupOpticalX;
+        m.textCentred(statusLabels[0], groupX, by + 39.5f + kLevelGroupOpticalY, true, a, 14, false, false, true);
+        drawStatusNumber(m, pm.level, groupX + labelWidth + kLevelGroupGap,
+                         by + 32.5f + kLevelGroupOpticalY, 3, 12, a, true, true);
+    } else {
+        const float levelLabelWidth = m.textWidth(statusLabels[0], 14);
+        m.textCentred(statusLabels[0], bx + 12 + (62.0f - levelLabelWidth) * 0.5f,
+                      by + 39.5f, true, a, 14, false, false, true);
+        boardNumber(pm.level, bx + 80, by + 33, 3, 12, 2, true);
+    }
     const int hpMax = cr::memberStat(app.game, c, cr::kHp, app.itemTable), mpMax = cr::memberStat(app.game, c, cr::kMp, app.itemTable);
     const int hp = pm.hp < 0 ? hpMax : pm.hp, mp = pm.mp < 0 ? mpMax : pm.mp;
     for (int k = 0; k < 2; ++k) { // __ComUty_FaceBoardHpMp
         const float x = bx - 1, y = by + 56 + 20 * k;
-        m.picture(k ? 63 : 62, x, y, a);
-        drawShopNumber(m, k ? mp : hp, x + 22, y - 4, 5, 12, a);
-        m.picture(k ? 65 : 66, x + 82, y - 4, a);
-        drawShopNumber(m, k ? mpMax : hpMax, x + 94, y - 4, 5, 12, a);
-        drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
-        drawShopBar(m, x + 15, y + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
+        drawShopBar(m, x + 11, y + 9, 1, 1, 0, a);
+        drawShopBar(m, x + 10, y + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
+        // Current and maximum values must stay visible over the coloured gauge fill.
+        gaugeNumber(k ? mp : hp, x + 22, y + 8.0f, 5, 12, 0, false);
+        gaugeNumber(k ? mpMax : hpMax, x + 94, y + 8.0f, 5, 12, 0, false);
+        // All gauge slashes use black glyphs with a white outline.
+        m.text("/", x + 82, y - 9, !fontNumbers, a, 14);
+        gaugeLabel(statusLabels[k ? 2 : 1], bx + 9.0f, y);
     }
     { // __ComUty_FaceBoardNextExp
-        const float x = bx - 2, y = by + 96;
+        const float x = bx - 1, y = by + 96;
         const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
-        m.picture(64, x, y, a);
-        drawShopNumber(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), x + 82, y - 4, 6, 12, a);
-        drawShopBar(m, x + 16, y + 9, 1, 1, 0, a);
-        drawShopBar(m, x + 15, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
+        drawShopBar(m, x + 11, y + 9, 1, 1, 0, a);
+        drawShopBar(m, x + 10, y + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
+        gaugeNumber(pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp),
+                     x + 82, y + 8.0f, 6, 12, 0, false);
+        gaugeLabel(statusLabels[3], bx + 9.0f, y);
     }
-    // EXP and the four stats: label boxes (83..87) at x + 12, their underline (88) at x + 64
+    // Rebuild the five white atlas label chips without their baked English lettering.
+    const std::string* kBoardStatLabel = statusLabels + 4;
     const int values[5] = {pm.exp, cr::memberStat(app.game, c, cr::kAttack, app.itemTable), cr::memberStat(app.game, c, cr::kDefense, app.itemTable),
                            cr::memberStat(app.game, c, cr::kSpeed, app.itemTable), cr::memberStat(app.game, c, cr::kLuck, app.itemTable)};
     for (int k = 0; k < 5; ++k) {
         const float y = by + 116 + 20 * k;
-        m.picture(83 + k, bx + 12, y, a);
-        m.picture(88, bx + 64, y + 11, a);
-        if (k == 0) drawShopNumber(m, values[0], bx + 68, y - 2, 7, 12, a);
-        else drawShopNumber(m, values[k], bx + 80, y - 2, 4, 12, a);
+        m.quad(bx + 12, y, 52, 12, white, white); // same size and position as atlas pictures 83..87
+        statChipLabel(kBoardStatLabel[k], bx + 12, y, 52, 12);
+        m.picture(88, bx + 64, y + 11, a); // underline stays as before
+        const float statValueY = y - (fontNumbers ? 3.0f : 2.0f);
+        if (k == 0) boardNumber(values[0], bx + 68, statValueY, 7, 12, 0, false);
+        else boardNumber(values[k], bx + 80, statValueY, 4, 12, 0, false);
     }
     if (item <= 0) return;
     int delta[6] = {0, 0, 0, 0, 0, 0};
@@ -1065,7 +1215,7 @@ void drawShop(App& app) {
     const PhoneMenu phoneMenu(app, m); // the iPhone layout: its screen's menu coordinates
     if (s.phase == App::Shop::Talk) { // the shopkeeper's scene: ShopPrc 2 takes windows 1 - 5 off, "Shop" (window 0)
         r.setOrigin(vitaLeft(app));      // stays over it (Part 12 2142-2184 s: "Shop" over Piu-Piu's talk)
-        m.picture(97, 8, 4, 1);
+        m.headingStrip(8, 4, tr("Shop"), 1);
         r.setOrigin(r.uiX());
         return;
     }
@@ -1089,7 +1239,7 @@ void drawShop(App& app) {
     if (s.keeper.id && !list && !board) // window 3: tex 10's (1, 3), 256 x 256 at (0, 64) (Part 4 1173.5 s)
         r.drawQuad(s.keeper, (16 + 0 - 240 * slide) * 2, (32 + 64) * 2, 256 * 2, 256 * 2, 1, 1, 1, 1);
     if (board) drawShopBoard(app, 12 - 200 * slide, 92, shopCharacter(app), s.selling ? 0 : item, a);
-    m.picture(97, 8, 4, 1); // "Shop"
+    m.headingStrip(8, 4, tr("Shop"), 1); // "Shop"
     if (s.phase == App::Shop::Main) { // window 2: font 0 (7, 0x3a) "Shopping" at (12, 40) over picture 15
         m.textCentred(sysText(app, 58058), 12 - 140 * slide, 47, false, a, kFont);
         m.picture(15, -140 * slide, 56, a);
@@ -1111,20 +1261,29 @@ void drawShop(App& app) {
     drawShopNumber(m, app.game.oz, 362, 0, 9, 12, 1);
     r.setOrigin(vitaR);
     if (s.phase == App::Shop::Main)
-        for (int i = 0; i < 3; ++i)
-            m.plate(328 + 240 * slide, 144 + 48.0f * float(i), kMainIcons[i], kMainWords[i],
-                    (s.cursor == i && !app.pointerLast) || shopPressIn(app, true, 328, 144 + 48.0f * float(i), 136, 40, v), a, false);
+        for (int i = 0; i < 3; ++i) {
+            const std::string label = menuWordText(kMainWords[i]); // Talk / Buy / Sell
+            m.plate(328 + 240 * slide, 144 + 48.0f * float(i), kMainIcons[i], -1,
+                    (s.cursor == i && !app.pointerLast) || shopPressIn(app, true, 328, 144 + 48.0f * float(i), 136, 40, v),
+                    a, false, label, true);
+        }
     if (s.phase == App::Shop::Category)
         for (int i = 0; i < categories(app); ++i) {
             const float cy = (categories(app) == 5 ? 48 : 96) + 48.0f * float(i);
-            m.plate(328 + 240 * slide, cy, kCategoryIcons[i], kCategoryWords[i],
-                    (s.category == i && !app.pointerLast) || shopPressIn(app, true, 328, cy, 136, 40, v), a, false);
+            const std::string label = menuWordText(kCategoryWords[i]);
+            const bool fontLabel = !label.empty(); // Items / Weapons / Armor / Jewel only
+            m.plate(328 + 240 * slide, cy, kCategoryIcons[i], fontLabel ? -1 : kCategoryWords[i],
+                    (s.category == i && !app.pointerLast) || shopPressIn(app, true, 328, cy, 136, 40, v),
+                    a, false, fontLabel ? label : std::string(), fontLabel);
         }
     if (s.phase == App::Shop::Member) // __CharChoiceDraw: window 9, the pair at (328, 176 + 56k) (Part 8 3475 s)
         for (int k = 0; k < campMembers(app); ++k) {
-            const int word = memberWord(app, campCharacter(app, k));
-            m.plate(328 + 240 * slide, 176 + 56.0f * float(k), plateIcon(word), word,
-                    (s.member == k && !app.pointerLast) || shopPressIn(app, true, 328, 176 + 56.0f * float(k), 136, 40, v), a, false);
+            const int character = campCharacter(app, k);
+            const int word = memberWord(app, character); // keep its original member icon
+            const std::string name = sysText(app, 58000 + charNameId(app, character));
+            m.plate(328 + 240 * slide, 176 + 56.0f * float(k), plateIcon(word), -1,
+                    (s.member == k && !app.pointerLast) || shopPressIn(app, true, 328, 176 + 56.0f * float(k), 136, 40, v), a,
+                    false, name, false);
         }
     if (list) {
         const int n = int(s.list.size());
@@ -1186,8 +1345,8 @@ void drawShop(App& app) {
         }
         // (a held plate takes the cursor: __ComUty_YesNoChoiceProc)
         const bool hy = shopPressIn(app, true, 336, 104, 136, 40), hn = shopPressIn(app, true, 336, 160, 136, 40);
-        m.plate(336, 104, 0, 0, hy || (!hn && s.confirm == 0), 1, false); // Yes
-        m.plate(336, 160, 1, 1, hn || (!hy && s.confirm == 1), 1, false); // No
+        m.plate(336, 104, 0, -1, hy || (!hn && s.confirm == 0), 1, false, tr("Yes"), true); // Yes
+        m.plate(336, 160, 1, -1, hn || (!hy && s.confirm == 1), 1, false, tr("No"), true); // No
     }
 
     // Centre: Back (with ◀ ▶ for equipment lists) and the message board
@@ -1204,14 +1363,14 @@ void drawShop(App& app) {
             m.text(have[0][0], 24, 250, false, 1, kFont);
     } else if (list && shopEquipment(app)) { // (the Vita's at 235: 43 right)
         m.backButton(kBackX + v, kBackY, shopPressIn(app, false, kBackX + 51, kBackY, 130, 24, v) ? 1 : shopPressIn(app, false, kBackX + 181, kBackY, 51, 24, v) ? 2
-                                     : shopPressIn(app, false, kBackX, kBackY, 51, 24, v) ? 3 : 0, s.bob, a); // ComUty_CmdBack 2: < Back >
+                                     : shopPressIn(app, false, kBackX, kBackY, 51, 24, v) ? 3 : 0, app.menuArrowBob, a, tr("Back")); // ComUty_CmdBack 2: < Back >
     } else {
-        m.backBar(kBackX + v, kBackY, shopPressIn(app, false, kBackX, kBackY, 232, 24, v), a); // (lit while held: DAT_000ec80c)
+        m.backBar(kBackX + v, kBackY, shopPressIn(app, false, kBackX, kBackY, 232, 24, v), a, tr("Back")); // (lit while held: DAT_000ec80c)
     }
-    const char* help = s.phase == App::Shop::Count     ? "Left/Right: 1  Shift: 10  Up/Down: Yes / No  Enter  Esc"
-                       : s.phase == App::Shop::EquipAsk ? "Up/Down  Enter  Esc: no"
-                       : list && shopEquipment(app)     ? "Up/Down  Left/Right: character  Enter  Esc: back"
-                                                        : "Up/Down  Enter  Esc: back";
+    const char* help = s.phase == App::Shop::Count     ? tr("Left/Right: 1  Shift: 10  Up/Down: Yes / No  Enter  Esc")
+                       : s.phase == App::Shop::EquipAsk ? tr("Up/Down  Enter  Esc: no")
+                       : list && shopEquipment(app)     ? tr("Up/Down  Left/Right: character  Enter  Esc: back")
+                                                        : tr("Up/Down  Enter  Esc: back");
     if (keyHints(app)) // (our key hints)
         m.text(help, 20, 372, false, a * 0.8f, 9);
     r.setOrigin(r.uiX());
@@ -1414,18 +1573,39 @@ void drawClockAndOz(App& app, cr::MenuPainter& m, float a) {
 #else
     localtime_r(&now, &tm);
 #endif
-    m.picture(71, (363 + vx), 8, a);
+    const float white[4] = {1, 1, 1, a};
+    auto clockPlateLabel = [&](const std::string& label, float x, float y, bool noOutline,
+                                float plateWidth = 36.0f) {
+        // White label plate; TIME is slightly wider so the selected-font text has clear side margins.
+        m.quad(x, y, plateWidth, 16.0f, white, white);
+        float size = 14.0f;
+        float width = m.textWidth(label, size);
+        const float textMaxWidth = plateWidth - 4.0f;
+        if (width > textMaxWidth && width > 0.0f) size *= textMaxWidth / width;
+        width = m.textWidth(label, size);
+        m.textCentred(label, x + (plateWidth - width) * 0.5f, y + 8.0f,
+                      true, a, size, false, false, noOutline);
+    };
+    const float clockX = 363.0f + vx;
+    // Bottom of the wider TIME plate aligns with the bottom of the thin 2-unit underline (y=18..20).
+    clockPlateLabel(tr("TIME"), clockX, 4.0f, true, 40.0f);
+    m.quad(clockX + 40.0f, 19.0f, 110.0f, 1.0f, white, white); // 1-unit font-rendered rule
     const int digit[4] = {tm.tm_hour / 10, tm.tm_hour % 10, tm.tm_min / 10, tm.tm_min % 10};
     static const float kAt[4] = {0, 12, 36, 48};
     for (int i = 0; i < 4; ++i)
-        if (i || digit[0]) drawShopNumber(m, digit[i], (363 + vx) + 47 + kAt[i], 6, 1, 12, a);
-    // (__ComUty_RealTimeDraw: the colon while its own count, one a frame, is under 20 of 40 - a second on,
-    // a second off at 20 Hz; Part 5 207-215 s: on 208.46-209.42, off to 210.44, on to 211.52, ...)
-    if (SDL_GetTicks() / 1000 % 2 == 0) m.picture(75, (363 + vx) + 71, 6, a);
-    m.picture(74, (363 + vx) + 36, 16, a);
-    m.picture(72, 326 + vx, 24, a);
-    drawShopNumber(m, app.game.oz, 362 + vx, 26, 9, 12, a);
-    m.picture(74, 362 + vx, 36, a);
+        if (i || digit[0])
+            drawStatusNumber(m, digit[i], clockX + 47.0f + kAt[i], 5.0f, 1, 12.0f, a, false);
+    // (__ComUty_RealTimeDraw: one second on, one second off at 20 Hz - keep the original phase.)
+    if (SDL_GetTicks() / 1000 % 2 == 0) {
+        const float colonWidth = m.textWidth(":", 14.0f);
+        m.textCentred(":", clockX + 71.0f + (14.0f - colonWidth) * 0.5f,
+                      12.0f, false, a, 14.0f, false, false, false);
+    }
+
+    const float ozX = 326.0f + vx;
+    clockPlateLabel(tr("OZ"), ozX, 24.0f, false);
+    m.quad(362.0f + vx, 39.0f, 110.0f, 1.0f, white, white); // 1-unit font-rendered rule behind the value
+    drawStatusNumber(m, app.game.oz, 362.0f + vx, 25.0f, 9, 12.0f, a, false);
 }
 
 // ComUty_FaceBoardDraw at (x, y): the face (29 + n), the board (28) and the name (37 + n and the
@@ -1440,33 +1620,69 @@ void drawFaceBoard(App& app, cr::MenuPainter& m, float x, float y, int c, int hp
     const cr::PartyMember& pm = (gs ? *gs : app.game).party[size_t(c)];
     m.picture(28, x + 8, y + 24, a);
     m.picture(37 + c, x + 136, y + 24, a);
-    if (languageSheet(app)) // 3.1.0 (FUN_000509fc): window_char's name, row c (Olgar's / Dante's for 0 / 1 when
-        // the story has made them so) in the language's column - MuComPictTexNoDraw(0x30, table 8, c + 9 x language)
-        m.imagePieceTo(app.charSheet, x + 96, y + 24, 92, 20, 92.0f * float(std::clamp(app.language, 0, 7)),
-                       32.0f + 20.0f * float(boardNameIndex(app, c)), 92, 20, a);
-    else m.picture((app.language == 0 ? 45 : 53) + boardNameIndex(app, c), x + 96, y + 24, a);
+    // The original's raster name row is localised per character; use the same system-text ID
+    // as the status board, but keep its underlined white-name treatment (no menu gradient).
+    const std::string name = sysText(app, 58000 + charNameId(app, c));
+    const float nameWidth = m.textWidth(name, 13);
+    const float nameSize = nameWidth > 92 ? std::max(8.0f, std::floor(13.0f * 92 / nameWidth)) : 13.0f;
+    const float fittedWidth = m.textWidth(name, nameSize);
+    const float nameX = x + 96 + (92 - fittedWidth) / 2;
+    // The underline sits behind the name: let the outlined glyphs cover its centre,
+    // leaving a short visible extension at both ends, as in the original name strip.
+    const float underlineWidth = std::min(92.0f, fittedWidth + 6.0f);
+    const float underlineX = x + 96 + (92 - underlineWidth) / 2;
+    const float underlineY = y + 42; // keep the original baseline; the text is drawn over it
+    const float underlineBlack[4] = {0, 0, 0, a};
+    const float underlineWhite[4] = {1, 1, 1, a};
+    // Double the black outline thickness on all four sides; keep a white one-pixel centre.
+    m.quad(underlineX - 1.0f, underlineY - 1.0f, underlineWidth + 2.0f, 1.0f, underlineBlack, underlineBlack);
+    m.quad(underlineX - 1.0f, underlineY, 1.0f, 1.0f, underlineBlack, underlineBlack);
+    m.quad(underlineX, underlineY, underlineWidth, 1.0f, underlineWhite, underlineWhite);
+    m.quad(underlineX + underlineWidth, underlineY, 1.0f, 1.0f, underlineBlack, underlineBlack);
+    m.quad(underlineX - 1.0f, underlineY + 1.0f, underlineWidth + 2.0f, 1.0f, underlineBlack, underlineBlack);
+    // Raise the outlined name by three more menu units so the visible glyph bottom meets the underline bottom.
+    m.textCentred(name, nameX, underlineY - 2.0f - m.baselineFromCentre(nameSize),
+                   false, a, nameSize, false);
     m.picture(facePicture(app, c), x, y, a);
     const cr::GameState& g = gs ? *gs : app.game;
     if (g.scenario == 1 && c == g.leaders[1]) m.picture(164, x + 238, y + 26, a); // the leader's mark
-    m.picture(61, x + 24, y + 86, a);
-    // (__ComUty_FaceBoardFaceDraw: PictNumDraw(x + 0x30, y + 0x56, level, 3 places, 12, style 1) right-aligned
-    // - Part 3 394 s: "LV  10", the digits at the field's right)
-    drawShopNumber(m, pm.level, x + 48, y + 86, 3, 12, a, 1);
+    // Replace the atlas level badge and its digits with the selected font.
+    // Keep the original 28x14 label cell and right-aligned three-digit level slot.
+    constexpr float kLevelBadgeWidth = 28.0f;
+    const float levelBadgeTextWidth = m.textWidth("УР", 14);
+    m.text("УР", x + 24 + (kLevelBadgeWidth - levelBadgeTextWidth) * 0.5f, y + 86, true, a, 14);
+    drawStatusNumber(m, pm.level, x + 48, y + 89, 3, 12, a, false, true);
+
+    // Match the submenu/status panel typography and vertical position. The Russian NEXT caption
+    // is sized once so it ends before the right-side value; original caption X origins are retained.
+    const std::string gaugeLabels[3] = {tr("HP"), tr("MP"), tr("NEXT")};
+    constexpr float kFaceGaugeLabelBaseSize = 14.0f;
+    constexpr float kFaceGaugeLabelWidth = 78.0f;
+    const float nextLabelWidth = m.textWidth(gaugeLabels[2], kFaceGaugeLabelBaseSize);
+    const float faceGaugeLabelSize = nextLabelWidth > kFaceGaugeLabelWidth && nextLabelWidth > 0.0f
+        ? kFaceGaugeLabelBaseSize * kFaceGaugeLabelWidth / nextLabelWidth : kFaceGaugeLabelBaseSize;
+
     for (int k = 0; k < 2; ++k) {
-        const float hx = x + 96, hy = y + 50 + 20.0f * float(k);
-        m.picture(k ? 63 : 62, hx, hy, a);
-        drawShopNumber(m, k ? mp : hp, hx + 22, hy - 4, 5, 12, a, 2);
-        m.picture(65, hx + 82, hy - 4, a);
-        drawShopNumber(m, k ? mpMax : hpMax, hx + 94, hy - 4, 5, 12, a, 2);
+        const float hx = x + 93, hy = y + 50 + 20.0f * float(k); // card gauge group: 3 units left of the atlas edge
         drawShopBar(m, hx + 16, hy + 9, 1, 1, 0, a);
         drawShopBar(m, hx + 15, hy + 8, float(k ? mp : hp), float(k ? mpMax : hpMax), k ? 2 : 1, a);
+        // Values and labels are rendered after the gauge fill so the coloured bar cannot mask them.
+        drawStatusNumberAtBaseline(m, k ? mp : hp, hx + 22, hy + 8.0f, 5, 12, a, false, true);
+        drawStatusNumberAtBaseline(m, k ? mpMax : hpMax, hx + 94, hy + 8.0f, 5, 12, a, false, true);
+        m.textCentred(gaugeLabels[k], hx + 15.0f,
+                      hy + 8.0f - m.baselineFromCentre(faceGaugeLabelSize),
+                      false, a, faceGaugeLabelSize, true);
+        m.text("/", hx + 82, hy - 9, true, a, 14);
     }
-    const float nx = x + 96, ny = y + 90;
+    const float nx = x + 93, ny = y + 90; // keep NEXT label, value and bars aligned with HP / MP
     const int from = cr::expForLevel(pm.level), to = cr::expForLevel(pm.level + 1);
-    m.picture(64, nx, ny, a);
-    drawShopNumber(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp), nx + 82, ny - 4, 6, 12, a, 2);
     drawShopBar(m, nx + 16, ny + 9, 1, 1, 0, a);
     drawShopBar(m, nx + 15, ny + 8, float(pm.exp - from), float(std::max(1, to - from)), 3, a);
+    drawStatusNumberAtBaseline(m, pm.level >= cr::levelCap(app.game.scenario) ? 0 : std::max(0, to - pm.exp),
+                                nx + 82, ny + 8.0f, 6, 12, a, false, true);
+    m.textCentred(gaugeLabels[2], nx + 15.0f,
+                  ny + 8.0f - m.baselineFromCentre(faceGaugeLabelSize),
+                  false, a, faceGaugeLabelSize, true);
 }
 
 // The member's HP (full outside battles) and MP as the boards show them
@@ -2604,12 +2820,14 @@ void drawGeneBoard(App& app, cr::MenuPainter& m, float x, float y, int plate, fl
     const float white[4] = {1, 1, 1, a};
     m.quad(x, y, 163, 16, white, white);
     const std::string name = itemName(app, plate);
-    m.textCentred(name, x + (163 - m.textWidth(name, 14)) / 2, y + 8, true, a, 14);
+    m.textCentred(name, x + (163 - m.textWidth(name, 14)) / 2, y + 9 - 0.5f * m.baselineFromCentre(14), true, a, 14);
     m.quad(x, y + 24, 163, 16, white, white);
-    m.picture(95, x + 24, y + 27, a);
-    drawShopNumber(m, cr::plateLearned(app.game, plate), x + 90, y + 24, 1, 12, a, 2);
-    m.picture(65, x + 102, y + 24, a);
-    drawShopNumber(m, 6, x + 114, y + 24, 1, 12, a, 2);
+    // Centre every glyph on the second white strip (y + 24 .. y + 40) and use
+    // the same dark fill / white outline as the plate name above.
+    m.textCentred(tr("Skill"), x + 24, y + 31, true, a, 11);
+    drawStatusNumber(m, cr::plateLearned(app.game, plate), x + 90, y + 24, 1, 12, a, true, true);
+    m.textCentred("/", x + 102, y + 31, true, a, 12);
+    drawStatusNumber(m, 6, x + 114, y + 24, 1, 12, a, true, true);
     // __MuCamp_GeneTexRead (_gkpachGenePlateImage): gene_m001c..m007c, then m201c..m224c
     static const std::array<std::string, cr::kPlates> kArt = [] {
         std::array<std::string, cr::kPlates> a;
@@ -2924,7 +3142,7 @@ void drawLastBattle(App& app) {
     // right, the question centred
     r.setOrigin(wideLeft(app));
     auto ease = [](float t) { return 1 - (1 - t) * (1 - t); };
-    if (lb.win[0] > 0) m.picture(110, 8, 6, lb.win[0]); // (_stMuPictInfo_LastBt: picture 110 at (8, 6))
+    if (lb.win[0] > 0) m.headingStrip(8, 6, tr("Scenarios"), lb.win[0], 216, 17, 15.25f); // Scenarios strip
     if (lb.win[1] > 0) {
         const float dx = -140 * (1 - ease(lb.win[1]));
         m.picture(15, dx, 56, lb.win[1]);
@@ -2959,8 +3177,8 @@ void drawLastBattle(App& app) {
         const float dx = 360 * (1 - ease(lb.win[6]));
         r.setOrigin(wideRight(app));
         const bool hy = pressIn(app, kPressLastBattle, wideRight(app), 336, 104, 136, 40), hn = pressIn(app, kPressLastBattle, wideRight(app), 336, 160, 136, 40);
-        m.plate(336 + dx, 104, 0, 0, hy || (!hn && lb.confirm == 0), lb.win[6], false); // (a held plate takes the cursor)
-        m.plate(336 + dx, 160, 1, 1, hn || (!hy && lb.confirm == 1), lb.win[6], false);
+        m.plate(336 + dx, 104, 0, -1, hy || (!hn && lb.confirm == 0), lb.win[6], false, tr("Yes"), true); // (a held plate takes the cursor)
+        m.plate(336 + dx, 160, 1, -1, hn || (!hy && lb.confirm == 1), lb.win[6], false, tr("No"), true);
     }
     r.setOrigin(r.uiX());
 }
@@ -3253,7 +3471,7 @@ void drawWorldSelect(App& app) {
         m.image(ws.maps[mapIx], dx(1) + ox, dy(1) + 64 + oy, 256, 256, ws.win[1]); // (the whole sheet: the _hd one is 512 square)
         r.setLayer(keep);
     }
-    if (ws.win[0] > 0) m.picture(0, dx(0) + 8 + ox, dy(0) + 4 + oy, ws.win[0]);
+    if (ws.win[0] > 0) m.headingStrip(dx(0) + 8 + ox, dy(0) + 4 + oy, tr("World Select"), ws.win[0], 216, 17, 17);
     if (ws.win[2] > 0) { // (the labels as the camp's: FontDisp's y the line box's top)
         m.picture(15, dx(2) + ox, dy(2) + 56 + oy, ws.win[2]);
         m.textCentred(sysText(app, 58000), dx(2) + 12 + ox, dy(2) + 47 + oy, false, ws.win[2], 14); // (the menu font, as the Camp's lines)
@@ -3291,7 +3509,7 @@ void drawWorldSelect(App& app) {
         ownPlace(false);
         const bool ph = app.renderer.phoneLayout(); // (lit while held: the box worldSelectClick tests)
         m.backBar(wldsel::kBackX + dx(w), wldsel::kBackY,
-                  pressIn(app, kPressWorld, vitaRight(app), wldsel::kBackX - (ph ? 16 : 0), wldsel::kBackY - (ph ? 32 : 0), 232, 24), a);
+                  pressIn(app, kPressWorld, vitaRight(app), wldsel::kBackX - (ph ? 16 : 0), wldsel::kBackY - (ph ? 32 : 0), 232, 24), a, tr("Back"));
     };
     r.setOrigin(vitaRight(app)); // (the Vita: its list table's x 235 and Back 235 - 43 to the right; Yes / No not)
     if (ws.win[6] > 0) // the gates
@@ -3319,8 +3537,8 @@ void drawWorldSelect(App& app) {
         // both dark; keys and pads keep the cursor's lit)
         const bool lit = !app.pointerLast;
         const bool hy = pressIn(app, kPressWorld, wideRight(app), 336, 104, 136, 40), hn = pressIn(app, kPressWorld, wideRight(app), 336, 160, 136, 40);
-        m.plate(336 + dx(8), 104, 0, 0, hy || (!hn && lit && ws.confirm == 0), ws.win[8], false); // (a held plate takes the cursor)
-        m.plate(336 + dx(8), 160, 1, 1, hn || (!hy && lit && ws.confirm == 1), ws.win[8], false);
+        m.plate(336 + dx(8), 104, 0, -1, hy || (!hn && lit && ws.confirm == 0), ws.win[8], false, tr("Yes"), true); // (a held plate takes the cursor)
+        m.plate(336 + dx(8), 160, 1, -1, hn || (!hy && lit && ws.confirm == 1), ws.win[8], false, tr("No"), true);
     }
     ownPlace(false);
     r.setOrigin(r.uiX());
@@ -3413,7 +3631,7 @@ void drawCamp(App& app) {
     // "Camp" (window 0): CampMain 0xd takes it off with the rest at the Emergency Exit's end (kCampExitHide), whole
     // the frame after, then 3/4 .. gone
     const float exitOff = c.phase == App::Camp::Exit ? std::clamp(float(c.exitT - kCampExitHide - 1) / 4.0f, 0.0f, 1.0f) : 0.0f;
-    m.picture(81, 8, 4, (1 - leave) * (1 - exitOff)); // "Camp"
+    m.headingStrip(8, 4, tr("Camp"), (1 - leave) * (1 - exitOff));
     // The main screen's pieces slide away on a page (CampMain 6), before the page's own come (campEase), and stay
     // away while the page's go on Back
     const float out = main ? std::max(1 - ease, leave) : c.pageOut ? 1.0f : std::min(1.0f, float(c.anim) / 4.0f);
@@ -3438,8 +3656,10 @@ void drawCamp(App& app) {
         const bool save = i == 5;
         // (lit: the keys' cursor - touch play none -, or a touch holding it: FUN_0006c548's DAT_000ec590)
         const bool held = main && campPressIn(app, vitaRight(app), kPlateX, kPlateY + kPlateStep * float(i), 136, 40);
-        m.plate(kPlateX + 360 * out, kPlateY + kPlateStep * float(i), save ? 6 : plateIcon(kWords[i]), save ? -1 : kWords[i],
-                (main && c.cursor == i && c.btnRow < 0 && !app.pointerLast) || held, 1 - outA, !save && !kReady[i], save ? "Save" : "");
+        const char* label = save ? "Save" : i == 0 ? tr("Items") : i == 1 ? tr("Equipment") :
+                            i == 2 ? tr("Genes") : i == 3 ? tr("Status") : tr("Options");
+        m.plate(kPlateX + 360 * out, kPlateY + kPlateStep * float(i), save ? 6 : plateIcon(kWords[i]), -1,
+                (main && c.cursor == i && c.btnRow < 0 && !app.pointerLast) || held, 1 - outA, !save && !kReady[i], label, !save);
     }
     centre();
     left();
@@ -3447,7 +3667,7 @@ void drawCamp(App& app) {
         // second scenario only (window 0x15), Collection (161) under the boards
         // (the one lit - the pad's place on them; 3.1.0 a touch held - picture 163 under it: 0xd3770 / 0xd37d0)
         if (main && (c.btnRow == 0 || campButtonHeld(app, 0))) m.picture(163, 12 - 120 * out, 236, 1 - outA);
-        m.picture(162, 12 - 120 * out, 236, 1 - outA); // (windows 0x14 / 0x15: WinDispOn / Off at x -120)
+        m.picture(162, 12 - 120 * out, 236, 1 - outA); // Original drawn Scenarios icon (keep separate from the title-menu text button)
         if (campScenariosNew(app)) m.picture(128, 12 - 120 * out, 236, 1 - outA);
         if (app.game.scenario != 0 && main && (c.btnRow == 1 || campButtonHeld(app, 1))) m.picture(163, 84 - 120 * out, 236, 1 - outA);
         if (app.game.scenario != 0) m.picture(161, 84 - 120 * out, 236, 1 - outA);
@@ -3457,13 +3677,16 @@ void drawCamp(App& app) {
     auto memberPlates = [&](bool lit, float e) {
         rightV();
         for (int k = 0; k < campMembers(app); ++k) {
-            const int word = memberWord(app, campCharacter(app, k));
+            const int character = campCharacter(app, k);
+            const int word = memberWord(app, character); // keep its original member icon
+            const std::string name = sysText(app, 58000 + charNameId(app, character));
             // (window 8: WinDispOn(8, 0x168) - in from 360 to the right, as the main plates go out)
             // (__MuCommon_CharChoiceProc: the plate - or the member's face board - held lights it)
             const bool held = lit && (campPressIn(app, vitaRight(app), kPlateX, kMemberY + kMemberStep * float(k), 136, 40) ||
                                       campPressIn(app, wideLeft(app), 8, 0x30 + 0x58 * float(k), 0xfc, 0x50));
-            m.plate(kPlateX + 360 * (1 - e), kMemberY + kMemberStep * float(k), plateIcon(word), word,
-                    (lit && c.member == k && !app.pointerLast) || held, e, false);
+            const bool gradientName = c.page == App::Camp::Equip || c.page == App::Camp::Status;
+            m.plate(kPlateX + 360 * (1 - e), kMemberY + kMemberStep * float(k), plateIcon(word), -1,
+                    (lit && c.member == k && !app.pointerLast) || held, e, false, name, gradientName);
         }
         left();
     };
@@ -3507,7 +3730,7 @@ void drawCamp(App& app) {
 
                 // (MuScrList_Start / DispActive: WinDispOn / Off(.., 0x1e0) - in from 480 to the right and out to it)
                 const float lx = kRowX + 480 * (1 - e);
-                if (c.list.empty()) m.text("Nothing here.", lx + 56, kFocusY + 16, false, e, 15);
+                if (c.list.empty()) m.text(tr("Nothing here."), lx + 56, kFocusY + 16, false, e, 15);
                 // MuScrList_Draw type 10 (__ChkCampItem): white for what can be used here (its table: 1 while
                 // MuCom_CheckExitItem, 3..6, 24..27), yellow for what either member wears, else grey; no count for a
                 // plate (Part 13 1172.5 s: "Emergency Exit" white, "Key" and the Collection grey)
@@ -3535,8 +3758,8 @@ void drawCamp(App& app) {
                                        current && campPressIn(app, wr, 436, 60, 36, 31));
                 // (a held plate takes the cursor: __ComUty_YesNoChoiceProc)
                 const bool hy = current && campPressIn(app, wr, 336, 104, 136, 40), hn = current && campPressIn(app, wr, 336, 160, 136, 40);
-                m.plate(336 + dx, 104, plateIcon(0), 0, hy || (!hn && current && c.confirm == 0), e, false); // Yes
-                m.plate(336 + dx, 160, plateIcon(1), 1, hn || (!hy && current && c.confirm == 1), e, false); // No
+                m.plate(336 + dx, 104, plateIcon(0), -1, hy || (!hn && current && c.confirm == 0), e, false, tr("Yes"), true); // Yes
+                m.plate(336 + dx, 160, plateIcon(1), -1, hn || (!hy && current && c.confirm == 1), e, false, tr("No"), true); // No
                 centre();
                 // ComUty_MsgBoardDraw(0, 0xdc, .., 0, font 3): picture 12, the mark (picture 13, PictAnimInit(1 tick, 4
                 // frames, 20 px, out and back)) at (458, 298), the line at (24, 234) in the menu font (Part 13 2946 s:
@@ -3560,7 +3783,9 @@ void drawCamp(App& app) {
         const bool gene = c.slot >= 3;
         if (w.plates.e > 0) memberPlates(c.phase == App::Camp::Member, std::min(ease, w.plates.e)); // (the face boards above)
         // the state board (window 10): what the gear list's focus row would make of the member's numbers
-        if (w.board.e > 0) drawShopBoard(app, 12 + w.board.dx, 92, sch, c.phase == App::Camp::List && !gene && item > 0 ? item : 0, w.board.e);
+        if (w.board.e > 0) drawShopBoard(app, 12 + w.board.dx, 92, sch,
+                                           c.phase == App::Camp::List && !gene && item > 0 ? item : 0,
+                                           w.board.e, true, 0, true); // equipment board: selected-font labels and numbers
         if (w.gene.e > 0) { // the gene board (0xb): the plate list's focus row by its entries, a chosen plate by its picture
             const bool picture = c.phase == App::Camp::Entries || (c.phase == App::Camp::Slot && c.prevPhase == App::Camp::Entries);
             const int plate = c.phase == App::Camp::Entries ? c.plate : picture ? pm.genes[std::clamp(c.slot - 3, 0, 2)] : item;
@@ -3634,7 +3859,7 @@ void drawCamp(App& app) {
         }
         drawGeneBoard(app, m, 14, 92, item, ease, 1); // (browsing: the cursor's known entries by name)
         rightV();
-        if (c.list.empty()) m.text("No gene plates.", kRowX + 56, kFocusY + 16, false, ease, 15);
+        if (c.list.empty()) m.text(tr("No gene plates."), kRowX + 56, kFocusY + 16, false, ease, 15);
         // (MuScrList_Draw type 0xb: yellow for a plate either member wears; its HELP the plate's own text -
         // SetIdInfo(0xb, 0xe, .., 1, ..) - Part 5 1132 s "Gene Plate used to record / Dragon abilities")
         scrollList(kRowX, int(c.list.size()), [&](int k, float x, float y, bool lit) {
@@ -3666,7 +3891,7 @@ void drawCamp(App& app) {
                 r.setLayer(keep);
             }
             right(); // (the Vita's board at 0x134 as 3.1.0's; its lists - the table's - 43 to the right)
-            if (c.statusView == 0) drawShopBoard(app, 308 + 200 * (1 - ease), 68, ch, 0, ease, false); // (StateBoardDraw param_11 = 0)
+            if (c.statusView == 0) drawShopBoard(app, 308 + 200 * (1 - ease), 68, ch, 0, ease, false, 0, true); // Status screen: font digits
             else { // (MuScrList mode 0 as the others - code reading only: no video shows the Status page)
                 rightV();
                 scrollList(kRowX, int(c.list.size()), [&](int k, float x, float y, bool lit) {
@@ -3692,13 +3917,13 @@ void drawCamp(App& app) {
     if (campBackShown(app)) { // (lit while a touch holds it - the boxes campClick tests)
         const float ux = app.renderer.uiX() + 2 * v43, by = campBackY(app);
         if (campOkBar(app))
-            m.backOkBar(kBackX, by, campPressIn(app, ux, 0xc0, by, 0x72, 34) ? 1 : campPressIn(app, ux, 0x137, by, 0x72, 34) ? 5 : 0, barA);
+            m.backOkBar(kBackX, by, campPressIn(app, ux, 0xc0, by, 0x72, 34) ? 1 : campPressIn(app, ux, 0x137, by, 0x72, 34) ? 5 : 0, barA, tr("Back"), menuWordText(5));
         else if (campArrows(app))
             m.backButton(kBackX, by, campPressIn(app, ux, 0xf8, by, 0x78, 34) ? 1 : campPressIn(app, ux, 0x175, by, 0x33, 34) ? 2
-                                     : campPressIn(app, ux, 0xc0, by, 0x33, 34) ? 3 : 0, 0, barA);
-        else m.backBar(kBackX, by, campPressIn(app, ux, kBackX, by, 256, 34), barA);
+                                     : campPressIn(app, ux, 0xc0, by, 0x33, 34) ? 3 : 0, app.menuArrowBob, barA, tr("Back"));
+        else m.backBar(kBackX, by, campPressIn(app, ux, kBackX, by, 256, 34), barA, tr("Back"));
     }
-    if (items && !c.pageOut && ease <= 0) m.backBar(kBackX, campBackY(app), false, 1 - outA); // (the main page's going)
+    if (items && !c.pageOut && ease <= 0) m.backBar(kBackX, campBackY(app), false, 1 - outA, tr("Back")); // (the main page's going)
     centre();
 
     // The title and section lines over everything else of the page: the section's line runs over the HELP
@@ -3918,8 +4143,8 @@ void drawResumePrompt(App& app) {
     r.setOrigin(wideRight(app)); // (... the date and Yes / No to its right)
     drawSaveDate(app, m, app.resumeData, a, 360 * out);                    // window 5
     const bool hy = pressIn(app, kPressResume, wideRight(app), 336, 126, 136, 40), hn = pressIn(app, kPressResume, wideRight(app), 336, 176, 136, 40);
-    m.plate(336 + 360 * out, 126, 0, 0, hy || (!hn && app.resumeCursor == 0), a, false); // window 4: Yes (a held plate takes the cursor)
-    m.plate(336 + 360 * out, 176, 1, 1, hn || (!hy && app.resumeCursor == 1), a, false); // No
+    m.plate(336 + 360 * out, 126, 0, -1, hy || (!hn && app.resumeCursor == 0), a, false, tr("Yes"), true); // window 4: Yes (a held plate takes the cursor)
+    m.plate(336 + 360 * out, 176, 1, -1, hn || (!hy && app.resumeCursor == 1), a, false, tr("No"), true); // No
     r.setOrigin(r.uiX());
     drawMsgBoard(app, m, 220 + 160 * out, pictAnimFrame(app.resumeMark, 1, 4), a, w >= 1, {57092, 57093}); // window 7
     r.setOrigin(wideLeft(app));
@@ -4325,8 +4550,12 @@ void drawScenarios(App& app) {
         const float black[4] = {0, 0, 0, 1};
         const float ex = androidEdgeX(app), ey = androidEdgeY(app);
         if (s.mode == 0) {
-            m.quad(-ex, -ey, 480 + 2 * ex, 48 + ey, black, black);
-            m.quad(-ex, 284, 480 + 2 * ex, 36 + ey, black, black);
+            // The Vita is wider than the 3:2 menu layout. Extend the title-mode black bands
+            // beyond the 480-unit menu width so the field cannot show through at either edge.
+            const float maskX = r.vitaScreen() ? -48.0f : -ex;
+            const float maskW = r.vitaScreen() ? 576.0f : 480.0f + 2 * ex;
+            m.quad(maskX, -ey, maskW, 48 + ey, black, black);
+            m.quad(maskX, 284, maskW, 36 + ey, black, black);
         } else if (r.vitaScreen()) { // Vita layout: masks stay behind the TIME and OZ digits
             m.quad(-48, -32, 576, 80, black, black);
             m.quad(-48, 284, 576, 100, black, black);
@@ -4368,22 +4597,71 @@ void drawScenarios(App& app) {
         m.quad(240, y + 34, 240, 1, white, edge);
     };
     auto rate = [&](int which, int value, float alpha) {
+        const auto scenarioText = [&](const std::string& text, float x, float y, float size) {
+            m.textCentred(text, x, y, false, alpha, size, true, false, false, 0, true);
+        };
         const float y = which ? 248 : 131;
-        for (int k = 0; k < 24; ++k) sheet(15, 20.0f * float(k), y, alpha);
+        // The source atlas tile is uniform black RGBA(0, 0, 0, 156).
+        // Use the requested muted grey in the renderer, preserving the source alpha.
+        const float bandGrey[4] = {
+            0x56 / 255.0f, 0x58 / 255.0f, 0x53 / 255.0f,
+            alpha * (156.0f / 255.0f)
+        };
+        m.quad(0, y, 480, 34, bandGrey, bandGrey);
         rateLine(which, alpha);
-        // (__Birthday_PictNumDraw: three digits from (385, y), the first at z -2, under the label)
-        const int d[3] = {value / 100 % 10, value / 10 % 10, value % 10};
-        const short* q = kSheetPict[5];
-        const float k = sheetScale(s.sheet);
-        for (int i = 0; i < 3; ++i)
-            m.imagePieceTo(s.sheet, 385 + 24.0f * float(i), which ? 254 : 136, q[2], q[3], (q[0] + q[2] * d[i]) * k, q[1] * k,
-                           q[2] * k, q[3] * k, alpha);
-        sheet(4, 315, which ? 254 : 136, alpha);
-        sheet(which ? 3 : 2, which ? 4 : 8, which ? 248 : 138, alpha);
+        // The three digits, Achievement and percent are rendered with the selected menu font.
+        // Keep the original three fixed digit slots (including leading zeroes).
+        const std::string digits = std::to_string(value / 100 % 10) +
+                                   std::to_string(value / 10 % 10) +
+                                   std::to_string(value % 10);
+        const float labelY = which ? 254.0f : 136.0f;
+        constexpr float digitSize = 26.0f;
+        const float percentX = 315.0f + 140.5f;
+        const float digitWidth = m.textWidth(digits, digitSize);
+        const float digitX = percentX - digitWidth; // digits end exactly where the percent sign begins
+        scenarioText(digits, digitX, labelY + 12.0f, digitSize);
+
+        const std::string achievement = tr("Achievement");
+        constexpr float achievementSize = 14.0f;
+        const float achievementX = 315.0f + 9.0f;
+
+        // Preserve the original underline, but draw it before its label so the text stays on top.
+        const float lineLeft[4] = {0xd1 / 255.0f, 0xcf / 255.0f, 0xd1 / 255.0f, alpha};
+        const float lineMid[4] = {0x6b / 255.0f, 0x6b / 255.0f, 0x6c / 255.0f, alpha};
+        const float lineRight[4] = {0xd1 / 255.0f, 0xcf / 255.0f, 0xd1 / 255.0f, alpha};
+        m.quad(322.0f, labelY + 25.0f, 76.0f, 1.0f, lineLeft, lineMid);
+        m.quad(398.0f, labelY + 25.0f, 76.0f, 1.0f, lineMid, lineRight);
+
+        // Text after the underline: keep Achievement and % in front of the rule.
+        scenarioText(achievement, achievementX, labelY + 17.5f, achievementSize);
+        scenarioText("%", percentX, labelY + 16.0f, 18.0f);
+
+        if (which) {
+            // Extra replaces its 128 x 35 atlas tile, centred in that original rectangle.
+            const std::string extra = tr("Extra");
+            float extraSize = 28.0f;
+            float extraWidth = m.textWidth(extra, extraSize);
+            if (extraWidth > 124.0f && extraWidth > 0.0f) {
+                extraSize *= 124.0f / extraWidth;
+                extraWidth = m.textWidth(extra, extraSize);
+            }
+            scenarioText(extra, 4.0f + (128.0f - extraWidth) * 0.5f, 265.5f, extraSize);
+        } else {
+            // The first row's character label is an illustration in the atlas, not UI copy.
+            // Vieg replaces the original 144 x 35 atlas wordmark.
+            const std::string vieg = tr("Vieg");
+            float viegSize = 28.0f;
+            float viegWidth = m.textWidth(vieg, viegSize);
+            if (viegWidth > 140.0f && viegWidth > 0.0f) {
+                viegSize *= 140.0f / viegWidth;
+                viegWidth = m.textWidth(vieg, viegSize);
+            }
+            scenarioText(vieg, 36.0f - viegWidth * 0.5f, 138.0f + 12.5f, viegSize);
+        }
     };
     if (s.card < 0) { // __menuu_SccnariosPut, windows 0..5
         drawClockAndOz(app, m, a);
-        m.picture(160, 8, 4, a);
+        m.headingStrip(8, 4, tr("Scenarios"), a, 216, 17, 15.25f);
         sheet(0, 13, 48, a);
         for (int i = 2; i < 8; ++i)
             if (flags(app).flag(0x518 + i - 2)) sheet(1, 15 + 57.0f * float(i), 50, a);
@@ -4410,7 +4688,7 @@ void drawScenarios(App& app) {
         }
         { // (the Vita's at 0xeb = 235)
             const float v = vitaEdge43(app);
-            m.backBar(192 + v, 288, pressIn(app, kPressScenarios, app.renderer.uiX(), 192 + v, 286, 256, 34), a); // (lit while held: DAT_000ed27c)
+            m.backBar(192 + v, 288, pressIn(app, kPressScenarios, app.renderer.uiX(), 192 + v, 286, 256, 34), a, tr("Back")); // (lit while held: DAT_000ed27c)
         }
         sideMasks();
         return;
@@ -4472,7 +4750,7 @@ void drawScenarios(App& app) {
     { // window 10: < Back > - the part held lit (DAT_000ed5e4: 1 Back, 2 right, 3 left)
         const float ux = app.renderer.uiX(), v = vitaEdge43(app); // (the Vita's at 0xeb = 235)
         m.backButton(192 + v, 288, pressIn(app, kPressScenarios, ux, 248 + v, 286, 120, 34) ? 1 : pressIn(app, kPressScenarios, ux, 373 + v, 286, 51, 34) ? 2
-                               : pressIn(app, kPressScenarios, ux, 192 + v, 286, 51, 34) ? 3 : 0, s.bob, a);
+                               : pressIn(app, kPressScenarios, ux, 192 + v, 286, 51, 34) ? 3 : 0, app.menuArrowBob, a, tr("Back"));
     }
     drawShopNumber(m, presentsUsed(app), 0, 296, 2, 12, a); // window 11: presents used / all
     m.picture(66, 24, 296, a);
@@ -4719,7 +4997,7 @@ void drawCollection(App& app) {
         pict(14, 444 + dx, 240, t);
     }
     const float v = vitaEdge43(app); // (the Vita's Back at 0xeb = 235)
-    m.backBar(192 + v, 288, pressIn(app, kPressCollection, app.renderer.uiX(), 192 + v, 286, 256, 34), t); // (lit while held: DAT_000ed638)
+    m.backBar(192 + v, 288, pressIn(app, kPressCollection, app.renderer.uiX(), 192 + v, 286, 256, 34), t, tr("Back")); // (lit while held: DAT_000ed638)
 }
 
 void collectionKey(App& app, SDL_Keycode key) {
@@ -4908,7 +5186,7 @@ void drawManual(App& app) {
     if (!app.manualIntro) {
         const PhoneFit phoneFit(app, m); // the iPhone layout: its screen's menu coordinates
         const float a = std::min(1.0f, app.manualAnim / 8.0f);
-        m.picture(103, 8, 4, a); // "Options" (_stMuPictInfo_Option)
+        m.headingStrip(8, 4, tr("Options"), a, 216, 22, 20.5f);
         m.text(sysLabel(app, 58081, "Instruction Manual"), 236, 14, false, a, 16);
         // The list (MuScrList: windows 7 and 8) fades out as a topic opens and is off while it's up
         const float la = mm.state == 0 ? a : mm.state == 1 ? a * float(std::max(0, mm.count)) / 4.0f : 0.0f;
@@ -4920,8 +5198,8 @@ void drawManual(App& app) {
             }
             if (app.manualTop > 0) m.text("...", 100, 40, false, la, 12);
             if (app.manualTop + kManualRows < int(topics.size())) m.text("...", 100, 52 + 32.0f * kManualRows - 6, false, la, 12);
-            m.backButton(192, 344, false, 0, la);
-            if (app.showHud) m.text("Up/Down  Enter: read  Esc: back", 20, 372, false, la * 0.8f, 9); // (our key hints)
+            m.backButton(192, 344, false, app.menuArrowBob, la, tr("Back"));
+            if (app.showHud) m.text(tr("Up/Down  Enter: read  Esc: back"), 20, 372, false, la * 0.8f, 9); // (our key hints)
         }
     }
     if (mm.state < 2) return;
@@ -4998,6 +5276,31 @@ constexpr int kScenarioWord[2] = {12, 17};
 bool laterPairsOpen(const App& app) { return allPairsFlags(app).flag(31); } // StartSet: the second page
 
 
+bool loadVitaHdLayers(App& app, const std::string& artName, const std::string& textName,
+                      std::array<cr::Texture, 2>& layers) {
+    if (!app.renderer.vitaScreen() || !app.video.hdTextures || !app.video.vitaOutpaint || app.hdDir.empty())
+        return false;
+    if (layers[0].id && layers[1].id) return true;
+    for (cr::Texture& tex : layers) app.renderer.destroy(tex);
+    cr::Image art, text;
+    std::string why;
+    if (!cr::loadNamedHdImage(app.hdDir, artName, art, &why)) {
+        if (!why.empty()) SDL_Log("Vita HD artwork %s: %s", artName.c_str(), why.c_str());
+        return false;
+    }
+    if (!cr::loadNamedHdImage(app.hdDir, textName, text, &why)) {
+        if (!why.empty()) SDL_Log("Vita HD text layer %s: %s", textName.c_str(), why.c_str());
+        return false;
+    }
+    layers[0] = app.renderer.upload(art);
+    layers[1] = app.renderer.upload(text);
+    return layers[0].id && layers[1].id;
+}
+
+void drawVitaHdLayer(App& app, const cr::Texture& layer, float alpha, float top = 0, float grey = 1) {
+    if (layer.id) app.renderer.drawQuadFullBleed(layer, top, alpha, grey, grey, grey);
+}
+
 void openCharSelect(App& app) {
     app.charSelectOpen = true;
     app.charSelectAnim = 0;
@@ -5005,10 +5308,17 @@ void openCharSelect(App& app) {
     app.charSelectCursor = 0;
     app.renderer.destroy(app.charSelectArt);
     app.renderer.destroy(app.charSelectArt2);
+    for (cr::Texture& tex : app.charSelectArtHd) app.renderer.destroy(tex);
+    for (cr::Texture& tex : app.charSelectArt2Hd) app.renderer.destroy(tex);
     const cr::GameState g = allPairsFlags(app);
+    const std::string firstStem = g.flag(0x6a2) || g.flag(0x4bd) ? "chara2" : "chara1";
     cr::Image img;
-    if (loadImage(app, g.flag(0x6a2) || g.flag(0x4bd) ? "chara2.mct" : "chara1.mct", img)) app.charSelectArt = app.renderer.upload(img);
-    if (g.flag(31) && loadImage(app, "chara3.mct", img)) app.charSelectArt2 = app.renderer.upload(img);
+    if (loadImage(app, firstStem + ".mct", img)) app.charSelectArt = app.renderer.upload(img);
+    loadVitaHdLayers(app, firstStem + "_hd1", firstStem + "_hd2", app.charSelectArtHd);
+    if (g.flag(31)) {
+        if (loadImage(app, "chara3.mct", img)) app.charSelectArt2 = app.renderer.upload(img);
+        loadVitaHdLayers(app, "chara3_hd1", "chara3_hd2", app.charSelectArt2Hd);
+    }
     app.renderer.destroy(app.startPage.serect);
     app.startPage = App::StartPage();
     app.startPage.y = pageTop(app);
@@ -5134,13 +5444,20 @@ void closeCharSelect(App& app, int scenario) { // __menuu_StartClr: var 0 = 0 (B
     app.charSelectOpen = false;
     app.game.vars[0] = scenario;
     if (scenario) app.chosenPair = scenario;
-    else app.renderer.destroy(app.charSelectArt); // (a scenario: the save screen shows it too - showMap frees it)
-    if (scenario == 2 && app.charSelectArt2.id) { // SaveLoadPut: slot 0x12 (chara3) for the second scenario
+    else {
+        app.renderer.destroy(app.charSelectArt); // (a scenario: the save screen shows it too - showMap frees it)
+        for (cr::Texture& tex : app.charSelectArtHd) app.renderer.destroy(tex);
+    }
+    if (scenario == 2 && (app.charSelectArt2.id || app.charSelectArt2Hd[0].id)) {
         app.renderer.destroy(app.charSelectArt);
+        for (cr::Texture& tex : app.charSelectArtHd) app.renderer.destroy(tex);
         app.charSelectArt = app.charSelectArt2;
         app.charSelectArt2 = cr::Texture();
+        app.charSelectArtHd = app.charSelectArt2Hd;
+        app.charSelectArt2Hd = {};
     }
     app.renderer.destroy(app.charSelectArt2);
+    for (cr::Texture& tex : app.charSelectArt2Hd) app.renderer.destroy(tex);
     app.renderer.destroy(app.startPage.serect);
     app.startPage = App::StartPage();
     app.charSelectPage = 0;
@@ -5167,20 +5484,33 @@ void drawFullPicture(App& app, const cr::Texture& tex, int pict, float x, float 
                           p[3] * k, alpha, grey, grey, grey);
 }
 
-void drawCharArt(App& app, float alpha, bool banner, float grey) {
-    const cr::Texture& tex = app.charSelectPage && app.charSelectArt2.id ? app.charSelectArt2 : app.charSelectArt;
+void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
+    const bool secondPage = app.charSelectPage && app.charSelectArt2.id;
+    const auto& hdPair = secondPage ? app.charSelectArt2Hd : app.charSelectArtHd;
+    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && hdPair[banner ? 1 : 0].id) {
+        drawVitaHdLayer(app, hdPair[banner ? 1 : 0], alpha, top, grey);
+        return;
+    }
+    const cr::Texture& tex = secondPage ? app.charSelectArt2 : app.charSelectArt;
     if (!tex.id) return;
     cr::MenuPainter& m = app.menu;
     const bool phone = app.renderer.phoneLayout();
     const float x = phone ? 0.0f : -32.0f, y = phone ? 0.0f : -64.0f;
-    const auto draw = [&](int pict, float dy) {
+    const auto draw = [&](int pict, float dx, float dy, float sourceY = -1.0f) {
         const short* p = cr::kOutReadPicture[pict];
         const float k = sheetScale(tex);
-        m.imagePieceTo(tex, x, y + dy, p[2], p[3], p[0] * k, p[1] * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
+        const float v = sourceY >= 0.0f ? sourceY : float(p[1]);
+        m.imagePieceTo(tex, x + dx, y + dy, p[2], p[3], p[0] * k, v * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
     };
-    if (banner) draw(phone ? 26 : 27, -androidEdgeY(app));
-    else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
-    else draw(phone ? 22 : 24, 0);
+    // Keep the native atlas banner as its own picture (Vita #26, otherwise the iPad #27).
+    // Its source row is 320 in the half-size picture table (pixel 641 on the doubled sheet).
+    const bool vitaSheet = tex.vitaSource || app.vitaOnly || app.renderer.vitaScreen();
+    if (banner) {
+        const float vitaLayer3Top = app.renderer.vitaScreen() ? 30.0f : 0.0f;
+        draw(phone || vitaSheet ? 26 : 27, 0.0f,
+             -androidEdgeY(app) + vitaLayer3Top, vitaSheet ? 320.0f : -1.0f);
+    } else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
+    else draw(phone ? 22 : 24, 0.0f, 0.0f, -1.0f);
 }
 
 void drawCharSelect(App& app) {
@@ -5197,11 +5527,20 @@ void drawCharSelect(App& app) {
     { // window 0: the first page's art (z -20)
         const int page = app.charSelectPage;
         app.charSelectPage = 0;
+        const int keepLayer = r.layer();
+        r.setLayer(3);
         drawCharArt(app, t, false);
+        r.setLayer(keepLayer);
         app.charSelectPage = page;
     }
     if (later && sp.shown) { // window 1: the second page's, falling (chara3 24 and 32 under it; iPhone 22 / 31)
-        if (r.androidScreen()) { // (22 fitted as the first page's; 31, its foot, + oy: _PictTexNoDrawFull2W)
+        const int keepLayer = r.layer();
+        r.setLayer(3);
+        if (r.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint &&
+            app.charSelectArt2Hd[0].id && app.charSelectArt2Hd[1].id) {
+            const float top = sp.y * 2.0f * r.layoutScale();
+            drawVitaHdLayer(app, app.charSelectArt2Hd[0], t, top);
+        } else if (r.androidScreen()) { // (22 fitted as the first page's; 31, its foot, + oy: _PictTexNoDrawFull2W)
             drawFullPicture(app, app.charSelectArt2, 22, 0, sp.y, t);
             outPicture(m, app.charSelectArt2, 31, 0, sp.y + 320 + androidEdgeY(app), t);
         } else if (phone) {
@@ -5211,11 +5550,17 @@ void drawCharSelect(App& app) {
             outPicture(m, app.charSelectArt2, 24, -32, sp.y - 64, t);
             outPicture(m, app.charSelectArt2, 32, -16, sp.y + 352, t);
         }
+        r.setLayer(keepLayer);
     }
-    m.backBar(124, 288, pressIn(app, kPressCharSelect, app.renderer.uiX(), 124, 288, 232, 24), t); // ComUty_BackButtonPosSetXYDraw(124, 288), mode 1; lit while held
+    m.backBar(124, 288, pressIn(app, kPressCharSelect, app.renderer.uiX(), 124, 288, 232, 24), t, tr("Back")); // ComUty_BackButtonPosSetXYDraw(124, 288), mode 1; lit while held
     const int word = kScenarioWord[app.charSelectPage & 1];
-    m.plate(172, 232, plateIcon(word), word,
-            (app.charSelectCursor == 0 && !app.pointerLast) || pressIn(app, kPressCharSelect, app.renderer.uiX(), 172, 232, 136, 40), t, false); // (StartPrc's DAT_000ecad8: held)
+    // The first scenario's Vieg label is word 12 in the raster atlas; use the same system-font
+    // entry as the Camp member names instead. Keep the atlas-derived button icon unchanged.
+    const bool fontName = word == 12;
+    const std::string scenarioName = fontName ? sysText(app, 58000 + 0xbc) : std::string();
+    m.plate(172, 232, plateIcon(word), fontName ? -1 : word,
+            (app.charSelectCursor == 0 && !app.pointerLast) || pressIn(app, kPressCharSelect, app.renderer.uiX(), 172, 232, 136, 40),
+            t, false, scenarioName, fontName); // (StartPrc's DAT_000ecad8: held)
     if (later && sp.serect.id) { // window 2: the cord (serect 29, tex2d_add at (260, pull - 205), turned), the arrow while held, 28
         const short* q = cr::kOutReadPicture[29];
         const float k = sheetScale(sp.serect);
@@ -5229,7 +5574,12 @@ void drawCharSelect(App& app) {
     { // window 3: the banner over it all (z -4) - chara3's once the second page is open
         const int page = app.charSelectPage;
         app.charSelectPage = later ? 1 : 0;
-        drawCharArt(app, t, true);
+        const int keepLayer = r.layer();
+        r.setLayer(3);
+        const float top = later && sp.shown && app.charSelectArt2Hd[1].id
+            ? sp.y * 2.0f * r.layoutScale() : 0.0f;
+        drawCharArt(app, t, true, 1.0f, top);
+        r.setLayer(keepLayer);
         app.charSelectPage = page;
     }
     if (keyHints(app)) // (our key hints)
@@ -5273,10 +5623,8 @@ void charSelectClick(App& app, float px, float py) {
 // own art from TitleSet's two sheets - title1 (slot 0x11) and chaos (0x12), group-1 pictures
 // (kOutReadPicture): on the iPad chaos's 6 (the logo) at (0, -32), title1's 9 at (184, 252) and
 // 10 at (0, 312); on the iPhone 6 at (0, 0), 7 at (184, 220), 8 at (0, 280) - then three plates
-// (ComUty_ChoicePlateDraw) at (328, 114 + 56k): Start, Scenarios, Options (words 2, 32, 3,
-// gnPlateNameTbl), and down the left pictures 125 / 126 at (8, 16) / (8, 96) (127 at (8, 176)
-// only with Game Center)
-constexpr int kTitleWords[3] = {2, 32, 3};
+// (ComUty_ChoicePlateDraw) at (328, 114 + 56k): Start, Scenarios and Options; their icons
+// are retained, while every label is drawn by the port's selected font (as the desktop's Quit is)
 constexpr int kTitleIcons[3] = {2, 27, 3};
 
 bool titleChoiceReady(int) { return true; }
@@ -5310,6 +5658,11 @@ void drawTitleMenu(App& app) {
             if (loadImage(app, kTitleSheet[k], img)) app.titleArt[k] = app.renderer.upload(img);
             if (k == 0) app.titleArtIpad = app.ipadImages > ipadBefore;
         }
+    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && !app.titleArtHdTried) {
+        app.titleArtHdTried = true;
+        loadVitaHdLayers(app, "title1_hd1", "title1_hd2", app.titleArtHd[0]);
+        loadVitaHdLayers(app, "title2_hd1", "title2_hd2", app.titleArtHd[1]);
+    }
     m.begin(app.renderer, app.windowTex, &app.font, app.cleanTextOutline);
     const PhoneMenu phoneMenu(app, m); // the iPhone layout: its screen's menu coordinates
     // TitlePrc: the title's art alone (windows 0 / 1: the logo and the name, the strip below) until
@@ -5322,10 +5675,18 @@ void drawTitleMenu(App& app) {
     // none, the Vita's, the iPad layout gets title1_hd, cut as the iPhone's 7 / 8 - the places by layout)
     const int name = app.titleArtIpad ? 9 : 7, strip = app.titleArtIpad ? 10 : 8;
     const bool vita = app.renderer.vitaScreen();
-    if (vita) {
-        // The Vita's __menuu_TitlePut (its table at 0x81123108): the name 7 at (184, 220), the chaos logo 6 at
-        // (0, 24), the strip 8 at (0, 264) - title1 / chaos read by _MuCom_MctTexRead, its pictures kind 3
-        // (FUN_81015be8: full size, the pictures' layer)
+    if (vita && app.video.hdTextures && app.video.vitaOutpaint &&
+        app.titleArtHd[0][0].id && app.titleArtHd[0][1].id &&
+        app.titleArtHd[1][0].id && app.titleArtHd[1][1].id) {
+        const int keep = app.renderer.layer();
+        app.renderer.setLayer(3);
+        drawVitaHdLayer(app, app.titleArtHd[0][0], logo);
+        drawVitaHdLayer(app, app.titleArtHd[0][1], logo);
+        drawVitaHdLayer(app, app.titleArtHd[1][0], logo);
+        drawVitaHdLayer(app, app.titleArtHd[1][1], logo);
+        app.renderer.setLayer(keep);
+    } else if (vita) {
+        // Original Vita texture behaviour: its own crop, scale and edge-filling title strip.
         const int keep = app.renderer.layer();
         app.renderer.setLayer(3);
         outPicture(m, app.titleArt[0], name, 184, 220, logo);
@@ -5353,17 +5714,10 @@ void drawTitleMenu(App& app) {
         app.renderer.setOrigin(vitaRight(app)); // (widescreen: the plates to the screen's right)
         for (int i = 0; i < kTitlePlates; ++i) {
             const bool lit = (app.titleCursor == i && !app.pointerLast) || pressIn(app, kPressTitle, vitaRight(app), 328, titlePlateY(i), 136, 40);
-            if (i == 3) { // (the sheet's x; "Exit" in its lettering - Extra's "Ex" and "t", Vieg's "i" - while the sheet is
-                          // the English one and so is the port's text, else our word)
-                const bool english = !app.vita.isOpen() && !(app.fanText && app.fan.isOpen()) && uitext::language() == "en";
-                m.plate(328 + dx, titlePlateY(i), 1, -1, lit, pa, false, english ? std::string() : std::string(tr("Quit")));
-                if (english) {
-                    const float x = 328 + dx + 84 - 18.25f, y = titlePlateY(i) + 8; // (36.5 wide, centred on the word's 88)
-                    m.piece(x, y, 196, 584, 24.5f, 24, pa);           // "Ex" (Extra, word 17)
-                    m.piece(x + 24.5f, y, 216, 560, 5, 24, pa);       // "i" (Vieg, word 12)
-                    m.piece(x + 29.5f, y, 220.5f, 584, 7, 24, pa);    // "t" (Extra)
-                }
-            } else m.plate(328 + dx, titlePlateY(i), kTitleIcons[i], kTitleWords[i], lit, pa, !titleChoiceReady(i));
+            const char* label = i == 0 ? tr("Start Game") : i == 1 ? tr("Scenarios") :
+                                i == 2 ? tr("Options") : tr("Quit");
+            const int icon = i < 3 ? kTitleIcons[i] : 1; // the desktop's Quit uses its X icon
+            m.plate(328 + dx, titlePlateY(i), icon, -1, lit, pa, !titleChoiceReady(i), label, true);
         } // (lit: the keys' cursor, or a touch holding it - TitlePrc's DAT_000ecb60)
         app.renderer.setOrigin(wideLeft(app)); // (... and the pictures down the left to its left)
         if (!vita) { // (the Vita's TitlePut draws none of them)
@@ -5373,7 +5727,7 @@ void drawTitleMenu(App& app) {
         }
     }
     if (keyHints(app) && !app.resumeNotice && !app.resumePrompt) // (our key hints)
-        m.text("Up/Down  Enter  V: Options  A: Achievements  Esc: quit", 20, 360, false, t * 0.8f, 9);
+        m.text(tr("Up/Down  Enter  V: Options  A: Achievements  Esc: quit"), 20, 360, false, t * 0.8f, 9);
     app.renderer.setOrigin(app.renderer.uiX());
 }
 
@@ -5672,8 +6026,8 @@ void drawAchievementList(App& app) {
     // (the knob as ComUty_GuageBarDraw's: 3876 s, scrolled 683.5, its top at 280; at the end 544 - as here)
     const int n = int(a.listRows.size());
     if (n > 1) drawScrGauge(m, 460, 34, 244, n, -a.listScroll, kRowH, 0, t);
-    m.backBar(192, 288, pressIn(app, kPressCollection, app.renderer.uiX(), 192, 286, 256, 34), t); // (lit while held: DAT_000ed638)
-    if (keyHints(app)) m.text("Up/Down  Esc: back", 8, 300, false, t * 0.8f, 9); // (our key hints)
+    m.backBar(192, 288, pressIn(app, kPressCollection, app.renderer.uiX(), 192, 286, 256, 34), t, tr("Back")); // (lit while held: DAT_000ed638)
+    if (keyHints(app)) m.text(tr("Up/Down  Esc: back"), 8, 300, false, t * 0.8f, 9); // (our key hints)
     r.setOrigin(r.uiX());
 }
 

@@ -23,6 +23,7 @@ struct Texture {
     bool noAlpha = false; // (Image::noAlpha: a mesh's GL_REPLACE keeps the fragment's alpha)
     bool cutout = false; // (an HD texture standing in for a cut-out: see Image::cutout)
     bool hdSheet = false; // (Image::hdSheet: a _hd / _ipad file's - its pictures at twice their units)
+    bool vitaSource = false; // (Image::vitaSource: loaded from a Vita GXT)
 };
 
 // A mesh uploaded to the GPU: interleaved position/uv plus a triangle index buffer.
@@ -64,6 +65,10 @@ public:
     // Draws `tex` into the logical-space rectangle (x, y, w, h), top-left origin.
     void drawQuad(const Texture& tex, float x, float y, float w, float h,
                   float r = 1, float g = 1, float b = 1, float a = 1);
+    // Draws a centre-cropped full-screen layer in logical screen coordinates, bypassing the
+    // phone layout and UI safe-area transforms. Intended for paired Vita 16:9 HD artwork.
+    void drawQuadFullBleed(const Texture& tex, float top = 0, float alpha = 1,
+                           float r = 1, float g = 1, float b = 1);
     // As drawQuad, showing only the texture's pixel rectangle (sx, sy, sw, sh).
     void drawQuadUV(const Texture& tex, float x, float y, float w, float h, float sx, float sy, float sw, float sh,
                     float r = 1, float g = 1, float b = 1, float a = 1);
@@ -147,6 +152,7 @@ public:
     float layoutScale() const {
         return androidScreen() ? kAndroidScale : vitaScreen() && (layer_ == 3 || layer_ == 7) ? kPhoneScale / 0.85f : kPhoneScale;
     }
+    // Vita's scenario artwork fills the wider screen without enlarging/cropping its vertical title.
     void layoutToScreen(float& x, float& y) const;
     // The visible screen's right / top edge in the layout's units (toLogical's)
     float layoutRight() const { return phone_ ? screenW_ * 0.5f + screenW_ * 0.5f / layoutScale() : screenW_; }

@@ -4,6 +4,8 @@
 // its coordinates doubled too) and plain colour (slot 45). Text uses the font the game's text
 // uses (gfx/font.hpp) at its size: 14 menu units.
 
+#include <array>
+#include <cstdint>
 #include <map>
 #include <string>
 
@@ -21,6 +23,9 @@ public:
         font_ = font;
         cleanOutline_ = cleanOutline;
     }
+    void setXboxPrompts(bool enabled) { xboxPrompts_ = enabled; }
+    // Draw the layout's primary / secondary face button: PS X / O or Xbox A / B.
+    void buttonPrompt(float x, float y, float size, bool secondary, float alpha = 1);
     void release(Renderer& r); // the cached text
     // Everything drawn after this is scaled by k about (x, y) (our denser Options pages draw
     // the game's controls at 85%); k = 1 turns it off
@@ -71,14 +76,23 @@ public:
     void setOutline(bool on) { outline_ = on; }
     void setCleanOutline(bool on) { cleanOutline_ = on; }
     // Text with its top-left at (x, y), 14 units high; dark = black (style 1), else white
-    void text(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14);
-    float textWidth(const std::string& s, float size = 14);
+    void text(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
+              bool verticalGradient = false, bool darkGradient = false, bool noOutline = false, float letterSpacing = 0,
+              bool scenarioVerticalGradient = false);
+    float textWidth(const std::string& s, float size = 14, float letterSpacing = 0);
+    // Vertical offset from a centred line box to the actual font baseline, in menu units.
+    float baselineFromCentre(float size = 14) const;
     // ... in a colour (MuComFontPlateDisp's colours: the plates' yellow, grey)
-    void textTint(const std::string& s, float x, float y, float r, float g, float b, float alpha = 1, float size = 14);
+    void textTint(const std::string& s, float x, float y, float r, float g, float b, float alpha = 1, float size = 14,
+                  bool verticalGradient = false);
     // Text whose line box is centred on y (labels in bars and on buttons: this font's box is
     // taller than the iOS system font's, so a fixed top offset would sit low)
-    void textCentred(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14);
+    void textCentred(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
+                     bool verticalGradient = false, bool darkGradient = false, bool noOutline = false,
+                     float letterSpacing = 0, bool scenarioVerticalGradient = false);
 
+    // Rebuild a window_hd section's fading white strip and draw its label with the selected font.
+    void headingStrip(float x, float y, const std::string& label, float alpha = 1, float width = 216, float textSize = 20, float textOffset = 20, bool fullWidthFade = false);
     // ComUty_OptCategoryDraw: a 24-tall white bar (100 solid, 123 fading out, alpha up to
     // 0xB3) with the label in black at (x + 8, y + 5). `highlight` tints the bar (keyboard
     // cursor - an addition: the original is touch-only)
@@ -86,23 +100,25 @@ public:
     void rowBar(float x, float y, const std::string& label, float alpha, bool highlight, float shade = 1, float cap = 179.0f / 255.0f);
     // ComUty_CmdBottom: a button at (x, y), 104 x 40 base, 112 x 32 face; the label is word
     // picture `word` (5 x 88 x 24 grid at (0, 512)) or, when word < 0, `text`
-    void button(float x, float y, int word, const std::string& text, bool selected, float alpha, bool highlight);
+    void button(float x, float y, int word, const std::string& text, bool selected, float alpha, bool highlight,
+                bool verticalGradient = false);
     // __ComUty_CmdBottom (ComUty_ChoicePlateDraw, the title menu): a 132-wide plate at (x, y),
     // a 32 x 32 icon (kanIconNoTbl - 1; 16 per row from (0, 376)) and word picture `word`
     // (no word picture for it: `text` instead)
     void plate(float x, float y, int icon, int word, bool selected, float alpha, bool dimmed,
-               const std::string& text = std::string());
+               const std::string& text = std::string(), bool gradientText = false);
     // ComUty_SideGuageDraw: the track at (x, y), the fill and knob for `value` 0..100
     // (active: the Vita's light cyan fill on the cursor's gauge; fill: where the fill ends, easing to the knob - < 0 at it)
     void gauge(float x, float y, int value, float alpha, bool active, float fill = -1);
     // ComUty_CmdBack type 2: the Back bar at (x, y), `pressed` lights it, `bob` 0..5 moves the arrows
-    void backButton(float x, float y, int pressed, int bob, float alpha); // pressed: 0 none, 1 Back, 2 right, 3 left
-    // ComUty_CmdBack type 1 (the shop's): a plain 232-wide bar, white fading in over 24 at each end,
-    // "Back" at x + 82
-    void backBar(float x, float y, bool pressed, float alpha);
+    void backButton(float x, float y, int pressed, int bob, float alpha, const std::string& label = std::string()); // pressed: 0 none, 1 Back, 2 right, 3 left; optional font label
+    // The value picker's arrows: vector triangles with the Back bar's original 0..5 bob.
+    void pickerArrows(float leftX, float rightX, float y, float size, int bob, float alpha);
+    // ComUty_CmdBack type 1 (the shop's): a 232-wide fading bar with a vector up-pointing triangle and a font-rendered label
+    void backBar(float x, float y, bool pressed, float alpha, const std::string& label);
     // ComUty_CmdBack type 3: Back (x .. x + 114, faded in over 24, the word at + 36) and OK (x + 118 .. x + 208,
     // fading out to 232, its word (sheet (76, 224) 64 x 20) at (+126, +2)); `pressed` 1 lights Back, 5 OK
-    void backOkBar(float x, float y, int pressed, float alpha);
+    void backOkBar(float x, float y, int pressed, float alpha, const std::string& label, const std::string& okLabel);
     // The 14 x 14 digits of sheet 0 (0 at (0, 0), then every 14 units) and "/" (picture 66)
     void digit(int d, float x, float y, float alpha = 1);
 
@@ -126,8 +142,17 @@ private:
         int generation = -1;
     };
     std::map<std::string, Cached> text_;
-    Texture white_;
-    Cached& rasterise(const std::string& s, float size);
+    std::map<std::array<uint8_t, 8>, Texture> gradients_;
+    std::array<Texture, 2> promptButtonTex_{};
+    std::array<int, 2> promptButtonTexCorePixels_{};
+    std::array<bool, 2> promptButtonTexXbox_{};
+    bool xboxPrompts_ = false;
+    void arrowTriangle(float x, float y, float w, float h, bool pointsRight, float alpha);
+    void promptButton(float x, float y, float size, bool secondary, float alpha);
+    void crossButton(float x, float y, float size, float alpha);
+    Cached& rasterise(const std::string& s, float size, bool perGlyphVerticalGradient = false,
+                      bool darkVerticalGradient = false, float letterSpacing = 0,
+                      bool scenarioVerticalGradient = false);
 };
 
 } // namespace cr

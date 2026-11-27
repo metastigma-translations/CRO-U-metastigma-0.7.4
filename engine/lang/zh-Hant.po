@@ -28,9 +28,17 @@ msgstr "效能"
 msgid "Ultra Perf."
 msgstr "極致效能"
 
-#: src/app/app.hpp src/app/scene_fx.cpp
+#: src/app/app.hpp src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Off"
 msgstr "關閉"
+
+#: src/app/battle.cpp
+msgid "Results"
+msgstr ""
+
+#: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
+msgid "Back"
+msgstr "返回"
 
 #: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Quit Game"
@@ -52,9 +60,233 @@ msgstr "非官方翻譯"
 msgid "{0} (fan translation)"
 msgstr "{0}（非官方翻譯）"
 
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Yes"
+msgstr "是"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "No"
+msgstr "否"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "OK"
+msgstr "OK"
+
+#: src/app/menus.cpp
+msgid "Start Game"
+msgstr "開始"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Options"
+msgstr "選項"
+
+#: src/app/menus.cpp
+msgid "New"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Load"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Items"
+msgstr "道具"
+
+#: src/app/menus.cpp
+msgid "Equipment"
+msgstr "裝備"
+
+#: src/app/menus.cpp
+msgid "Genes"
+msgstr "基因"
+
+#: src/app/menus.cpp
+msgid "Status"
+msgstr "狀態"
+
+#: src/app/menus.cpp
+msgid "Extra"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Pair"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Solo"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Escape"
+msgstr ""
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Check"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Attack"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Defend"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Talk"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Buy"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Sell"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Weapons"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Armor"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Jewel"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Scenarios"
+msgstr "劇情"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "On"
+msgstr "開啟"
+
+#: src/app/menus.cpp
+msgid "Ohm"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "DATE"
+msgstr "DATE"
+
+#: src/app/menus.cpp
+msgid "TOTAL PLAYTIME"
+msgstr "TOTAL PLAYTIME"
+
+#: src/app/menus.cpp
+msgid "The save couldn't be written."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  Esc: no"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  Esc: back"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "LV"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "HP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "MP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "NEXT"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "EXP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "ATTACK"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "DEFENSE"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "SPEED"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "LUCK"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Shop"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Left/Right: 1  Shift: 10  Up/Down: Yes / No  Enter  Esc"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Left/Right: character  Enter  Esc: back"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "TIME"
+msgstr "TIME"
+
+#: src/app/menus.cpp
+msgid "OZ"
+msgstr "OZ"
+
+#: src/app/menus.cpp
+msgid "Skill"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "World Select"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Camp"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Nothing here."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "No gene plates."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Achievement"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Vieg"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter: read  Esc: back"
+msgstr ""
+
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
 msgstr "結束"
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  V: Options  A: Achievements  Esc: quit"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Esc: back"
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Game"
@@ -81,6 +313,14 @@ msgid "Graphics"
 msgstr "圖形"
 
 #: src/app/scene_fx.cpp
+msgid "Japanese"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "English"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Text Language"
 msgstr "文字語言"
 
@@ -99,8 +339,8 @@ msgstr "操作提示"
 
 #: src/app/scene_fx.cpp
 msgid ""
-"Show the control hints and status overlay. Off hides the WASD help; F3 is a shortcut."
-msgstr "顯示操作提示與狀態資訊。關閉後隱藏WASD說明；快速鍵為F3。"
+"Show the control hints and status overlay. Disable hides the WASD help; F3 is a shortcut."
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
@@ -179,8 +419,8 @@ msgid "The battles 2 .. 5 times as fast"
 msgstr "戰鬥加快2～5倍"
 
 #: src/app/scene_fx.cpp
-msgid "Swap ○ and ×"
-msgstr "交換○與×"
+msgid "Swap"
+msgstr "交換"
 
 #: src/app/scene_fx.cpp
 msgid "Controller: {0}."
@@ -191,13 +431,21 @@ msgid "With a controller:"
 msgstr "使用控制器時："
 
 #: src/app/scene_fx.cpp
-msgid ""
-"○ (the right button) confirms, × (the bottom one) goes back - as on the Vita"
-msgstr "○（右側鍵）確定，×（下方鍵）返回，與Vita相同"
+msgid "The right button confirms, the bottom one goes back - as on the Vita"
+msgstr "右側按鍵確認，下方按鍵返回（與 Vita 相同）"
 
 #: src/app/scene_fx.cpp
-msgid "× (the bottom button) confirms, ○ (the right one) goes back"
-msgstr "×（下方鍵）確定，○（右側鍵）返回"
+msgid "The bottom button confirms, the right one goes back"
+msgstr "下方按鍵確認，右側按鍵返回"
+
+#: src/app/scene_fx.cpp
+msgid "Button Layout"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid ""
+"Changes only the on-screen button symbols; it does not change controller actions."
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Master Volume"
@@ -382,6 +630,15 @@ msgid ""
 msgstr "銳利：場景材質放大時取最近的紋素（近看呈方塊像素）"
 
 #: src/app/scene_fx.cpp
+msgid "Vita HD Artwork Layers"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid ""
+"Use paired 16:9 PNG layers from textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 and title2_hd1/2; originals keep the Vita crop"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Infinite HP"
 msgstr "無限HP"
 
@@ -488,6 +745,10 @@ msgid "Upscale Mode"
 msgstr "超解析度模式"
 
 #: src/app/scene_fx.cpp
+msgid "The scene at {0}% of the frame per side"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Sharpness"
 msgstr "銳利度"
 
@@ -506,6 +767,18 @@ msgstr "已修正"
 #: src/app/scene_fx.cpp
 msgid "Original: eight offset draws; Fixed: one antialiased pass."
 msgstr "原始方式繪製八次偏移副本；修正方式只繪製一次抗鋸齒外框。"
+
+#: src/app/scene_fx.cpp
+msgid "and"
+msgstr "與"
+
+#: src/app/scene_fx.cpp
+msgid "Up/Down  Left/Right  Enter  Q/E or PgUp/PgDn: page  Esc: back"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "Choose the folder containing your decrypted Vita saves."
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Quit the game?"
@@ -884,10 +1157,6 @@ msgstr "已複製進來..."
 #: src/platform/setup.cpp
 msgid "An archive..."
 msgstr "壓縮檔..."
-
-#: src/platform/setup.cpp
-msgid "Back"
-msgstr "返回"
 
 #: src/platform/setup.cpp
 msgid "A folder - Vita3K's (or its ux0), the game's own, or a NoNpDrm dump's"

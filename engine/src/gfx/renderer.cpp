@@ -97,6 +97,7 @@ Texture Renderer::upload(const Image& img) {
     t.cutout = img.cutout;
     t.noAlpha = img.noAlpha;
     t.hdSheet = img.hdSheet;
+    t.vitaSource = img.vitaSource;
     if (img.logicalW > 0 && img.logicalH > 0) { // HD: drawn at the original's size
         t.width = img.logicalW;
         t.height = img.logicalH;
@@ -339,6 +340,29 @@ void Renderer::interfaceRect(float& x, float& y, float& w, float& h) const {
     const float cx = screenW_ * 0.5f, cy = kLogicalH * 0.5f;
     x = cx + (x - cx) * uiShrink_, y = cy + (y - cy) * uiShrink_;
     w *= uiShrink_, h *= uiShrink_;
+}
+
+void Renderer::drawQuadFullBleed(const Texture& tex, float top, float alpha, float r, float g, float b) {
+    if (!tex.id || tex.width <= 0 || tex.height <= 0 || alpha <= 0.001f) return;
+    const float screenAspect = screenW_ / float(kLogicalH);
+    const float imageAspect = float(tex.width) / float(tex.height);
+    float u0 = 0, v0 = 0, u1 = 1, v1 = 1;
+    if (imageAspect > screenAspect) {
+        const float visible = screenAspect / imageAspect;
+        u0 = (1 - visible) * 0.5f;
+        u1 = 1 - u0;
+    } else if (imageAspect < screenAspect) {
+        const float visible = imageAspect / screenAspect;
+        v0 = (1 - visible) * 0.5f;
+        v1 = 1 - v0;
+    }
+    const float right = screenW_, bottom = top + float(kLogicalH);
+    const float vertices[24] = {
+        0, top, u0, v0, right, top, u1, v0, right, bottom, u1, v1,
+        0, top, u0, v0, right, bottom, u1, v1, 0, bottom, u0, v1
+    };
+    const float colour[4] = {r, g, b, alpha};
+    dev_->drawQuad(tex, vertices, proj_, colour);
 }
 
 void Renderer::drawQuad(const Texture& tex, float x, float y, float w, float h, float r, float g,

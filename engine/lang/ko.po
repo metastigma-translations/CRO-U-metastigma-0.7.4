@@ -28,9 +28,17 @@ msgstr "성능"
 msgid "Ultra Perf."
 msgstr "울트라 성능"
 
-#: src/app/app.hpp src/app/scene_fx.cpp
+#: src/app/app.hpp src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Off"
 msgstr "끄기"
+
+#: src/app/battle.cpp
+msgid "Results"
+msgstr ""
+
+#: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
+msgid "Back"
+msgstr "뒤로"
 
 #: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Quit Game"
@@ -52,9 +60,233 @@ msgstr "팬 번역"
 msgid "{0} (fan translation)"
 msgstr "{0} (팬 번역)"
 
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Yes"
+msgstr "예"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "No"
+msgstr "아니요"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "OK"
+msgstr "OK"
+
+#: src/app/menus.cpp
+msgid "Start Game"
+msgstr "시작"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Options"
+msgstr "옵션"
+
+#: src/app/menus.cpp
+msgid "New"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Load"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Items"
+msgstr "아이템"
+
+#: src/app/menus.cpp
+msgid "Equipment"
+msgstr "장비"
+
+#: src/app/menus.cpp
+msgid "Genes"
+msgstr "유전자"
+
+#: src/app/menus.cpp
+msgid "Status"
+msgstr "상태"
+
+#: src/app/menus.cpp
+msgid "Extra"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Pair"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Solo"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Escape"
+msgstr ""
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Check"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Attack"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Defend"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Talk"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Buy"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Sell"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Weapons"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Armor"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Jewel"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Scenarios"
+msgstr "시나리오"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "On"
+msgstr "켜기"
+
+#: src/app/menus.cpp
+msgid "Ohm"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "DATE"
+msgstr "DATE"
+
+#: src/app/menus.cpp
+msgid "TOTAL PLAYTIME"
+msgstr "TOTAL PLAYTIME"
+
+#: src/app/menus.cpp
+msgid "The save couldn't be written."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  Esc: no"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  Esc: back"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "LV"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "HP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "MP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "NEXT"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "EXP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "ATTACK"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "DEFENSE"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "SPEED"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "LUCK"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Shop"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Left/Right: 1  Shift: 10  Up/Down: Yes / No  Enter  Esc"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Left/Right: character  Enter  Esc: back"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "TIME"
+msgstr "TIME"
+
+#: src/app/menus.cpp
+msgid "OZ"
+msgstr "OZ"
+
+#: src/app/menus.cpp
+msgid "Skill"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "World Select"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Camp"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Nothing here."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "No gene plates."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Achievement"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Vieg"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter: read  Esc: back"
+msgstr ""
+
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
 msgstr "종료"
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  V: Options  A: Achievements  Esc: quit"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Esc: back"
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Game"
@@ -81,6 +313,14 @@ msgid "Graphics"
 msgstr "그래픽"
 
 #: src/app/scene_fx.cpp
+msgid "Japanese"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "English"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Text Language"
 msgstr "텍스트 언어"
 
@@ -99,8 +339,8 @@ msgstr "조작 힌트"
 
 #: src/app/scene_fx.cpp
 msgid ""
-"Show the control hints and status overlay. Off hides the WASD help; F3 is a shortcut."
-msgstr "조작 힌트와 상태 표시를 보여 줍니다. 끄면 WASD 도움말이 숨겨집니다. F3로 전환"
+"Show the control hints and status overlay. Disable hides the WASD help; F3 is a shortcut."
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
@@ -179,8 +419,8 @@ msgid "The battles 2 .. 5 times as fast"
 msgstr "전투를 2~5배속으로"
 
 #: src/app/scene_fx.cpp
-msgid "Swap ○ and ×"
-msgstr "○와 × 교체"
+msgid "Swap"
+msgstr "교체"
 
 #: src/app/scene_fx.cpp
 msgid "Controller: {0}."
@@ -191,13 +431,21 @@ msgid "With a controller:"
 msgstr "컨트롤러 사용 시:"
 
 #: src/app/scene_fx.cpp
-msgid ""
-"○ (the right button) confirms, × (the bottom one) goes back - as on the Vita"
-msgstr "○(오른쪽 버튼)로 결정, ×(아래쪽 버튼)로 취소 - Vita와 같음"
+msgid "The right button confirms, the bottom one goes back - as on the Vita"
+msgstr "오른쪽 버튼으로 결정하고 아래쪽 버튼으로 돌아갑니다(Vita와 동일)"
 
 #: src/app/scene_fx.cpp
-msgid "× (the bottom button) confirms, ○ (the right one) goes back"
-msgstr "×(아래쪽 버튼)로 결정, ○(오른쪽 버튼)로 취소"
+msgid "The bottom button confirms, the right one goes back"
+msgstr "아래쪽 버튼으로 결정하고 오른쪽 버튼으로 돌아갑니다"
+
+#: src/app/scene_fx.cpp
+msgid "Button Layout"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid ""
+"Changes only the on-screen button symbols; it does not change controller actions."
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Master Volume"
@@ -384,6 +632,15 @@ msgid ""
 msgstr "선명하게: 월드 텍스처를 최근접 텍셀로 확대(가까이서 보면 네모난 픽셀)"
 
 #: src/app/scene_fx.cpp
+msgid "Vita HD Artwork Layers"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid ""
+"Use paired 16:9 PNG layers from textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 and title2_hd1/2; originals keep the Vita crop"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Infinite HP"
 msgstr "HP 무한"
 
@@ -490,6 +747,10 @@ msgid "Upscale Mode"
 msgstr "업스케일 모드"
 
 #: src/app/scene_fx.cpp
+msgid "The scene at {0}% of the frame per side"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Sharpness"
 msgstr "선명도"
 
@@ -508,6 +769,18 @@ msgstr "수정됨"
 #: src/app/scene_fx.cpp
 msgid "Original: eight offset draws; Fixed: one antialiased pass."
 msgstr "기존 방식은 8번 오프셋 렌더링하고 수정 방식은 안티앨리어싱된 윤곽선을 한 번 그립니다."
+
+#: src/app/scene_fx.cpp
+msgid "and"
+msgstr "와"
+
+#: src/app/scene_fx.cpp
+msgid "Up/Down  Left/Right  Enter  Q/E or PgUp/PgDn: page  Esc: back"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "Choose the folder containing your decrypted Vita saves."
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Quit the game?"
@@ -888,10 +1161,6 @@ msgstr "복사해 둔 폴더..."
 #: src/platform/setup.cpp
 msgid "An archive..."
 msgstr "압축 파일..."
-
-#: src/platform/setup.cpp
-msgid "Back"
-msgstr "뒤로"
 
 #: src/platform/setup.cpp
 msgid "A folder - Vita3K's (or its ux0), the game's own, or a NoNpDrm dump's"

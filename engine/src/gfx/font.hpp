@@ -23,6 +23,8 @@ public:
     // Reads a .ttf / .otf / .ttc; false if it isn't one stb_truetype can use.
     bool load(const std::string& path);
     bool loaded() const;
+    // Baseline offset from the raster line-box centre, measured in em units.
+    float baselineFromCentreEm() const;
     const std::string& path() const { return path_; }
     int generation() const { return generation_; } // changes with the face
     // In a collection, the face whose name ends with `region` ("JP", "KR", "SC", "TC");
@@ -35,7 +37,9 @@ public:
     const ::stbtt_fontinfo* cyrillicInfo() const; // (font.cpp: the face as a Cyrillic fallback)
     // White-on-transparent lines: `em` pixels to the em, baselines `lineStep` apart, `pad`
     // pixels of margin.
-    bool rasterise(const std::vector<std::string>& lines, float em, float lineStep, int pad, Image& out) const;
+    bool rasterise(const std::vector<std::string>& lines, float em, float lineStep, int pad, Image& out,
+                   bool perGlyphVerticalGradient = false, bool darkVerticalGradient = false,
+                   float letterSpacing = 0, bool scenarioVerticalGradient = false) const;
     // The line box (ascent and descent in ems, descent negative) the glyphs are placed in, in place of the
     // face's own (hhea) - a face standing in for another keeps the text where the other put it; 0, 0: the face's
     void setLineBox(float ascentEm, float descentEm) {

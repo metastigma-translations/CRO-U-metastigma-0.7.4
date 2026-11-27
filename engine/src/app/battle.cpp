@@ -3715,6 +3715,10 @@ void drawBattleNumber(cr::MenuPainter& m, int value, float x, float y, int digit
 }
 
 // cmd_bottom: a battle button (`x` and `y` its corner): base, face (lit when selected), icon, word
+std::string battleButtonText(int word) {
+    return menuWordText(word);
+}
+
 void drawBattleButton(cr::MenuPainter& m, float x, float y, int icon, int word, bool selected, bool dimmed, float a) {
     const float c = dimmed ? 0.25f : 1.0f;
     m.piece(x, y, 0, 184, 24, 40, a, c, c, c);
@@ -3725,7 +3729,17 @@ void drawBattleButton(cr::MenuPainter& m, float x, float y, int icon, int word, 
     m.pieceTo(x + 52, y, 68, 40, face + 24, 184, 4, 40, a, c, c, c);
     m.piece(x + 120, y, face + 28, 184, 16, 40, a, c, c, c);
     m.piece(x + 8, y + 4, float(icon % 16 * 32), float(icon / 16 * 32 + 376), 32, 32, a, c, c, c);
-    m.piece(x + 40, y + 8, float(word % 5 * 88), float(word / 5 * 24 + 512), 88, 24, a, c, c, c);
+    const std::string label = battleButtonText(word);
+    if (label.empty()) {
+        m.piece(x + 40, y + 8, float(word % 5 * 88), float(word / 5 * 24 + 512), 88, 24, a, c, c, c);
+    } else {
+        float size = 15;
+        float wide = m.textWidth(label, size);
+        if (wide > 88) size = std::max(8.0f, std::floor(size * 88 / wide));
+        wide = m.textWidth(label, size);
+        // Match the main menu plate: centre in the 88-unit label area and use its vertical anchor.
+        m.textCentred(label, x + 40 + (88 - wide) / 2, y + 17, false, a * c, size, true);
+    }
 }
 
 // The red -> orange HP bar of the plates and rows (_cmd_hp_bar / _cmd_mp_bar: tex2d_add4 on slot 45),
@@ -3775,7 +3789,7 @@ void drawBattlePlate(App& app, cr::MenuPainter& m, float x, float y, int fighter
     for (const App::Battle::Actor& ac : b.actors)
         if (ac.fighter == fighter) name = ac.name;
     // menub_mainPut: _drawfont_center(i, x + 0x92, y + 10) - the 16-pixel name btlord_make_select set, white
-    m.text(name, x + 146 - m.textWidth(name, 16) / 2, y + 10, false, a, 16);
+    m.text(name, x + 146 - m.textWidth(name, 16) / 2, y + 10, false, a, 16, f.character < 0);
     drawBattleStatus(m, f, x + 56, y - 8, a);
 }
 
@@ -3882,7 +3896,7 @@ void drawBattleResults(App& app, cr::MenuPainter& m, float a) {
     const float in = rs.stage == 3 ? std::max(0.0f, float(rs.count) / 4) : std::min(1.0f, float(rs.frames) / 4);
     const float away = 1 - in;
     r.setOrigin(wideLeft(app)); // (widescreen: the heading and boards left, the takings right)
-    m.picture(19, 8, 4, a * in); // "Results"
+    m.headingStrip(8, 4, tr("Results"), a * in, 216, 17, 17);
     for (int k = 0; k < 2; ++k) {
         const cr::Fighter& f = b.rules.f[size_t(k)];
         if (!f.present) continue;
@@ -4101,7 +4115,7 @@ void drawBattleHud(App& app, float W, float H) {
                 const bool held = !dim && v.menu == b.menu && battlePressIn(app, kButtonX, kButtonY + kButtonStep * float(i), 136, 40);
                 drawBattleButton(m, kButtonX, kButtonY + kButtonStep * float(i), kCmdIcon[i], kCmdWord[i], (v.cursor == i && cursorLit) || held, dim, a);
             }
-            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a); // (_cmd_back: lit while held)
+            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a, tr("Back")); // (_cmd_back: lit while held)
             break;
         case App::Battle::Targets: {
             const int n = int(v.picks.size());
@@ -4109,7 +4123,7 @@ void drawBattleHud(App& app, float W, float H) {
             const bool all = act && b.rules.isGroupScope(*act);
             for (int i = 0; i < n; ++i)
                 drawBattlePlate(app, m, kPlateX, kPlateBottom - 48.0f * float(n - i), v.picks[size_t(i)], all || v.pick == i, a);
-            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a);
+            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a, tr("Back"));
             break;
         }
         case App::Battle::Items: { // MuScrList: the battle items in the bag, how many of each
@@ -4121,7 +4135,7 @@ void drawBattleHud(App& app, float W, float H) {
                 const auto it = app.game.items.find(item);
                 drawCampRow(app, m, 232, y, item, it == app.game.items.end() ? 0 : it->second, index == v.pick, a);
             }
-            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a);
+            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a, tr("Back"));
             if (v.pick >= 0 && v.pick < n) helpBoard(v.picks[size_t(v.pick)]); // (MuScrList_SetIdInfo's help: the items' too)
             break;
         }
@@ -4136,7 +4150,7 @@ void drawBattleHud(App& app, float W, float H) {
                 m.picture(27, 232 + 188, y + 34, ra);
                 drawShopNumber(m, cost, 232 + 218, y + 30, 3, 10, ra, 2); // (ComUty_PictNumDraw: the field from 218, right-aligned)
             }
-            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a);
+            m.backBar(kBackX, kBackY, v.menu == b.menu && battlePressIn(app, kBackX, kBackY, 232, 24), a, tr("Back"));
             if (v.pick >= 0 && v.pick < n) helpBoard(v.picks[size_t(v.pick)]); // the gene's target and effect
             break;
         }

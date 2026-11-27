@@ -28,9 +28,17 @@ msgstr "Производительность"
 msgid "Ultra Perf."
 msgstr "Ультра-произв."
 
-#: src/app/app.hpp src/app/scene_fx.cpp
+#: src/app/app.hpp src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Off"
-msgstr "Выкл."
+msgstr "Выключить"
+
+#: src/app/battle.cpp
+msgid "Results"
+msgstr "Результаты"
+
+#: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
+msgid "Back"
+msgstr "Назад"
 
 #: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Quit Game"
@@ -52,9 +60,233 @@ msgstr "Фанатский перевод"
 msgid "{0} (fan translation)"
 msgstr "{0} (фанатский перевод)"
 
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Yes"
+msgstr "Да"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "No"
+msgstr "Нет"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "OK"
+msgstr "Да"
+
+#: src/app/menus.cpp
+msgid "Start Game"
+msgstr "Начать"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Options"
+msgstr "Настройки"
+
+#: src/app/menus.cpp
+msgid "New"
+msgstr "Новая"
+
+#: src/app/menus.cpp
+msgid "Load"
+msgstr "Загрузка"
+
+#: src/app/menus.cpp
+msgid "Items"
+msgstr "Предметы"
+
+#: src/app/menus.cpp
+msgid "Equipment"
+msgstr "Одежда"
+
+#: src/app/menus.cpp
+msgid "Genes"
+msgstr "Гены"
+
+#: src/app/menus.cpp
+msgid "Status"
+msgstr "Статус"
+
+#: src/app/menus.cpp
+msgid "Extra"
+msgstr "Экстра"
+
+#: src/app/menus.cpp
+msgid "Pair"
+msgstr "Пара"
+
+#: src/app/menus.cpp
+msgid "Solo"
+msgstr "Соло"
+
+#: src/app/menus.cpp
+msgid "Escape"
+msgstr "Побег"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Check"
+msgstr "Проверить"
+
+#: src/app/menus.cpp
+msgid "Attack"
+msgstr "Атака"
+
+#: src/app/menus.cpp
+msgid "Defend"
+msgstr "Защита"
+
+#: src/app/menus.cpp
+msgid "Talk"
+msgstr "Говорить"
+
+#: src/app/menus.cpp
+msgid "Buy"
+msgstr "Купить"
+
+#: src/app/menus.cpp
+msgid "Sell"
+msgstr "Продать"
+
+#: src/app/menus.cpp
+msgid "Weapons"
+msgstr "Оружие"
+
+#: src/app/menus.cpp
+msgid "Armor"
+msgstr "Броня"
+
+#: src/app/menus.cpp
+msgid "Jewel"
+msgstr "Камни"
+
+#: src/app/menus.cpp
+msgid "Scenarios"
+msgstr "Сценарии"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "On"
+msgstr "Включить"
+
+#: src/app/menus.cpp
+msgid "Ohm"
+msgstr "Ом"
+
+#: src/app/menus.cpp
+msgid "DATE"
+msgstr "ДАТА"
+
+#: src/app/menus.cpp
+msgid "TOTAL PLAYTIME"
+msgstr "ПРОВЕДЕНО В ИГРЕ"
+
+#: src/app/menus.cpp
+msgid "The save couldn't be written."
+msgstr "Не удалось записать сохранение."
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  Esc: no"
+msgstr "Вверх/Вниз  Enter  Esc: нет"
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  Esc: back"
+msgstr "Вверх/Вниз  Enter  Esc: назад"
+
+#: src/app/menus.cpp
+msgid "LV"
+msgstr "УРОВЕНЬ"
+
+#: src/app/menus.cpp
+msgid "HP"
+msgstr "ОЗ"
+
+#: src/app/menus.cpp
+msgid "MP"
+msgstr "ОМ"
+
+#: src/app/menus.cpp
+msgid "NEXT"
+msgstr "Следующий"
+
+#: src/app/menus.cpp
+msgid "EXP"
+msgstr "ОПЫТ"
+
+#: src/app/menus.cpp
+msgid "ATTACK"
+msgstr "АТАКА"
+
+#: src/app/menus.cpp
+msgid "DEFENSE"
+msgstr "ЗАЩИТА"
+
+#: src/app/menus.cpp
+msgid "SPEED"
+msgstr "СКОРОСТЬ"
+
+#: src/app/menus.cpp
+msgid "LUCK"
+msgstr "УДАЧА"
+
+#: src/app/menus.cpp
+msgid "Shop"
+msgstr "Магазин"
+
+#: src/app/menus.cpp
+msgid "Left/Right: 1  Shift: 10  Up/Down: Yes / No  Enter  Esc"
+msgstr "Влево/Вправо: 1  Shift: 10  Вверх/Вниз: Да / Нет  Enter  Esc"
+
+#: src/app/menus.cpp
+msgid "Up/Down  Left/Right: character  Enter  Esc: back"
+msgstr "Вверх/Вниз  Влево/Вправо: персонаж  Enter  Esc: назад"
+
+#: src/app/menus.cpp
+msgid "TIME"
+msgstr "ВРЕМЯ"
+
+#: src/app/menus.cpp
+msgid "OZ"
+msgstr "ОЗ"
+
+#: src/app/menus.cpp
+msgid "Skill"
+msgstr "НАВЫК"
+
+#: src/app/menus.cpp
+msgid "World Select"
+msgstr "Выбор мира"
+
+#: src/app/menus.cpp
+msgid "Camp"
+msgstr "Лагерь"
+
+#: src/app/menus.cpp
+msgid "Nothing here."
+msgstr "Здесь ничего нет."
+
+#: src/app/menus.cpp
+msgid "No gene plates."
+msgstr "Генопластин нет."
+
+#: src/app/menus.cpp
+msgid "Achievement"
+msgstr "Достижения"
+
+#: src/app/menus.cpp
+msgid "Vieg"
+msgstr "Виг"
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter: read  Esc: back"
+msgstr "Вверх/Вниз  Enter: читать  Esc: назад"
+
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
 msgstr "Выход"
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  V: Options  A: Achievements  Esc: quit"
+msgstr "Вверх/Вниз  Enter  V: настройки  A: достижения  Esc: выход"
+
+#: src/app/menus.cpp
+msgid "Up/Down  Esc: back"
+msgstr "Вверх/Вниз  Esc: назад"
 
 #: src/app/scene_fx.cpp
 msgid "Game"
@@ -81,6 +313,14 @@ msgid "Graphics"
 msgstr "Графика"
 
 #: src/app/scene_fx.cpp
+msgid "Japanese"
+msgstr "Японский"
+
+#: src/app/scene_fx.cpp
+msgid "English"
+msgstr "Английский"
+
+#: src/app/scene_fx.cpp
 msgid "Text Language"
 msgstr "Язык игровых текстов"
 
@@ -100,9 +340,9 @@ msgstr "Подсказки управления"
 
 #: src/app/scene_fx.cpp
 msgid ""
-"Show the control hints and status overlay. Off hides the WASD help; F3 is a shortcut."
+"Show the control hints and status overlay. Disable hides the WASD help; F3 is a shortcut."
 msgstr ""
-"Показывать подсказки управления и строку состояния. «Выкл.» скрывает справку WASD; F3 переключает их отображение."
+"Показывать подсказки управления и строку состояния. При выборе «Выключить» справка WASD скрывается; F3 также переключает их отображение."
 
 #: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
@@ -185,8 +425,8 @@ msgid "The battles 2 .. 5 times as fast"
 msgstr "Сражения проходят в 2–5 раз быстрее"
 
 #: src/app/scene_fx.cpp
-msgid "Swap ○ and ×"
-msgstr "Поменять местами ○ и ×"
+msgid "Swap"
+msgstr "Поменять"
 
 #: src/app/scene_fx.cpp
 msgid "Controller: {0}."
@@ -197,14 +437,21 @@ msgid "With a controller:"
 msgstr "При использовании геймпада:"
 
 #: src/app/scene_fx.cpp
-msgid ""
-"○ (the right button) confirms, × (the bottom one) goes back - as on the Vita"
-msgstr ""
-"○ (правая кнопка) подтверждает, × (нижняя) возвращает назад — как на Vita"
+msgid "The right button confirms, the bottom one goes back - as on the Vita"
+msgstr "Правая кнопка подтверждает, нижняя возвращает назад — как на Vita"
 
 #: src/app/scene_fx.cpp
-msgid "× (the bottom button) confirms, ○ (the right one) goes back"
-msgstr "× (нижняя кнопка) подтверждает, ○ (правая) возвращает назад"
+msgid "The bottom button confirms, the right one goes back"
+msgstr "Нижняя кнопка подтверждает, правая возвращает назад"
+
+#: src/app/scene_fx.cpp
+msgid "Button Layout"
+msgstr "Раскладка кнопок"
+
+#: src/app/scene_fx.cpp
+msgid ""
+"Changes only the on-screen button symbols; it does not change controller actions."
+msgstr "Меняет только значки кнопок на экране, не меняя их назначение."
 
 #: src/app/scene_fx.cpp
 msgid "Master Volume"
@@ -397,6 +644,16 @@ msgstr ""
 "«Чёткая»: при увеличении текстур мира берётся ближайший тексель (вблизи пиксели квадратные)"
 
 #: src/app/scene_fx.cpp
+msgid "Vita HD Artwork Layers"
+msgstr "Слои HD-графики Vita"
+
+#: src/app/scene_fx.cpp
+msgid ""
+"Use paired 16:9 PNG layers from textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 and title2_hd1/2; originals keep the Vita crop"
+msgstr ""
+"Использовать парные PNG-слои 16:9 из textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 и title2_hd1/2; оригиналы сохраняют обрезку Vita"
+
+#: src/app/scene_fx.cpp
 msgid "Infinite HP"
 msgstr "Бесконечное здоровье"
 
@@ -509,6 +766,10 @@ msgid "Upscale Mode"
 msgstr "Режим масштабирования"
 
 #: src/app/scene_fx.cpp
+msgid "The scene at {0}% of the frame per side"
+msgstr "Сцена рендерится в масштабе {0}% от ширины и высоты итогового кадра."
+
+#: src/app/scene_fx.cpp
 msgid "Sharpness"
 msgstr "Резкость"
 
@@ -528,6 +789,19 @@ msgstr "Исправленная"
 msgid "Original: eight offset draws; Fixed: one antialiased pass."
 msgstr ""
 "Оригинал рисует обводку восемью смещёнными проходами; исправление использует один сглаженный проход."
+
+#: src/app/scene_fx.cpp
+msgid "and"
+msgstr "и"
+
+#: src/app/scene_fx.cpp
+msgid "Up/Down  Left/Right  Enter  Q/E or PgUp/PgDn: page  Esc: back"
+msgstr ""
+"Вверх/Вниз  Влево/Вправо  Enter  Q/E или PgUp/PgDn: страница  Esc: назад"
+
+#: src/app/scene_fx.cpp
+msgid "Choose the folder containing your decrypted Vita saves."
+msgstr "Выберите папку с расшифрованными сохранениями PS Vita."
 
 #: src/app/scene_fx.cpp
 msgid "Quit the game?"
@@ -917,10 +1191,6 @@ msgstr "Скопировано..."
 #: src/platform/setup.cpp
 msgid "An archive..."
 msgstr "Архив..."
-
-#: src/platform/setup.cpp
-msgid "Back"
-msgstr "Назад"
 
 #: src/platform/setup.cpp
 msgid "A folder - Vita3K's (or its ux0), the game's own, or a NoNpDrm dump's"

@@ -28,9 +28,17 @@ msgstr "Performance"
 msgid "Ultra Perf."
 msgstr "Ultra perf."
 
-#: src/app/app.hpp src/app/scene_fx.cpp
+#: src/app/app.hpp src/app/menus.cpp src/app/scene_fx.cpp
 msgid "Off"
 msgstr "Désactivé"
+
+#: src/app/battle.cpp
+msgid "Results"
+msgstr ""
+
+#: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
+msgid "Back"
+msgstr "Retour"
 
 #: src/app/explore.cpp src/app/scene_fx.cpp
 msgid "Quit Game"
@@ -52,9 +60,233 @@ msgstr "Traduction amateur"
 msgid "{0} (fan translation)"
 msgstr "{0} (traduction amateur)"
 
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Yes"
+msgstr "Oui"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "No"
+msgstr "Non"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "OK"
+msgstr "OK"
+
+#: src/app/menus.cpp
+msgid "Start Game"
+msgstr "Démarrer"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Options"
+msgstr "Options"
+
+#: src/app/menus.cpp
+msgid "New"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Load"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Items"
+msgstr "Objets"
+
+#: src/app/menus.cpp
+msgid "Equipment"
+msgstr "Équipement"
+
+#: src/app/menus.cpp
+msgid "Genes"
+msgstr "Gènes"
+
+#: src/app/menus.cpp
+msgid "Status"
+msgstr "Statut"
+
+#: src/app/menus.cpp
+msgid "Extra"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Pair"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Solo"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Escape"
+msgstr ""
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "Check"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Attack"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Defend"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Talk"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Buy"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Sell"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Weapons"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Armor"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Jewel"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Scenarios"
+msgstr "Scénarios"
+
+#: src/app/menus.cpp src/app/scene_fx.cpp
+msgid "On"
+msgstr "Activé"
+
+#: src/app/menus.cpp
+msgid "Ohm"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "DATE"
+msgstr "DATE"
+
+#: src/app/menus.cpp
+msgid "TOTAL PLAYTIME"
+msgstr "TOTAL PLAYTIME"
+
+#: src/app/menus.cpp
+msgid "The save couldn't be written."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  Esc: no"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  Esc: back"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "LV"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "HP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "MP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "NEXT"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "EXP"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "ATTACK"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "DEFENSE"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "SPEED"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "LUCK"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Shop"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Left/Right: 1  Shift: 10  Up/Down: Yes / No  Enter  Esc"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Left/Right: character  Enter  Esc: back"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "TIME"
+msgstr "TIME"
+
+#: src/app/menus.cpp
+msgid "OZ"
+msgstr "OZ"
+
+#: src/app/menus.cpp
+msgid "Skill"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "World Select"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Camp"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Nothing here."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "No gene plates."
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Achievement"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Vieg"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter: read  Esc: back"
+msgstr ""
+
 #: src/app/menus.cpp src/platform/setup.cpp
 msgid "Quit"
 msgstr "Quitter"
+
+#: src/app/menus.cpp
+msgid "Up/Down  Enter  V: Options  A: Achievements  Esc: quit"
+msgstr ""
+
+#: src/app/menus.cpp
+msgid "Up/Down  Esc: back"
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Game"
@@ -81,6 +313,14 @@ msgid "Graphics"
 msgstr "Graphismes"
 
 #: src/app/scene_fx.cpp
+msgid "Japanese"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "English"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Text Language"
 msgstr "Langue du texte"
 
@@ -100,9 +340,8 @@ msgstr "Aide aux commandes"
 
 #: src/app/scene_fx.cpp
 msgid ""
-"Show the control hints and status overlay. Off hides the WASD help; F3 is a shortcut."
+"Show the control hints and status overlay. Disable hides the WASD help; F3 is a shortcut."
 msgstr ""
-"Afficher l'aide aux commandes et l'état à l'écran. Sinon, l'aide WASD est masquée ; F3 pour basculer."
 
 #: src/app/scene_fx.cpp
 msgid "Import Vita Saves"
@@ -185,8 +424,8 @@ msgid "The battles 2 .. 5 times as fast"
 msgstr "Combats 2 à 5 fois plus rapides"
 
 #: src/app/scene_fx.cpp
-msgid "Swap ○ and ×"
-msgstr "Inverser ○ et ×"
+msgid "Swap"
+msgstr "Inverser"
 
 #: src/app/scene_fx.cpp
 msgid "Controller: {0}."
@@ -197,13 +436,22 @@ msgid "With a controller:"
 msgstr "Avec une manette :"
 
 #: src/app/scene_fx.cpp
-msgid ""
-"○ (the right button) confirms, × (the bottom one) goes back - as on the Vita"
-msgstr "○ (bouton de droite) valide, × (celui du bas) annule, comme sur Vita"
+msgid "The right button confirms, the bottom one goes back - as on the Vita"
+msgstr ""
+"Le bouton de droite confirme et celui du bas revient en arrière, comme sur Vita"
 
 #: src/app/scene_fx.cpp
-msgid "× (the bottom button) confirms, ○ (the right one) goes back"
-msgstr "× (bouton du bas) valide, ○ (celui de droite) annule"
+msgid "The bottom button confirms, the right one goes back"
+msgstr "Celui du bas confirme et celui de droite revient en arrière"
+
+#: src/app/scene_fx.cpp
+msgid "Button Layout"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid ""
+"Changes only the on-screen button symbols; it does not change controller actions."
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Master Volume"
@@ -397,6 +645,15 @@ msgstr ""
 "Net : textures du décor agrandies au texel le plus proche (pixels carrés vus de près)"
 
 #: src/app/scene_fx.cpp
+msgid "Vita HD Artwork Layers"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid ""
+"Use paired 16:9 PNG layers from textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 and title2_hd1/2; originals keep the Vita crop"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Infinite HP"
 msgstr "HP infinis"
 
@@ -507,6 +764,10 @@ msgid "Upscale Mode"
 msgstr "Mode mise à l'échelle"
 
 #: src/app/scene_fx.cpp
+msgid "The scene at {0}% of the frame per side"
+msgstr ""
+
+#: src/app/scene_fx.cpp
 msgid "Sharpness"
 msgstr "Netteté"
 
@@ -526,6 +787,18 @@ msgstr "Corrigé"
 msgid "Original: eight offset draws; Fixed: one antialiased pass."
 msgstr ""
 "Original : huit dessins décalés ; corrigé : un seul passage anticrénelé."
+
+#: src/app/scene_fx.cpp
+msgid "and"
+msgstr "et"
+
+#: src/app/scene_fx.cpp
+msgid "Up/Down  Left/Right  Enter  Q/E or PgUp/PgDn: page  Esc: back"
+msgstr ""
+
+#: src/app/scene_fx.cpp
+msgid "Choose the folder containing your decrypted Vita saves."
+msgstr ""
 
 #: src/app/scene_fx.cpp
 msgid "Quit the game?"
@@ -921,10 +1194,6 @@ msgstr "Déjà copié..."
 #: src/platform/setup.cpp
 msgid "An archive..."
 msgstr "Une archive..."
-
-#: src/platform/setup.cpp
-msgid "Back"
-msgstr "Retour"
 
 #: src/platform/setup.cpp
 msgid "A folder - Vita3K's (or its ux0), the game's own, or a NoNpDrm dump's"

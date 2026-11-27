@@ -142,6 +142,20 @@ bool Font::load(const std::string& path) {
 
 bool Font::loaded() const { return face_ != nullptr; }
 
+float Font::baselineFromCentreEm() const {
+    if (!face_) return 0.3f;
+    const stbtt_fontinfo& info = face_->info;
+    int ascent = 0, descent = 0, gap = 0;
+    stbtt_GetFontVMetrics(&info, &ascent, &descent, &gap);
+    if (boxAscent_ != 0 || boxDescent_ != 0) {
+        const float unitScale = stbtt_ScaleForMappingEmToPixels(&info, 1.0f);
+        const float upm = unitScale > 0.0f ? 1.0f / unitScale : 1000.0f;
+        ascent = int(std::lround(boxAscent_ * upm));
+        descent = int(std::lround(boxDescent_ * upm));
+    }
+    return 0.5f * float(ascent + descent) * stbtt_ScaleForMappingEmToPixels(&info, 1.0f);
+}
+
 bool Font::selectRegion(const char* region) {
     if (!loaded()) return false;
     const int n = stbtt_GetNumberOfFonts(data_.data());
@@ -193,7 +207,9 @@ bool Font::covers(const std::string& utf8) const {
     return true;
 }
 
-bool Font::rasterise(const std::vector<std::string>& lines, float em, float lineStep, int pad, Image& out) const {
+bool Font::rasterise(const std::vector<std::string>& lines, float em, float lineStep, int pad, Image& out,
+                     bool perGlyphVerticalGradient, bool darkVerticalGradient, float letterSpacing,
+                     bool scenarioVerticalGradient) const {
     if (!loaded() || lines.empty()) return false;
     const stbtt_fontinfo& info = face_->info;
     const float scale = stbtt_ScaleForMappingEmToPixels(&info, em);
@@ -218,6 +234,7 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
     bool cyrLooked = false;
     auto scaleOf = [&](const stbtt_fontinfo* f) { return f == &info ? scale : stbtt_ScaleForMappingEmToPixels(f, em); };
     float widest = 1;
+    int minGlyphX = 0, maxGlyphX = 0;
     for (size_t l = 0; l < lines.size(); ++l) {
         float x = 0;
         Glyph prev{nullptr, 0};
@@ -231,6 +248,7 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
         for (size_t i = 0; i < lines[l].size();) {
             const uint32_t c = nextUtf8(lines[l], i);
             if (c < 0x20) continue; // (a message's marks, such as the centred line's \x01: not drawn)
+            if (!glyphs[l].empty()) x += letterSpacing;
             Glyph gl{&info, 0};
             if (isCyrillic(c) && !cjkLine) {
                 if (!cyrLooked) cyrLooked = true, cyr = cyrillicFromFallback() ? cyrillicFallback(boldFace(info)) : nullptr;
@@ -242,22 +260,36 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
             int adv = 0, lsb = 0;
             stbtt_GetGlyphHMetrics(gl.face, gl.g, &adv, &lsb);
             if (prev.g && prev.face == gl.face) x += float(stbtt_GetGlyphKernAdvance(gl.face, prev.g, gl.g)) * s;
+            const float fx = x - std::floor(x);
+            int x0, y0, x1, y1;
+            stbtt_GetGlyphBitmapBoxSubpixel(gl.face, gl.g, s, s, fx, 0, &x0, &y0, &x1, &y1);
+            const int bitmapLeft = int(std::floor(x)) + x0;
+            minGlyphX = std::min(minGlyphX, bitmapLeft);
+            maxGlyphX = std::max(maxGlyphX, bitmapLeft + (x1 - x0));
             x += float(adv) * s;
             glyphs[l].push_back(gl);
             prev = gl;
         }
         widest = std::max(widest, x);
     }
-    out.width = int(std::ceil(widest)) + 2 * pad + 1;
+    // Some italic glyphs (notably Cyrillic capital Д) overhang the line's origin. Include that
+    // negative side bearing in the cached line box and shift the rasterised run right, rather than
+    // clipping its first few pixels at the texture's left edge.
+    const int leftBearing = std::max(0, -minGlyphX);
+    const int contentRight = std::max(int(std::ceil(widest)), maxGlyphX);
+    out.width = contentRight + leftBearing + 2 * pad + 1;
     out.height = int(std::ceil(float(lines.size() - 1) * lineStep + float(ascent - descent) * scale)) + 2 * pad;
     out.alphaOnly = false;
     out.rgba.assign(size_t(out.width) * out.height * 4, 0);
     std::vector<unsigned char> bmp;
     for (size_t l = 0; l < lines.size(); ++l) {
         const float baseline = base0 + float(l) * lineStep;
-        float x = float(pad);
+        float x = float(pad + leftBearing);
         Glyph prev{nullptr, 0};
+        bool firstGlyph = true;
         for (const Glyph& gl : glyphs[l]) {
+            if (!firstGlyph) x += letterSpacing;
+            firstGlyph = false;
             const stbtt_fontinfo* face = gl.face;
             const int g = gl.g;
             const float s = scaleOf(face);
@@ -280,8 +312,20 @@ bool Font::rasterise(const std::vector<std::string>& lines, float em, float line
                         const int tx = ox + xx;
                         if (tx < 0 || tx >= out.width) continue;
                         uint8_t* p = &out.rgba[(size_t(ty) * out.width + tx) * 4];
-                        p[0] = p[1] = p[2] = 255;
-                        p[3] = std::max(p[3], bmp[size_t(y) * gw + xx]);
+                        const uint8_t coverage = bmp[size_t(y) * gw + xx];
+                        if (coverage > p[3]) {
+                            // Each character receives its own vertical ramp, based on its own bitmap.
+                            // Lowercase letters therefore get a complete ramp, not a leftover section
+                            // of the uppercase letter's taller shared line gradient.
+                            const float position = (perGlyphVerticalGradient || darkVerticalGradient || scenarioVerticalGradient) && gh > 1
+                                                       ? float(y) / float(gh - 1) : 0.0f;
+                            const float t = std::clamp((position - 0.50f) / 0.50f, 0.0f, 1.0f);
+                            const float top = scenarioVerticalGradient ? 128.0f : darkVerticalGradient ? 85.0f : 255.0f;
+                            const float bottom = scenarioVerticalGradient ? 64.0f : darkVerticalGradient ? 0.0f : 85.0f;
+                            const uint8_t shade = uint8_t(std::lround(top + (bottom - top) * t));
+                            p[0] = p[1] = p[2] = shade; // light: white -> #555; dark: #555 -> black; Scenario: #808080 -> #404040
+                            p[3] = coverage;
+                        }
                     }
                 }
             }

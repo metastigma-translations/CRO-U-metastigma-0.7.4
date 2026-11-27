@@ -226,7 +226,10 @@ struct App {
     int optionsScroll = 0;                 // the first row shown (a page of more than kOptVisible scrolls)
     bool optionsBarDrag = false;           // the scroll bar's thumb held
     int optionsAnim = 0;                   // frames since the page appeared (windows slide in)
-    int optionsBob = 0, optionsBobDir = 1; // ComUty_CmdBack's arrows
+    int menuArrowBob = 0, menuArrowBobDir = 1; // shared 0..5 bob for the menu Back arrows
+    float menuArrowClock = 0;              // shared 20 Hz animation clock, active in every menu
+    int swapPromptTicks = 0;                // 20 options ticks per one-second icon exchange
+    bool swapPromptReversed = false;        // false: X/A left; true: O/B left
     struct GaugeEase { int from = -1, to = -1, left = 0; }; // SideGuageProc / Draw: the fill 10 frames from the old
     std::map<const int*, GaugeEase> gaugeEase;           // knob to the new (#17), by the setting it shows
     float optionsClock = 0;
@@ -291,6 +294,7 @@ struct App {
         int upscaleMode = 0;               // kUpscaleModes: 0 native AA (DLAA) .. 4 ultra performance
         int sharpness = 25;                // % (FSR's RCAS pass; 0 = none)
         bool hdTextures = false;           // upscaled replacements from hdDir (what loads next)
+        bool vitaOutpaint = false;         // use paired full-screen Vita HD artwork and transparent text layers
         bool avoidCutout = true;           // phones: the layout kept clear of a camera's notch / punch hole (Options, Display)
         bool cutoutBars = false;           // ... and the picture too: boxed inside the safe area, black bars over the cutout
         int smoothModels = 0;              // 0 off, 2 / 3: PN-triangle level for characters and monsters
@@ -338,6 +342,8 @@ struct App {
     std::string cutinWideName;
     cr::Texture speedLinesTex;             // syuutyuusen(_ipad).mct (slot 0x2e): scene effect 1
     cr::Texture titleArt[2];               // __menuu_TitleSet: title1.mct (MuCom slot 0x11), chaos.mct (0x12)
+    std::array<std::array<cr::Texture, 2>, 2> titleArtHd; // [title1/title2][art/text]
+    bool titleArtHdTried = false;
     bool titleArtIpad = false;             // title1 came from its _ipad sheet (pictures 9 / 10; else 7 / 8)
     float footPrev = 0;                    // player's animation time last frame (footsteps)
     std::vector<uint32_t> soundLog;        // every sound started (self-test)
@@ -568,7 +574,8 @@ struct App {
         float clock = 0;
         cr::Texture serect;        // slot 0x11: the cord, the arrow
     } startPage;
-    cr::Texture charSelectArt, charSelectArt2; // Select Scenario's sheets: chara1 / chara2 (slot 0x10), chara3 (0x12)
+    cr::Texture charSelectArt, charSelectArt2; // Select Scenario's original sheets
+    std::array<cr::Texture, 2> charSelectArtHd, charSelectArt2Hd; // each pair: _hd1 artwork, _hd2 text overlay
     struct Camp {                          // the Camp menu's page and cursors (__menuu_CampMain*)
         enum Page { Main, Items, Equip, Status, Genes } page = Main;
         enum Phase { List, Member, Slot, Ask, Entries, Result, Exit } phase = List; // Status: Slot = the member's
@@ -667,6 +674,7 @@ struct App {
     // Empty: every pad
     std::vector<SDL_JoystickID> padAllow;
     bool padConfirmEast = true;
+    bool xboxButtonPrompts = false; // visual symbols only: PlayStation X or Xbox A
     // CRO-U's own (Options, Game: Field Speed, Battle Speed): the field - while the player walks it,
     // nothing over it - and the battles run this many times as fast (1, or 2 .. 5)
     int fieldSpeed = 1, battleSpeed = 1;
@@ -1331,6 +1339,7 @@ struct OptRow {
     int words[2] = {-1, -1};     // Pair: word pictures (Japanese / English, On / Off ...), else texts
     std::string texts[2];
     int selected = -1;           // Pair: the lit button
+    bool promptPair = false;       // draw the active layout's two button glyphs beside this row
     int* gauge = nullptr;        // Gauge: the 0..100 setting
     int value = 0;
     std::string valueText;       // Value
@@ -1941,8 +1950,8 @@ int wrap(int i, size_t n);
 void updateTitle(App& app);
 void showTexture(App& app, int index);
 void applyHd(App& app, cr::Image& img);
-bool loadImage(App& app, const std::string& mct, cr::Image& img, bool* fromAndroid = nullptr);
-bool loadOriginalImage(App& app, const std::string& mct, cr::Image& img, bool* fromAndroid = nullptr);
+bool loadImage(App& app, const std::string& mct, cr::Image& img, bool* fromAndroid = nullptr, bool* fromVita = nullptr);
+bool loadOriginalImage(App& app, const std::string& mct, cr::Image& img, bool* fromAndroid = nullptr, bool* fromVita = nullptr);
 bool openVita(App& app, const std::string& path);
 bool startSound(App& app);
 void vitaAudio(App& app);
@@ -2262,7 +2271,7 @@ void stepCharSelect(App& app);
 void charSelectDrag(App& app, float my);
 void charSelectRelease(App& app);
 void closeCharSelect(App& app, int scenario);
-void drawCharArt(App& app, float alpha, bool banner, float grey = 1);
+void drawCharArt(App& app, float alpha, bool banner, float grey = 1, float top = 0);
 void drawCharSelect(App& app);
 void charSelectKey(App& app, SDL_Keycode key);
 void charSelectClick(App& app, float px, float py);
@@ -2332,6 +2341,7 @@ void drawMessageBox(App& app, const std::vector<std::string>& page, const std::s
 void drawWinPiece(App& app, const float* piece, float x, float y, float w, float h, float alpha = 1);
 int partyLevel(const App& app);
 std::string sysText(const App& app, int id, const std::string& name = std::string());
+std::string menuWordText(int word);
 int battleAction(const LoadedModel& lm, int slot);
 App::Battle::Actor* battleActor(App& app, int fighter);
 int realSlot(const LoadedModel& lm, int slot);

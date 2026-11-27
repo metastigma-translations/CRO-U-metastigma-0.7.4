@@ -615,6 +615,7 @@ void loadVideo(App& app, const char* text) {
     v.upscaleMode = std::clamp(keyValue(text, "\nupscale_mode=", v.upscaleMode), 0, 4);
     v.sharpness = std::clamp(keyValue(text, "\nsharpness=", v.sharpness), 0, 100);
     v.hdTextures = keyValue(text, "\nhd_textures=", v.hdTextures) != 0;
+    v.vitaOutpaint = keyValue(text, "\nvita_outpaint=", v.vitaOutpaint) != 0;
     v.avoidCutout = keyValue(text, "\navoid_cutout=", v.avoidCutout) != 0;
     v.cutoutBars = keyValue(text, "\ncutout_bars=", v.cutoutBars) != 0;
     v.smoothModels = keyValue(text, "\nsmooth_models=", v.smoothModels);
@@ -631,6 +632,9 @@ void loadVideo(App& app, const char* text) {
     app.lockOrientation = keyValue(text, "\nlock_orientation=", app.lockOrientation) != 0;
     app.lockLandscapeFlipped = keyValue(text, "\nlock_landscape_flipped=", app.lockLandscapeFlipped) != 0;
     if (const char* at = SDL_strstr(text, "\npad_confirm=")) app.padConfirmEast = SDL_strncmp(at + 13, "south", 5) != 0;
+    if (const char* at = SDL_strstr(text, "\nbutton_prompts="))
+        app.xboxButtonPrompts = SDL_strncmp(at + SDL_strlen("\nbutton_prompts="), "xbox", 4) == 0;
+    app.menu.setXboxPrompts(app.xboxButtonPrompts);
     app.fieldSpeed = std::clamp(keyValue(text, "\nfield_speed=", app.fieldSpeed), 1, 5);
     if (const char* at = SDL_strstr(text, "\ncheats=")) { // (Options' Cheats: hp,mp,oz,first strike,no battles,one hit,exp)
         int v[8] = {0, 0, 0, 0, 0, 0, 1, 0};
@@ -750,6 +754,9 @@ void applyVideo(App& app) {
         if (loadImage(app, "window.mct", wi, &app.androidWindow))
             app.renderer.destroy(app.windowTex), app.windowTex = app.renderer.upload(wi), noteWindowAtlas(app, wi);
         for (cr::Texture& t : app.titleArt) app.renderer.destroy(t);
+        for (auto& pair : app.titleArtHd)
+            for (cr::Texture& t : pair) app.renderer.destroy(t);
+        app.titleArtHdTried = false;
     }
     r.setRenderScale(v.renderScale / 100.0f);
     r.setSamples(v.msaa);
@@ -830,7 +837,7 @@ void stepChoice(int& value, const int* choices, int count, int dir) {
 // adjustVideo's settings: 0 resolution, 1 display, 2 aspect, 3 painted rooms, 4 render scale,
 // 5 MSAA, 6 vsync, 7 the original presentation, 8 anti-aliasing (MSAA / FSR Native AA / DLAA),
 // 9 upscaler, 10 upscale mode, 11 sharpness, 12 HD textures, 13 smoothed models, 14 layout,
-// 15 the frame rate, 16 anisotropic filtering, 17 texture filtering
+// 15 the frame rate, 16 anisotropic filtering, 17 texture filtering, 19 Vita HD art layers
 
 // Anti-aliasing choices: Off, MSAA 2 / 4 / 8, FSR (Native AA), DLSS (DLAA)
 int aaChoice(const App::Video& v) {
@@ -925,6 +932,7 @@ void adjustVideo(App& app, int row, int dir) {
     }
     case 17: v.sharpTextures = !v.sharpTextures; break;
     case 18: v.hdModels = !v.hdModels; break; // (what loads from now on)
+    case 19: v.vitaOutpaint = !v.vitaOutpaint; break;
     case 13: v.smoothModels = (v.smoothModels == 0 ? (dir > 0 ? 2 : 3) : v.smoothModels == 2 ? (dir > 0 ? 3 : 0) : (dir > 0 ? 0 : 2)); break;
     case 12: { // HD textures: what loads from now on (the next room); the UI atlas at once
         v.hdTextures = !v.hdTextures;
@@ -985,6 +993,9 @@ void refreshFanArt(App& app) {
     }
     app.renderer.destroy(app.charSheet), app.charSheet = cr::Texture(), app.charSheetTried = false; // (the rest as they next load)
     for (cr::Texture& t : app.titleArt) app.renderer.destroy(t), t = cr::Texture();
+    for (auto& pair : app.titleArtHd)
+        for (cr::Texture& t : pair) app.renderer.destroy(t), t = cr::Texture();
+    app.titleArtHdTried = false;
 }
 
 std::vector<OptRow> optionRows(App& app, int page) {
@@ -1007,8 +1018,9 @@ std::vector<OptRow> optionRows(App& app, int page) {
         OptRow r;
         r.label = label;
         r.kind = OptControl::Pair;
-        r.words[0] = 33; // On
-        r.words[1] = 34; // Off
+        r.words[0] = r.words[1] = -1;
+        r.texts[0] = tr("On");
+        r.texts[1] = tr("Off");
         r.selected = *flag ? 0 : 1;
         r.act = [&app, flag, after](int i) {
             *flag = i == 0;
@@ -1051,15 +1063,14 @@ std::vector<OptRow> optionRows(App& app, int page) {
                     }
                 }
             });
-            if (!app.fanText) rows.back().valueTex = &app.charSheet;
-            const float uv[4] = {88.0f * float(app.language), 0, 88, 24};
-            std::memcpy(rows.back().valueUv, uv, sizeof uv);
+            // The selected language name is rendered by the port font like every other button value.
         } else {
         OptRow lang;
         lang.label = sysLabel(app, 58082, "Language");
         lang.kind = OptControl::Pair;
-        lang.words[0] = 37; // Japanese
-        lang.words[1] = 38; // English
+        lang.words[0] = lang.words[1] = -1;
+        lang.texts[0] = tr("Japanese");
+        lang.texts[1] = tr("English");
         lang.selected = app.fanText ? -1 : app.language == 0 ? 0 : app.language == 1 ? 1 : -1;
         lang.act = [&app](int i) { setLanguageChoice(app, i); };
         rows.push_back(lang);
@@ -1094,7 +1105,7 @@ std::vector<OptRow> optionRows(App& app, int page) {
         onOff(sysLabel(app, 58109, "Lock Screen Orientation"), &app.lockOrientation,
               [&app] { applyOrientation(app, app.lockOrientation); });
         onOff(tr("Control Hints"), &app.showHud, nullptr);
-        rows.back().hint = tr("Show the control hints and status overlay. Off hides the WASD help; F3 is a shortcut.");
+        rows.back().hint = tr("Show the control hints and status overlay. Disable hides the WASD help; F3 is a shortcut.");
         value(tr("Import Vita Saves"), tr("Choose Folder"), [&app](int dir) {
             if (dir == 0 && app.optionsFromTitle) app.saveImport.begin("omega", app.window);
         });
@@ -1154,19 +1165,27 @@ std::vector<OptRow> optionRows(App& app, int page) {
         speed(tr("Field Speed"), &app.fieldSpeed, tr("Walking the field 2 .. 5 times as fast - the scenes, talk and menus as they are"));
         speed(tr("Battle Speed"), &app.battleSpeed, tr("The battles 2 .. 5 times as fast"));
         OptRow swap; // the controller's ○ (east) / × (south): Off as on the Vita, ○ confirms
-        swap.label = tr("Swap \u25cb and \u00d7");
+        swap.label = tr("Swap");
+        swap.promptPair = true;
         swap.kind = OptControl::Pair;
-        swap.words[0] = 33; // On
-        swap.words[1] = 34; // Off
+        swap.words[0] = swap.words[1] = -1;
+        swap.texts[0] = tr("On");
+        swap.texts[1] = tr("Off");
         swap.selected = app.padConfirmEast ? 1 : 0;
         swap.act = [&app](int i) {
             app.padConfirmEast = i == 1;
             saveMix(app);
         };
         swap.hint = (app.pad ? trf("Controller: {0}.", {SDL_GetGamepadName(app.pad) ? SDL_GetGamepadName(app.pad) : ""}) + " " : std::string(tr("With a controller:")) + " ") +
-                    (app.padConfirmEast ? tr("\u25cb (the right button) confirms, \u00d7 (the bottom one) goes back - as on the Vita")
-                                        : tr("\u00d7 (the bottom button) confirms, \u25cb (the right one) goes back"));
+                    (app.padConfirmEast ? tr("The right button confirms, the bottom one goes back - as on the Vita")
+                                        : tr("The bottom button confirms, the right one goes back"));
         rows.push_back(swap);
+        pair(tr("Button Layout"), "PlayStation", "Xbox", app.xboxButtonPrompts ? 1 : 0, [&app](int i) {
+            app.xboxButtonPrompts = i == 1;
+            app.menu.setXboxPrompts(app.xboxButtonPrompts);
+            saveMix(app);
+        });
+        rows.back().hint = tr("Changes only the on-screen button symbols; it does not change controller actions.");
         OptRow manual; // the topics and their pages (MuScrList + MsgUty)
         manual.label = sysLabel(app, 58081, "Instruction Manual");
         manual.act = [&app](int) { openManual(app, 0); };
@@ -1278,6 +1297,12 @@ std::vector<OptRow> optionRows(App& app, int page) {
             if (app.video.sharpTextures != (i == 1)) adjustVideo(app, 17, 1);
         });
         rows.back().hint = tr("Sharp: the world's textures magnified by the nearest texel (square pixels up close)");
+        onOff(tr("Vita HD Artwork Layers"), &v.vitaOutpaint, nullptr);
+        rows.back().act = [&app](int i) {
+            if (app.video.vitaOutpaint != (i == 0)) adjustVideo(app, 19, 1);
+        };
+        rows.back().enabled = app.renderer.vitaScreen() && v.hdTextures && !app.hdDir.empty();
+        rows.back().hint = tr("Use paired 16:9 PNG layers from textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 and title2_hd1/2; originals keep the Vita crop");
         break;
     }
     case 4: { // Cheats (the port's own): the user's - "Infinite HP and MP. Infinite Maxed out Money, xp multipliers. always advantage"
@@ -1340,9 +1365,8 @@ std::vector<OptRow> optionRows(App& app, int page) {
         rows.back().enabled = scalable && v.upscaler != 0;
         {
             const float ratio = kUpscaleModes[v.upscaleMode].ratio;
-            char h[96];
-            SDL_snprintf(h, sizeof h, "The scene at %d%% of the frame per side", int(100.0f / ratio + 0.5f));
-            rows.back().hint = h;
+            rows.back().hint = trf("The scene at {0}% of the frame per side",
+                                   {std::to_string(int(100.0f / ratio + 0.5f))});
         }
         value(tr("Sharpness"), std::to_string(v.sharpness) + "%", [&app](int dir) {
             if (app.video.upscaler == 1 || app.video.upscaler == 4) adjustVideo(app, 11, dir ? dir : 1);
@@ -1426,7 +1450,11 @@ std::vector<std::string> wrapText(cr::MenuPainter& m, const std::string& s, floa
 
 void openOptions(App& app, int page) {
     const bool first = !app.optionsOpen;
-    if (first) app.optionsFromTitle = app.titleOpen, app.resetAsk = 0;
+    if (first) {
+        app.optionsFromTitle = app.titleOpen, app.resetAsk = 0;
+        app.swapPromptTicks = 0;
+        app.swapPromptReversed = false;
+    }
     app.optionsOpen = true;
     app.optionsPage = (page + kOptionPages) % kOptionPages;
     app.optionsRow = 0;
@@ -1535,19 +1563,24 @@ void drawOptions(App& app, float, float) {
     // The windows slide in: rows from the left, controls from the right (WinDispOn -240 / +240)
     const float t = std::min(1.0f, app.optionsAnim / 8.0f), ease = 1 - (1 - t) * (1 - t);
     const float rowsX = -240 * (1 - ease), ctrlX = 240 * (1 - ease), a = t;
-    m.picture(103, 8, 4); // "Options" (_stMuPictInfo_Option: Omega's 103, CR1's 102)
     const std::vector<OptRow> rows = optionRows(app, app.optionsPage);
     const int n = int(rows.size()), shown = std::min(n, kOptVisible);
     optionsScrollFix(app, n, false);
-    { // (the port's: a darker panel under the page's name, the rows and the help line - readable
-      // over any scene - and the help's lines)
+    const std::string pageName = tr(kOptionPageName[app.optionsPage]);
+    constexpr float pageTitleSize = 22.0f;
+    const float pageTitleWidth = m.textWidth(pageName, pageTitleSize);
+    const float pageTitleX = 256.0f - pageTitleWidth * 0.5f;
+    { // (the port's darker page panel and rows, readable over every scene)
         const float shade[4] = {0, 0, 0, 0.5f * a}, fade[4] = {0, 0, 0, 0.2f * a};
-        const float nameW = m.textWidth(tr(kOptionPageName[app.optionsPage]), 16);
-        m.quad(228, 10, nameW + 16, 24, shade, shade);
         m.quad(12, kOptRowTop - 8, 250, optRowY(shown) + 42 - kOptRowTop, shade, shade);
         m.quad(262, kOptRowTop - 8, 238, optRowY(shown) + 42 - kOptRowTop, shade, fade);
     }
-    m.text(tr(kOptionPageName[app.optionsPage]), 236, 14, false, a, 16);
+    // Draw the white heading after its backing panel so neither its strip nor the label is covered.
+    // Its 480-unit width ends at the right edge of the dark menu panel (x = 500).
+    m.headingStrip(20, 4, tr("Options"), 1, 480, 22, 20.5f, true);
+    // Page names use the same dark selected-font style, size and baseline as "Options".
+    m.textCentred(pageName, pageTitleX, 4 + 24 - m.baselineFromCentre(pageTitleSize),
+                  true, a, pageTitleSize, false);
     for (int i = app.optionsScroll; i < n && i < app.optionsScroll + kOptVisible; ++i) {
         const OptRow& row = rows[size_t(i)];
         const float y = optRowY(i - app.optionsScroll), mid = y + 12;
@@ -1557,12 +1590,24 @@ void drawOptions(App& app, float, float) {
         // pad lead; under a finger or the mouse every row alike, 3.1.0's white at 0xb3: #17)
         const bool focus = !app.pointerLast, vita = r.vitaScreen();
         m.rowBar(20 + rowsX, y, row.label, dim, false, focus && !cursor ? 0xc8 / 255.0f : 1, (vita ? 0xd2 : 0xb3) / 255.0f);
+        if (row.promptPair) {
+            const std::string conjunction = tr("and");
+            const float firstPromptX = 28.0f + rowsX + m.textWidth(row.label, 14.0f) + 6.0f;
+            const bool firstIsSecondary = app.swapPromptReversed;
+            m.buttonPrompt(firstPromptX, y + 4.0f, 16.0f, firstIsSecondary, dim);
+            const float conjunctionX = firstPromptX + 20.0f;
+            const float conjunctionWidth = m.textWidth(conjunction, 14.0f);
+            m.textCentred(conjunction, conjunctionX, y + 12.0f, true, dim, 14.0f, false, true);
+            m.buttonPrompt(conjunctionX + conjunctionWidth + 4.0f, y + 4.0f, 16.0f, !firstIsSecondary, dim);
+        }
         // The control in the original's design units (buttons 8 above the bar, gauges 4 below),
         // scaled about (kOptCtrlX, the bar's middle)
         m.setScale(kOptCtrlX + ctrlX, mid, kOptCtrlScale);
         const float cx = kOptCtrlX + ctrlX;
         switch (row.kind) {
-        case OptControl::Check: m.button(cx + 120, y - 8, 23, "", false, dim, cursor && row.enabled); break;
+        case OptControl::Check:
+            m.button(cx + 120, y - 8, -1, tr("Check"), false, dim, cursor && row.enabled, true);
+            break;
         case OptControl::Gauge: {
             App::GaugeEase& e = app.gaugeEase[row.gauge];
             if (e.to < 0) e.from = e.to = row.value;
@@ -1573,14 +1618,11 @@ void drawOptions(App& app, float, float) {
         }
         case OptControl::Pair:
             for (int k = 0; k < 2; ++k)
-                m.button(cx + 120 * k, y - 8, row.words[k], row.texts[k], row.selected == k, a, false);
+                m.button(cx + 120 * k, y - 8, -1, row.texts[k], row.selected == k, a, false, true);
             break;
         case OptControl::Value: // our picker: the value on a button with the Back arrows either side
-            m.button(cx + 60, y - 8, -1, row.valueTex ? std::string() : row.valueText, false, dim, cursor && row.enabled);
-            if (row.valueTex) // (where the button's word goes)
-                m.imagePieceTo(*row.valueTex, cx + 70, y, 88, 24, row.valueUv[0], row.valueUv[1], row.valueUv[2], row.valueUv[3], dim);
-            m.piece(cx + 36, y + 4, 336, 880, 16, 16, dim);
-            m.piece(cx + 180, y + 4, 352, 880, 16, 16, dim);
+            m.button(cx + 60, y - 8, -1, row.valueText, false, dim, cursor && row.enabled, true);
+            m.pickerArrows(cx + 36, cx + 180, y + 4, 16, app.menuArrowBob, dim);
             break;
         }
         m.setScale(0, 0, 1);
@@ -1595,32 +1637,34 @@ void drawOptions(App& app, float, float) {
         m.quad(kOptBarX, top, kOptBarW, height, track, track);
         m.quad(kOptBarX + 1, ty + 1, kOptBarW - 2, th - 2, lit, deep);
     }
-    // "n / total" from the game's 14 x 14 digits, and Back
-    m.digit(app.optionsPage + 1, 20, kOptPageY, a);
-    m.digit(-1, 34, kOptPageY, a);
-    m.digit(kOptionPages, 48, kOptPageY, a);
-    m.backButton(192, kOptBackY, app.optionsRow == kOptionsBackRow, app.optionsBob, a);
+    // "n / total" in the selected menu font, fitted to the original 42-unit atlas slots.
+    const std::string pageCount = std::to_string(app.optionsPage + 1) + " / " + std::to_string(kOptionPages);
+    float pageCountSize = 14.0f;
+    const float pageCountWidth = m.textWidth(pageCount, pageCountSize);
+    if (pageCountWidth > 42.0f && pageCountWidth > 0.0f) pageCountSize *= 42.0f / pageCountWidth;
+    m.text(pageCount, 20, kOptPageY, false, a, pageCountSize);
+    m.backButton(192, kOptBackY, app.optionsRow == kOptionsBackRow, app.menuArrowBob, a, tr("Back")); // shared animated arrows; up-pointing triangle and selected-font label
     if (app.optionsRow >= 0 && app.optionsRow < n && !rows[size_t(app.optionsRow)].hint.empty()) { // (under the rows shown, clear of Back)
         const std::vector<std::string> lines = wrapText(m, rows[size_t(app.optionsRow)].hint, 470, 11, 2);
         for (size_t l = 0; l < lines.size(); ++l) m.text(lines[l], 20, optRowY(shown) + 2 + 13 * float(l), false, a, 11);
     }
     if (app.showHud) // (our key hints: off in a Release build, F3)
-        m.text("Up/Down  Left/Right  Enter  Q/E or PgUp/PgDn: page  Esc: back", 20, 372, false, a * 0.8f, 9);
+        m.text(tr("Up/Down  Left/Right  Enter  Q/E or PgUp/PgDn: page  Esc: back"), 20, 372, false, a * 0.8f, 9);
     if (app.saveImport.active()) {
         r.setOrigin(0);
         r.fillRect(0, 0, r.screenW(), cr::Renderer::kLogicalH, 0, 0, 0, 0.75f);
         r.setOrigin(r.uiX());
         m.picture(12, 0, 220, 1);
         std::string message = app.saveImport.state == vitaimport::Session::Picking
-            ? "Choose the folder containing your decrypted Vita saves." : app.saveImport.message;
+            ? tr("Choose the folder containing your decrypted Vita saves.") : app.saveImport.message;
         std::replace(message.begin(), message.end(), '\n', ' ');
         const auto lines = wrapText(m, message, 455, 13, 8);
         for (size_t l = 0; l < lines.size(); ++l) m.text(lines[l], 24, 234 + 16 * float(l), false, 1, 13);
         if (app.saveImport.state == vitaimport::Session::Confirm) {
-            m.plate(336, 104, 0, 0, app.saveImport.focus == 0, 1, false);
-            m.plate(336, 160, 1, 1, app.saveImport.focus == 1, 1, false);
+            m.plate(336, 104, 0, -1, app.saveImport.focus == 0, 1, false, tr("Yes"), true);
+            m.plate(336, 160, 1, -1, app.saveImport.focus == 1, 1, false, tr("No"), true);
         } else if (app.saveImport.state == vitaimport::Session::Result) {
-            m.plate(336, 104, -1, -1, true, 1, false, "OK");
+            m.plate(336, 104, -1, -1, true, 1, false, tr("OK"), true);
         }
     }
     if (app.resetAsk) { // OptionPrc 9 / 10: the message board (57078, then 57079), Yes / No at (336, 104 / 160)
@@ -1633,8 +1677,8 @@ void drawOptions(App& app, float, float) {
         m.picture(12, 0, 220, 1);
         if (!pages.empty())
             for (size_t l = 0; l < pages[0].size(); ++l) m.text(pages[0][l], 24, 234 + 16.0f * float(l), false, 1, 14);
-        m.plate(336, 104, 0, 0, app.resetConfirm == 0, 1, false);
-        m.plate(336, 160, 1, 1, app.resetConfirm == 1, 1, false);
+        m.plate(336, 104, 0, -1, app.resetConfirm == 0, 1, false, tr("Yes"), true);
+        m.plate(336, 160, 1, -1, app.resetConfirm == 1, 1, false, tr("No"), true);
     }
     r.setOrigin(r.uiX());
 }
@@ -1646,11 +1690,13 @@ void stepOptions(App& app) {
     takeAndroidFolder(app);
     if (!app.optionsOpen) return;
     if (optionsAbout(app)) { app.optionsAnim = 0; return; } // (the page slides in once "About Option" has shut)
+    if (++app.swapPromptTicks >= kFramesPerSecond) {
+        app.swapPromptTicks = 0;
+        app.swapPromptReversed = !app.swapPromptReversed;
+    }
     for (auto& [setting, e] : app.gaugeEase) // (SideGuageDraw's count: one a frame)
         if (e.left > 0) --e.left;
     ++app.optionsAnim;
-    app.optionsBob += app.optionsBobDir;
-    if (app.optionsBob >= 5 || app.optionsBob <= 0) app.optionsBobDir = -app.optionsBobDir;
 }
 
 
@@ -3180,6 +3226,12 @@ void drawFrame(App& app, bool present) {
     r.setPictureLayer(false); // (the interface from here on: kept off a camera cutout - Renderer::interfaceRect)
     r.setOrigin(r.uiX()); // the game's 2D from here on: its 1024 x 768 layout, centred
     app.order2d = App::Order2D();
+    // The Back arrows use the same 20 Hz bob in every menu, not just Options.
+    for (app.menuArrowClock += dt; app.menuArrowClock >= 1.0f / kFramesPerSecond;
+         app.menuArrowClock -= 1.0f / kFramesPerSecond) {
+        app.menuArrowBob += app.menuArrowBobDir;
+        if (app.menuArrowBob >= 5 || app.menuArrowBob <= 0) app.menuArrowBobDir = -app.menuArrowBobDir;
+    }
     // A message window this frame (the calls of drawMessageBox below): the front fade waits for its
     // text - else it goes over the portraits at once
     const bool heldNow = app.heldPage && !(!app.runner.running() || !app.dialogue.empty() || app.lastPage.empty());
@@ -3236,7 +3288,8 @@ void drawFrame(App& app, bool present) {
                 // Widescreen: side portraits keep to the screen's edges (as the later widescreen
                 // release does), centre images to the middle
                 // (Android's __EvtTex2d: the side ones 2 ex further out, to the phone's edges)
-                const float edge = r.vitaScreen() ? 0.0f
+                const float vx = 2 * vitaEdgeX(app);
+                const float edge = r.vitaScreen() ? (p.side < 0 ? -vx : p.side > 0 ? vx : 0.0f)
                                    : p.side < 0  ? wideLeft(app) - r.uiX() - 2 * androidEdgeX(app)
                                    : p.side > 0  ? wideRight(app) - r.uiX() + 2 * androidEdgeX(app)
                                                  : 0.0f; // (inside the safe area)
