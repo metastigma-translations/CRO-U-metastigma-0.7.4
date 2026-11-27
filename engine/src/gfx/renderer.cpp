@@ -341,6 +341,29 @@ void Renderer::interfaceRect(float& x, float& y, float& w, float& h) const {
     w *= uiShrink_, h *= uiShrink_;
 }
 
+void Renderer::drawQuadFullBleed(const Texture& tex, float top, float alpha, float r, float g, float b) {
+    if (!tex.id || tex.width <= 0 || tex.height <= 0 || alpha <= 0.001f) return;
+    const float screenAspect = screenW_ / float(kLogicalH);
+    const float imageAspect = float(tex.width) / float(tex.height);
+    float u0 = 0, v0 = 0, u1 = 1, v1 = 1;
+    if (imageAspect > screenAspect) {
+        const float visible = screenAspect / imageAspect;
+        u0 = (1 - visible) * 0.5f;
+        u1 = 1 - u0;
+    } else if (imageAspect < screenAspect) {
+        const float visible = imageAspect / screenAspect;
+        v0 = (1 - visible) * 0.5f;
+        v1 = 1 - v0;
+    }
+    const float right = screenW_, bottom = top + float(kLogicalH);
+    const float vertices[24] = {
+        0, top, u0, v0, right, top, u1, v0, right, bottom, u1, v1,
+        0, top, u0, v0, right, bottom, u1, v1, 0, bottom, u0, v1
+    };
+    const float colour[4] = {r, g, b, alpha};
+    dev_->drawQuad(tex, vertices, proj_, colour);
+}
+
 void Renderer::drawQuad(const Texture& tex, float x, float y, float w, float h, float r, float g,
                         float b, float a) {
     if (!tex.id) return;
