@@ -135,21 +135,9 @@ void showTexture(App& app, int index) {
     if (app.mode == Mode::Textures) updateTitle(app); // startup loads a texture before --maps/--models
 }
 
-// The five Vita-wide artwork sheets which can have an outpainted HD replacement.
-bool vitaOutpaintSheet(const std::string& mct) {
-    std::string stem = mct;
-    const size_t slash = stem.find_last_of("/\\");
-    if (slash != std::string::npos) stem.erase(0, slash + 1);
-    if (stem.size() >= 4 && stem.compare(stem.size() - 4, 4, ".mct") == 0) stem.resize(stem.size() - 4);
-    for (const char* suffix : {"_hd", "_ipad"})
-        if (stem.size() > SDL_strlen(suffix) && stem.compare(stem.size() - SDL_strlen(suffix), SDL_strlen(suffix), suffix) == 0)
-            stem.resize(stem.size() - SDL_strlen(suffix));
-    return stem == "chara1" || stem == "chara2" || stem == "chara3" || stem == "title1" || stem == "title2";
-}
-
 // With HD textures on: the upscaled replacement for `img` (found by its pixels' hash), drawn at
 // the original's size with a mip chain
-void applyHd(App& app, cr::Image& img, bool isVitaOutpaintSheet = false) {
+void applyHd(App& app, cr::Image& img) {
     if (!app.video.hdTextures || app.hdDir.empty() || img.width <= 0) return;
     if (const char* only = SDL_getenv("CR_HD_ONLY"); only && cr::hashName(cr::imageHash(img)) != only) return; // (debugging: one replacement alone)
     cr::Image hd;
@@ -164,7 +152,6 @@ void applyHd(App& app, cr::Image& img, bool isVitaOutpaintSheet = false) {
     hd.logicalH = img.height;
     hd.noAlpha = img.noAlpha;
     hd.hdSheet = img.hdSheet;
-    hd.vitaOutpaint = isVitaOutpaintSheet;
     { // (a cut-out: its alpha only 0 and 255, some of it 0)
         bool binary = !img.alphaOnly, some = false;
         for (size_t i = 3; binary && i < img.rgba.size(); i += 4) {
@@ -185,7 +172,7 @@ void applyHd(App& app, cr::Image& img, bool isVitaOutpaintSheet = false) {
 // A full-image texture by its .mct name (loadOriginalImage), its HD replacement when that's on
 bool loadImage(App& app, const std::string& mct, cr::Image& img, bool* fromAndroid) {
     if (!loadOriginalImage(app, mct, img, fromAndroid)) return false;
-    applyHd(app, img, vitaOutpaintSheet(mct));
+    applyHd(app, img);
     return true;
 }
 
