@@ -386,7 +386,7 @@ else()
     set_target_properties(chaosrings PROPERTIES
         MACOSX_BUNDLE_BUNDLE_NAME "Chaos Rings Omega"
         MACOSX_BUNDLE_GUI_IDENTIFIER "local.preservation.chaosringsomega")
-    if(WIN32)
+    if(WIN32 OR (UNIX AND NOT APPLE))
         set_target_properties(chaosrings PROPERTIES OUTPUT_NAME "chaosringsomega")
     endif()
     if(IOS) # iPhone and iPad: OpenGL ES 3.0 as Android's, the app's Documents its game folder (Files, Finder) -
