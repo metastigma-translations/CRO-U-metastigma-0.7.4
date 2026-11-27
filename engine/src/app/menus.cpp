@@ -5496,18 +5496,18 @@ void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
     cr::MenuPainter& m = app.menu;
     const bool phone = app.renderer.phoneLayout();
     const float x = phone ? 0.0f : -32.0f, y = phone ? 0.0f : -64.0f;
-    const auto draw = [&](int pict, float dx, float dy, float sourceY) {
+    const auto draw = [&](int pict, float dx, float dy) {
         const short* p = cr::kOutReadPicture[pict];
         const float k = sheetScale(tex);
-        // The original Vita scenario sheet keeps its art above the banner. Its text plate begins
-        // at source row 641 (zero-based UV y=320 in the doubled sheet); picture 27's iPad crop
-        // starts 64 pixels too low and clips the top of the embedded "Select Scenario" heading.
-        const float v = sourceY >= 0.0f ? sourceY : float(p[1]);
-        m.imagePieceTo(tex, x + dx, y + dy, p[2], p[3], p[0] * k, v * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
+        m.imagePieceTo(tex, x + dx, y + dy, p[2], p[3], p[0] * k, p[1] * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
     };
-    if (banner) draw(phone ? 26 : 27, 0.0f, -androidEdgeY(app), app.renderer.vitaScreen() ? 320.0f : -1.0f);
+    // Vita's original scenario banner is picture 26: {0, 320, 480, 84}, i.e. source row 641
+    // on the doubled HD sheet. Picture 27 is the larger iPad crop {-16, 352, 528, 128};
+    // changing only its Y coordinate leaves the wrong size and clips the banner text.
+    const bool vitaSheet = app.vitaOnly || app.renderer.vitaScreen();
+    if (banner) draw(phone || vitaSheet ? 26 : 27, 0.0f, -androidEdgeY(app));
     else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
-    else draw(phone ? 22 : 24, 0.0f, 0.0f, -1.0f);
+    else draw(phone ? 22 : 24, 0.0f, 0.0f);
 }
 
 void drawCharSelect(App& app) {
