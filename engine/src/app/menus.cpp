@@ -5504,7 +5504,7 @@ void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
     // Vita's original scenario banner is picture 26: {0, 320, 480, 84}, i.e. source row 641
     // on the doubled HD sheet. Picture 27 is the larger iPad crop {-16, 352, 528, 128};
     // changing only its Y coordinate leaves the wrong size and clips the banner text.
-    const bool vitaSheet = app.vitaOnly || app.renderer.vitaScreen();
+    const bool vitaSheet = app.vita.isOpen() || app.vitaOnly || app.renderer.vitaScreen();
     if (banner) draw(phone || vitaSheet ? 26 : 27, 0.0f, -androidEdgeY(app));
     else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
     else draw(phone ? 22 : 24, 0.0f, 0.0f);
