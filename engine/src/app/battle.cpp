@@ -3825,14 +3825,15 @@ void drawBattleRow(App& app, cr::MenuPainter& m, int k, bool dimmed, float a) {
     drawBattleHpBar(m, 20 + dx, 376 + dy, 59, b.rollHp[k], f.hpMax, false, a);
     drawBattleHpBar(m, 100 + dx, 376 + dy, 49, b.rollMp[k], f.mpMax, true, a);
     auto drawHudLabel = [&](const std::string& label, float x) {
-        constexpr float size = 11.0f;
+        float size = 11.0f;
         float width = m.textWidth(label, size);
         if (width > 22.0f && width > 0.0f) {
-            width *= 22.0f / width;
+            size *= 22.0f / width;
+            width = m.textWidth(label, size);
         }
-        // The text box is 1.2 em high; put its bottom on the empty black track's bottom (y + 4).
-        constexpr float boxHeight = size * 1.2f;
-        const float centreY = 376.0f + 4.0f - boxHeight * 0.5f;
+        // Align the bottom of the one-unit black glyph outline with the black track's bottom.
+        const float glyphBaseline = 376.0f + 4.0f - 1.0f;
+        const float centreY = glyphBaseline - m.baselineFromCentre(size);
         m.textCentred(label, x + (22.0f - width) * 0.5f, centreY + dy, false, a, size, true);
     };
     drawHudLabel(tr("HP"), 1.0f + dx);
