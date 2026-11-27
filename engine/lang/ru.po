@@ -644,6 +644,16 @@ msgstr ""
 "«Чёткая»: при увеличении текстур мира берётся ближайший тексель (вблизи пиксели квадратные)"
 
 #: src/app/scene_fx.cpp
+msgid "Vita HD Artwork Layers"
+msgstr "Слои HD-графики Vita"
+
+#: src/app/scene_fx.cpp
+msgid ""
+"Use paired 16:9 PNG layers from textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 and title2_hd1/2; originals keep the Vita crop"
+msgstr ""
+"Использовать парные PNG-слои 16:9 из textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 и title2_hd1/2; оригиналы сохраняют обрезку Vita"
+
+#: src/app/scene_fx.cpp
 msgid "Infinite HP"
 msgstr "Бесконечное здоровье"
 
@@ -1424,10 +1434,3 @@ msgstr "Предыдущие сохранения сохранены в резе
 #: src/platform/vita_import_ui.hpp
 msgid "Load from the title."
 msgstr "Загрузите сохранение с главного экрана."
-#: src/app/scene_fx.cpp
-msgid "Vita HD Artwork Layers"
-msgstr "Слои HD-графики Vita"
-
-#: src/app/scene_fx.cpp
-msgid "Use paired 16:9 PNG layers from textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 and title2_hd1/2; originals keep the Vita crop"
-msgstr "Использовать парные PNG-слои 16:9 из textures/hd: chara1_hd1/2, chara2_hd1/2, chara3_hd1/2, title1_hd1/2 и title2_hd1/2; оригиналы сохраняют обрезку Vita"
