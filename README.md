@@ -65,9 +65,10 @@ First-start notes per system:
   It runs at the display's rate (120 Hz on ProMotion screens), keeps the menus clear of the camera's notch
   or punch hole, and with Layout on *Auto* takes the iPhone layout on a small screen and the iPad layout on
   a large one - on a foldable (iPhone Duo) it changes as you fold or open it.
-- **Android:** install the APK. The launcher identifies the app as `CRO-U — Chaos Rings Omega` and
-  uses CRO-U-specific icons. The setup can pick files on the phone (an `.ipa`, the APK and OBB,
-  a Vita dump archive). Folders have to be copied over USB into
+- **Android:** install the APK. The launcher identifies the app as `CRO-U — Chaos Rings Omega`
+  and uses CRO-U-specific icons. Its application ID stays `local.preservation.chaosringsomega`,
+  so updates keep the existing app and its private data. The setup can pick files on the phone (an
+  `.ipa`, the APK and OBB, a Vita dump archive). Folders have to be copied over USB into
   `Android/data/local.preservation.chaosringsomega/files/`, in an `ios/`, `android/` or `vita/`
   folder. From v0.5.0 on, each release installs over the one before it; coming from an older build,
   uninstall it first, one last time (that deletes the copied game files and saves, so keep a copy).
