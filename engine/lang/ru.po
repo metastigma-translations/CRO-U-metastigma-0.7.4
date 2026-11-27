@@ -34,7 +34,7 @@ msgstr "Выключить"
 
 #: src/app/battle.cpp
 msgid "Lv"
-msgstr "УР"
+msgstr "Ур"
 
 #: src/app/battle.cpp src/app/menus.cpp
 msgid "HP"

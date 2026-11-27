@@ -3719,7 +3719,7 @@ void drawBattleLevelBadge(cr::MenuPainter& m, int value, float x, float y, float
         digitWidth = m.textWidth(digits, digitSize);
     }
     const float digitX = x + 34.0f - digitWidth;
-    const float digitCentreY = y + 19.0f - m.glyphInkCentreFromCentre(digits, digitSize);
+    const float digitCentreY = y + 20.0f - m.glyphInkCentreFromCentre(digits, digitSize);
     m.textTintCentred(digits, digitX, digitCentreY, yellow[0], yellow[1], yellow[2], a, digitSize, true);
 
     const std::string levelLabel = tr("Lv");
@@ -3825,7 +3825,8 @@ void drawBattlePlate(App& app, cr::MenuPainter& m, float x, float y, int fighter
         if (ac.fighter == fighter) name = ac.name;
     // Centre the visible first capital on the button's colour split; use the standard white-to-dark-grey gradient.
     constexpr float nameSize = 16.0f;
-    const float nameCentreY = y + 20.0f - m.glyphInkCentreFromCentre(name, nameSize);
+    const float nameCentreY = y + 20.0f - (selected ? 1.0f : 0.0f) -
+                             m.glyphInkCentreFromCentre(name, nameSize);
     m.textCentred(name, x + 146 - m.textWidth(name, nameSize) / 2, nameCentreY, false, a, nameSize,
                   true, false, false, 0, false);
     drawBattleStatus(m, f, x + 56, y - 8, a);
