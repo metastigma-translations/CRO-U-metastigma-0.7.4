@@ -3825,8 +3825,7 @@ void drawBattlePlate(App& app, cr::MenuPainter& m, float x, float y, int fighter
         if (ac.fighter == fighter) name = ac.name;
     // Centre the visible first capital on the button's colour split; use the standard white-to-dark-grey gradient.
     constexpr float nameSize = 16.0f;
-    const float nameCentreY = y + 20.0f - (selected ? 1.0f : 0.0f) -
-                             m.glyphInkCentreFromCentre(name, nameSize);
+    const float nameCentreY = y + 20.0f - m.glyphInkCentreFromCentre(name, nameSize);
     m.textCentred(name, x + 146 - m.textWidth(name, nameSize) / 2, nameCentreY, false, a, nameSize,
                   true, false, false, 0, false);
     drawBattleStatus(m, f, x + 56, y - 8, a);
@@ -3859,7 +3858,7 @@ void drawBattleRow(App& app, cr::MenuPainter& m, int k, bool dimmed, float a) {
         m.textCentred(label, x + (22.0f - width) * 0.5f, centreY + dy, false, a, size, true);
     };
     drawHudLabel(tr("HP"), 1.0f + dx);
-    drawHudLabel(tr("MP"), 83.0f + dx);
+    drawHudLabel(tr("MP"), 82.0f + dx);
     drawBattleHudNumber(m, b.rollHp[k], 24 + dx, 364 + dy, 5, a);
     drawBattleHudNumber(m, b.rollMp[k], 108 + dx, 364 + dy, 4, a);
     drawBattleStatus(m, f, 152 + dx, 364 + dy, a);
