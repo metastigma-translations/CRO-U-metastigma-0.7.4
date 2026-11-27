@@ -152,6 +152,7 @@ void applyHd(App& app, cr::Image& img) {
     hd.logicalH = img.height;
     hd.noAlpha = img.noAlpha;
     hd.hdSheet = img.hdSheet;
+    hd.vitaSource = img.vitaSource;
     { // (a cut-out: its alpha only 0 and 255, some of it 0)
         bool binary = !img.alphaOnly, some = false;
         for (size_t i = 3; binary && i < img.rgba.size(); i += 4) {
@@ -170,8 +171,8 @@ void applyHd(App& app, cr::Image& img) {
 
 
 // A full-image texture by its .mct name (loadOriginalImage), its HD replacement when that's on
-bool loadImage(App& app, const std::string& mct, cr::Image& img, bool* fromAndroid) {
-    if (!loadOriginalImage(app, mct, img, fromAndroid)) return false;
+bool loadImage(App& app, const std::string& mct, cr::Image& img, bool* fromAndroid, bool* fromVita) {
+    if (!loadOriginalImage(app, mct, img, fromAndroid, fromVita)) return false;
     applyHd(app, img);
     return true;
 }
@@ -186,8 +187,9 @@ bool mctHeader(const std::vector<uint8_t>& f, cr::MctInfo& mi) {
 // A full-image texture by its .mct name: the Vita's lossless .gxt of the same name when --vita is
 // given (same sizes; 8 bits per channel where the iPad files use palettes, PVRTC or RGBA4444),
 // else the data folder's .mct.
-bool loadOriginalImage(App& app, const std::string& mct, cr::Image& img, bool* fromAndroid) {
+bool loadOriginalImage(App& app, const std::string& mct, cr::Image& img, bool* fromAndroid, bool* fromVita) {
     if (fromAndroid) *fromAndroid = false;
+    if (fromVita) *fromVita = false;
     // Art the Vita redrew (crtool vita: > 12/255 from the iPad's - Omega's: the ending's two
     // backgrounds and the icon sheets) keeps the iPad's version but for the Vita alone
     static const char* const kVitaRedrawn[] = {"EndBack01.mct", "EndBack02.mct", "icon.mct", "icon_hd.mct"};
@@ -217,12 +219,16 @@ bool loadOriginalImage(App& app, const std::string& mct, cr::Image& img, bool* f
         if (app.fanText && app.fan.isOpen() && (!redrawn || app.vitaOnly) && app.fan.read(names[k] + ".gxt", data) && cr::decodeGxt(data, img)) {
             if (k + 1 < names.size()) ++(k == 0 ? app.ipadImages : app.hdImages);
             img.hdSheet = hdName;
+            img.vitaSource = true;
+            if (fromVita) *fromVita = true;
             return true;
         }
         if (app.vita.isOpen() && (!redrawn || app.vitaOnly) && app.vita.read(names[k] + ".gxt", data) && cr::decodeGxt(data, img)) {
             ++app.vitaTextures;
             if (k + 1 < names.size()) ++(k == 0 ? app.ipadImages : app.hdImages);
             img.hdSheet = hdName;
+            img.vitaSource = true;
+            if (fromVita) *fromVita = true;
             return true;
         }
         // the Android copy of the same name: when the data has none, or one of the same size
