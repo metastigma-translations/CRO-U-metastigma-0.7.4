@@ -2271,7 +2271,7 @@ void stepCharSelect(App& app);
 void charSelectDrag(App& app, float my);
 void charSelectRelease(App& app);
 void closeCharSelect(App& app, int scenario);
-void drawCharArt(App& app, float alpha, bool banner, float grey = 1);
+void drawCharArt(App& app, float alpha, bool banner, float grey = 1, float top = 0);
 void drawCharSelect(App& app);
 void charSelectKey(App& app, SDL_Keycode key);
 void charSelectClick(App& app, float px, float py);
