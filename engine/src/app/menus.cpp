@@ -5487,8 +5487,8 @@ void drawFullPicture(App& app, const cr::Texture& tex, int pict, float x, float 
 void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
     const bool secondPage = app.charSelectPage && app.charSelectArt2.id;
     const auto& hdPair = secondPage ? app.charSelectArt2Hd : app.charSelectArtHd;
-    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && hdPair[banner ? 1 : 0].id) {
-        drawVitaHdLayer(app, hdPair[banner ? 1 : 0], alpha, top, grey);
+    if (!banner && app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && hdPair[0].id) {
+        drawVitaHdLayer(app, hdPair[0], alpha, top, grey);
         return;
     }
     const cr::Texture& tex = secondPage ? app.charSelectArt2 : app.charSelectArt;
@@ -5501,11 +5501,10 @@ void drawCharArt(App& app, float alpha, bool banner, float grey, float top) {
         const float k = sheetScale(tex);
         m.imagePieceTo(tex, x + dx, y + dy, p[2], p[3], p[0] * k, p[1] * k, p[2] * k, p[3] * k, alpha, grey, grey, grey);
     };
-    // Vita's original scenario banner is picture 26: {0, 320, 480, 84}, i.e. source row 641
-    // on the doubled HD sheet. Picture 27 is the larger iPad crop {-16, 352, 528, 128};
-    // changing only its Y coordinate leaves the wrong size and clips the banner text.
-    const bool vitaSheet = tex.vitaSource;
-    if (banner) draw(phone || vitaSheet ? 26 : 27, 0.0f, -androidEdgeY(app));
+    // The text plate is the strip beginning at pixel row 641 of the doubled HD sheet.
+    // In the game's half-size source coordinates this is y=320, picture 26 (480x84).
+    // Always draw this strip from the original chara sheet; do not draw the full-bleed hd2 layer.
+    if (banner) draw(26, 0.0f, -androidEdgeY(app));
     else if (app.renderer.androidScreen()) drawFullPicture(app, tex, 22, 0, 0, alpha, grey);
     else draw(phone ? 22 : 24, 0.0f, 0.0f);
 }
