@@ -207,6 +207,13 @@ void MenuPainter::textTint(const std::string& s, float x, float y, float r, floa
     r_->drawQuad(c.tex, x0, y0, w, h, r, g, b, alpha);
 }
 
+void MenuPainter::textTintCentred(const std::string& s, float x, float y, float r, float g, float b,
+                                  float alpha, float size, bool verticalGradient) {
+    if (!r_ || s.empty()) return;
+    const Cached& c = rasterise(s, menuSize(size) * K(), verticalGradient);
+    textTint(s, x, y - c.h / kScale / K() / 2.0f, r, g, b, alpha, size, verticalGradient);
+}
+
 void MenuPainter::textCentred(const std::string& s, float x, float y, bool dark, float alpha, float size,
                                 bool verticalGradient, bool darkGradient, bool noOutline, float letterSpacing,
                                 bool scenarioVerticalGradient) {

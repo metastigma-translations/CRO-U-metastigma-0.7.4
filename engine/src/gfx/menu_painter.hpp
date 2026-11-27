@@ -85,6 +85,9 @@ public:
     // ... in a colour (MuComFontPlateDisp's colours: the plates' yellow, grey)
     void textTint(const std::string& s, float x, float y, float r, float g, float b, float alpha = 1, float size = 14,
                   bool verticalGradient = false);
+    // As above, with the glyph box centred vertically on y.
+    void textTintCentred(const std::string& s, float x, float y, float r, float g, float b, float alpha = 1, float size = 14,
+                         bool verticalGradient = false);
     // Text whose line box is centred on y (labels in bars and on buttons: this font's box is
     // taller than the iOS system font's, so a fixed top offset would sit low)
     void textCentred(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,
