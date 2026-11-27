@@ -45,16 +45,16 @@ msgid "Results"
 msgstr "Результаты"
 
 #: src/app/battle.cpp
-msgid "Even"
-msgstr "Равны"
-
-#: src/app/battle.cpp
 msgid "Player"
 msgstr "Игрок"
 
 #: src/app/battle.cpp
 msgid "Enemy"
 msgstr "Враг"
+
+#: src/app/battle.cpp
+msgid "Even"
+msgstr "Равны"
 
 #: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
 msgid "Back"
