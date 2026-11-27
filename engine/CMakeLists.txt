@@ -386,6 +386,9 @@ else()
     set_target_properties(chaosrings PROPERTIES
         MACOSX_BUNDLE_BUNDLE_NAME "Chaos Rings Omega"
         MACOSX_BUNDLE_GUI_IDENTIFIER "local.preservation.chaosringsomega")
+    if(WIN32 OR (UNIX AND NOT APPLE))
+        set_target_properties(chaosrings PROPERTIES OUTPUT_NAME "chaosringsomega")
+    endif()
     if(IOS) # iPhone and iPad: OpenGL ES 3.0 as Android's, the app's Documents its game folder (Files, Finder) -
         # packaging/ios/Info.plist.in; built unsigned (the .ipa is signed by whoever sideloads it)
         # (the open dialogs SDL has none for on iOS: the system's document picker - platform/ios_picker.mm)

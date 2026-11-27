@@ -43,7 +43,7 @@ is the game; without either, the Android release is.
 ## Install and first start
 
 1. Download the file for your system from the releases page and unzip it.
-2. Start `chaosrings`.
+2. Start `chaosringsomega.exe` on Windows, `chaosringsomega` on Linux, or `chaosrings.app` on macOS.
 3. If it doesn't find your copy, it opens a setup window: pick your `.ipa`, your Android APK and
    OBB, or your Vita folder or dump. The files it needs are **copied into the game folder**, so the
    place you picked them from can be deleted afterwards. A Vita dump is decrypted as Vita3K's
@@ -65,8 +65,10 @@ First-start notes per system:
   It runs at the display's rate (120 Hz on ProMotion screens), keeps the menus clear of the camera's notch
   or punch hole, and with Layout on *Auto* takes the iPhone layout on a small screen and the iPad layout on
   a large one - on a foldable (iPhone Duo) it changes as you fold or open it.
-- **Android:** install the APK. The setup can pick files on the phone (an `.ipa`, the APK and OBB,
-  a Vita dump archive). Folders have to be copied over USB into
+- **Android:** install the APK. The launcher identifies the app as `CRO-U — Chaos Rings Omega`
+  and uses CRO-U-specific icons. Its application ID stays `local.preservation.chaosringsomega`,
+  so updates keep the existing app and its private data. The setup can pick files on the phone (an
+  `.ipa`, the APK and OBB, a Vita dump archive). Folders have to be copied over USB into
   `Android/data/local.preservation.chaosringsomega/files/`, in an `ios/`, `android/` or `vita/`
   folder. From v0.5.0 on, each release installs over the one before it; coming from an older build,
   uninstall it first, one last time (that deletes the copied game files and saves, so keep a copy).
@@ -77,7 +79,8 @@ You can also skip the setup and place the files yourself. The **game folder** is
 
 | Platform | Game folder |
 |---|---|
-| Windows, Linux | the folder holding `chaosrings.exe` / `chaosrings` |
+| Windows | the folder holding `chaosringsomega.exe` |
+| Linux | the folder holding `chaosringsomega` |
 | Linux AppImage | the folder holding the `.AppImage` |
 | macOS | the folder holding `chaosrings.app` (its `Contents/Resources/` works too) |
 | Android | `Android/data/local.preservation.chaosringsomega/files/` on the shared storage |
@@ -87,7 +90,7 @@ Inside it, one folder per release you have (the downloads come with these folder
 
 ```
 <game folder>/
-├── chaosrings                  (or chaosrings.exe, chaosrings.app, the .AppImage)
+├── chaosringsomega             (Linux; Windows: chaosringsomega.exe; macOS: chaosrings.app; or the .AppImage)
 ├── ios/ChaosRingsOmegaHDeng.app/          the iPad .app (1.0.0 or 3.1.0), or Payload/ChaosRingsOmegaHDeng.app/, or the .ipa
 ├── android/                               the .obb and the 1.1.6 APK (or its classes.dex), or the .xapk / .apks
 ├── vita/PCSG00499/                        the installed title (CRO/resources/cro.psarc, CRO/sound/*.psarc)
@@ -119,7 +122,14 @@ CR3-U) find their copies the same way.
 
 A controller plays as the Vita does. The face buttons go by position, so on an Xbox pad ○ is B,
 × is A, △ is Y and □ is X. ○ confirms and × cancels, as in the Japanese release; Options, Game,
-"Swap ○ and ×" turns that round. Tested with a Steam Controller (through Steam Input).
+**Swap** changes which face button confirms and which goes back. The separate **Button Layout**
+setting chooses PlayStation or Xbox symbols for on-screen prompts only; it does not change
+controller actions. Tested with a Steam Controller (through Steam Input).
+
+With a gamepad connected, the system mouse cursor is hidden. Physical mouse movement or a click
+shows it again; the next gamepad input hides it again. The cursor is restored when the last
+gamepad disconnects, the window loses focus, or the game exits. Touch and the R3 virtual pointer
+in puzzle rooms are not treated as physical mouse activity.
 
 | Button | On the field | In menus and dialogue | In puzzle rooms |
 |---|---|---|---|
@@ -191,11 +201,19 @@ Everything is in **Options** (START, or V). Settings and saves live in the profi
 - **DLSS** isn't in the downloads: NVIDIA's library is proprietary and can't ship with GPL code. You
   can build it in for your own use (see [Building](#building-from-source)).
 - **HD Textures**, **HD Models**, **Smooth Models**, **Anisotropic Filtering**, **Texture Filtering**.
+- **Vita HD Artwork Layers** is available only in the Vita layout when HD Textures are enabled and
+  the HD texture folder exists. It uses optional 16:9 layer pairs in `textures/hd/`: `chara1_hd1`
+  + `chara1_hd2`, `chara2_hd1` + `chara2_hd2`, `chara3_hd1` + `chara3_hd2`,
+  `title1_hd1` + `title1_hd2`, and `title2_hd1` + `title2_hd2`. In each pair, `hd1` is the
+  artwork and `hd2` is the transparent banner/text layer. Each file can be PNG or DDS, including
+  mixed-format pairs; both files are required for that artwork. Without a complete pair, the
+  original Vita atlas rendering remains in use.
 
 **Game**
 - **Field Speed** / **Battle Speed:** Off or 2x-5x (scenes, talk and menus keep their pace).
   `--field-speed n` / `--battle-speed n` for one run.
-- **Swap ○ and ×**, **Control Hints**, **Vita Assets** / **Android Assets**, **Import Vita Saves**.
+- **Swap** (confirm / back button), **Button Layout** (PlayStation or Xbox on-screen symbols;
+  visual prompts only), **Control Hints**, **Vita Assets** / **Android Assets**, **Import Vita Saves**.
 
 **Language:** chosen in Options. The 3.1.0, Android and Vita data carry eight languages; the 1.0.0
 data has Japanese and English.
@@ -245,7 +263,7 @@ You can make sharper textures and better models from your own copy. They are for
 are made from the game's art, so keep them out of anything you share.
 
 **HD textures**
-1. `chaosrings --export-textures` writes every picture the game draws to `textures/export/` in the
+1. `chaosringsomega --export-textures` writes every picture the game draws to `textures/export/` in the
    game folder as `<hash>.png` (`--export-textures <folder>` for somewhere else).
 2. `python3 tools/hd_textures.py <game folder>` upscales them into `textures/hd/`, with waifu2x
    (`waifu2x-ncnn-vulkan`) and Real-ESRGAN (`--esrgan <folder>`) for 16-bit pictures. It needs
@@ -261,7 +279,7 @@ files so one upscale serves the game with or without the Vita's art. `CR_HD_TEXT
 reads them from elsewhere; `--no-hd-textures` runs without.
 
 **HD models**
-1. `chaosrings --export-models` writes every model to `models/export/` as glTF 2.0 (`.glb`, with
+1. `chaosringsomega --export-models` writes every model to `models/export/` as glTF 2.0 (`.glb`, with
    its skeleton, materials, pictures and animations). Blender opens them as they are.
 2. Edit it, keeping the armature (bones are named `node_<n>...`) and the material names
    (`cr_mat_<n>...`). A material can take a picture of your own (PNG or JPEG, packed in the `.glb`).
@@ -280,9 +298,8 @@ The game plays its own animations; up to four weights a vertex and 255 joints a 
   Vulkan renderer; the option's hint says why it's off. FSR 4 also needs the files in `fsr4/`.
 - **Android, an update won't install:** builds before v0.5.0 were each signed with a different key.
   Uninstall the old one first (back up your game files and saves).
-- **Tested on:** Linux (played) and Windows (under Wine, Vulkan and OpenGL). The macOS and Android
-  builds are made by CI but haven't been played on real hardware yet. Reports are welcome in
-  [Issues](https://github.com/DuIslingr/CRO-U/issues).
+- **Tested on:** Linux, Windows and Android. The macOS build is made by CI but has not been played
+  on real hardware. Reports are welcome in [Issues](https://github.com/DuIslingr/CRO-U/issues).
 
 ## Building from source
 
@@ -292,7 +309,9 @@ The build is CR1:U's: C++17, SDL3, Vulkan or OpenGL.
 cd engine
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build
-build/chaosrings
+build/chaosringsomega  # Linux
+# Windows: build/chaosringsomega.exe
+# macOS: open build/chaosrings.app
 ```
 
 Put your copy in `engine/build/` (or the folder you start it from) as described above.
@@ -312,7 +331,7 @@ Put your copy in `engine/build/` (or the folder you start it from) as described 
   Windows to prove it works but never uploads those builds: a DLSS build is for your own use.
 - Every push is built for all four platforms by `.github/workflows/build.yml`; a `v*` tag publishes
   a release.
-- `chaosrings --selftest` checks the game logic against your data (iPad 1.0.0 and 3.1.0, iPad +
+- `chaosringsomega --selftest` checks the game logic against your data (iPad 1.0.0 and 3.1.0, iPad +
   Vita, Vita alone); `--explore n [scenario]` plays a scenario by itself to its ending.
 
 ### Documentation

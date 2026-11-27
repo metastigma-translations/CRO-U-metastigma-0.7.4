@@ -12,6 +12,19 @@ listed is CR1:U's behaviour still (`docs/ENGINE.md` is CR1's notes).
       (the UI sheet is `window_ipad`)
 - [x] the title screen as `__menuu_TitlePut` draws it (logo, Please Touch, copyright, the two
       pictures down the left, the plates)
+- [x] selected menu labels use the port's chosen UI font instead of baked atlas lettering: title
+      choices, Save / Load and confirmation labels, dates and play time, section headings, Camp and
+      Shop controls, character and Status boards, the Gene Board, Scenarios, battle commands and
+      Options; the surrounding atlas artwork, icons and focus treatment remain texture-rendered
+- [x] the controller's `Swap` setting and `Button Layout` are independent: Swap changes the
+      physical confirm / back buttons, while PlayStation / Xbox Button Layout changes only the
+      on-screen prompt symbols. A connected gamepad hides the OS cursor; physical mouse activity
+      shows it, later gamepad input hides it again, and disconnecting the last pad, losing window
+      focus or quitting restores it. Touch and the R3 virtual pointer do not count as mouse activity
+- [x] optional Vita HD Artwork Layers use paired 16:9 files from the HD texture folder:
+      `chara1_hd1/2`, `chara2_hd1/2`, `chara3_hd1/2`, `title1_hd1/2` and `title2_hd1/2`.
+      The first is artwork, the second a transparent text/banner layer; each can be PNG or DDS.
+      Complete pairs draw full-bleed, while missing pairs leave the original Vita atlas path intact
 - [x] the menus' coordinates: Omega's iPad build is the iPhone layout doubled and centred
       (`tex2d_add`: screen = 2 x + (32, 64)); menu sounds are CR1's + 0x91
 - [x] Select Scenario (`__menuu_Start*`: the scenario's art and banner, one plate, Back) and the
