@@ -127,6 +127,53 @@ int main() {
             check(!cr::loadHdImage(dir, orig2, out, &why) && why.find("short") != std::string::npos, "a DDS cut short left out");
         }
     }
+    { // Named Vita layers accept independent extensions: title1_hd1.dds + title1_hd2.png.
+        auto put32 = [](std::vector<uint8_t>& v, size_t at, uint32_t x) {
+            for (int i = 0; i < 4; ++i) v[at + size_t(i)] = uint8_t(x >> (8 * i));
+        };
+        std::vector<uint8_t> dds(128 + size_t(960) * 544 * 4, 0);
+        std::memcpy(dds.data(), "DDS ", 4);
+        put32(dds, 4, 124);
+        put32(dds, 12, 544);
+        put32(dds, 16, 960);
+        put32(dds, 76, 32);
+        put32(dds, 80, 0x40); // legacy 32-bit RGB masks
+        put32(dds, 88, 32);
+        put32(dds, 92, 0x000000ff);
+        put32(dds, 96, 0x0000ff00);
+        put32(dds, 100, 0x00ff0000);
+        put32(dds, 104, 0);
+        for (size_t i = 128; i < dds.size(); i += 4)
+            dds[i] = 220, dds[i + 1] = 30, dds[i + 2] = 40, dds[i + 3] = 0;
+        {
+            std::ofstream outFile(dir + "title1_hd1.dds", std::ios::binary);
+            outFile.write(reinterpret_cast<const char*>(dds.data()), std::streamsize(dds.size()));
+        }
+
+        cr::Image pngLayer;
+        pngLayer.width = 960;
+        pngLayer.height = 544;
+        pngLayer.rgba.resize(size_t(pngLayer.width) * pngLayer.height * 4);
+        for (size_t i = 0; i < pngLayer.rgba.size(); i += 4)
+            pngLayer.rgba[i] = 5, pngLayer.rgba[i + 1] = 180, pngLayer.rgba[i + 2] = 70, pngLayer.rgba[i + 3] = 128;
+        check(cr::savePngImage(dir + "title1_hd2.png", pngLayer), "a named PNG text layer written");
+
+        cr::Image artLayer, textLayer;
+        check(cr::loadNamedHdImage(dir, "title1_hd1", artLayer, &why) &&
+                  artLayer.width == 960 && artLayer.height == 544 &&
+                  std::vector<uint8_t>(artLayer.rgba.begin(), artLayer.rgba.begin() + 4) ==
+                      std::vector<uint8_t>{220, 30, 40, 255},
+              "a named DDS artwork layer loaded");
+        check(cr::loadNamedHdImage(dir, "title1_hd2", textLayer, &why) &&
+                  textLayer.width == 960 && textLayer.height == 544 &&
+                  std::vector<uint8_t>(textLayer.rgba.begin(), textLayer.rgba.begin() + 4) ==
+                      std::vector<uint8_t>{5, 180, 70, 128},
+              "a named PNG text layer loaded beside a DDS artwork layer");
+    }
+    {
+        cr::Image named;
+        check(!cr::loadNamedHdImage(dir, "title2_hd1", named, &why), "a missing named HD layer is not reported as loaded");
+    }
     std::error_code ec;
     fs::remove_all(root, ec);
     std::printf("hd texture: %d problems\n", problems);
