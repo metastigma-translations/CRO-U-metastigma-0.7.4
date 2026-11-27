@@ -5276,6 +5276,31 @@ constexpr int kScenarioWord[2] = {12, 17};
 bool laterPairsOpen(const App& app) { return allPairsFlags(app).flag(31); } // StartSet: the second page
 
 
+bool loadVitaHdLayers(App& app, const std::string& artName, const std::string& textName,
+                      std::array<cr::Texture, 2>& layers) {
+    if (!app.renderer.vitaScreen() || !app.video.hdTextures || !app.video.vitaOutpaint || app.hdDir.empty())
+        return false;
+    if (layers[0].id && layers[1].id) return true;
+    for (cr::Texture& tex : layers) app.renderer.destroy(tex);
+    cr::Image art, text;
+    std::string why;
+    if (!cr::loadNamedHdImage(app.hdDir, artName, art, &why)) {
+        if (!why.empty()) SDL_Log("Vita HD artwork %s: %s", artName.c_str(), why.c_str());
+        return false;
+    }
+    if (!cr::loadNamedHdImage(app.hdDir, textName, text, &why)) {
+        if (!why.empty()) SDL_Log("Vita HD text layer %s: %s", textName.c_str(), why.c_str());
+        return false;
+    }
+    layers[0] = app.renderer.upload(art);
+    layers[1] = app.renderer.upload(text);
+    return layers[0].id && layers[1].id;
+}
+
+void drawVitaHdLayer(App& app, const cr::Texture& layer, float alpha, float top = 0, float grey = 1) {
+    if (layer.id) app.renderer.drawQuadFullBleed(layer, top, alpha, grey, grey, grey);
+}
+
 void openCharSelect(App& app) {
     app.charSelectOpen = true;
     app.charSelectAnim = 0;
@@ -5283,10 +5308,17 @@ void openCharSelect(App& app) {
     app.charSelectCursor = 0;
     app.renderer.destroy(app.charSelectArt);
     app.renderer.destroy(app.charSelectArt2);
+    for (cr::Texture& tex : app.charSelectArtHd) app.renderer.destroy(tex);
+    for (cr::Texture& tex : app.charSelectArt2Hd) app.renderer.destroy(tex);
     const cr::GameState g = allPairsFlags(app);
+    const std::string firstStem = g.flag(0x6a2) || g.flag(0x4bd) ? "chara2" : "chara1";
     cr::Image img;
-    if (loadImage(app, g.flag(0x6a2) || g.flag(0x4bd) ? "chara2.mct" : "chara1.mct", img)) app.charSelectArt = app.renderer.upload(img);
-    if (g.flag(31) && loadImage(app, "chara3.mct", img)) app.charSelectArt2 = app.renderer.upload(img);
+    if (loadImage(app, firstStem + ".mct", img)) app.charSelectArt = app.renderer.upload(img);
+    loadVitaHdLayers(app, firstStem + "_hd1", firstStem + "_hd2", app.charSelectArtHd);
+    if (g.flag(31)) {
+        if (loadImage(app, "chara3.mct", img)) app.charSelectArt2 = app.renderer.upload(img);
+        loadVitaHdLayers(app, "chara3_hd1", "chara3_hd2", app.charSelectArt2Hd);
+    }
     app.renderer.destroy(app.startPage.serect);
     app.startPage = App::StartPage();
     app.startPage.y = pageTop(app);
@@ -5412,13 +5444,20 @@ void closeCharSelect(App& app, int scenario) { // __menuu_StartClr: var 0 = 0 (B
     app.charSelectOpen = false;
     app.game.vars[0] = scenario;
     if (scenario) app.chosenPair = scenario;
-    else app.renderer.destroy(app.charSelectArt); // (a scenario: the save screen shows it too - showMap frees it)
-    if (scenario == 2 && app.charSelectArt2.id) { // SaveLoadPut: slot 0x12 (chara3) for the second scenario
+    else {
+        app.renderer.destroy(app.charSelectArt); // (a scenario: the save screen shows it too - showMap frees it)
+        for (cr::Texture& tex : app.charSelectArtHd) app.renderer.destroy(tex);
+    }
+    if (scenario == 2 && (app.charSelectArt2.id || app.charSelectArt2Hd[0].id)) {
         app.renderer.destroy(app.charSelectArt);
+        for (cr::Texture& tex : app.charSelectArtHd) app.renderer.destroy(tex);
         app.charSelectArt = app.charSelectArt2;
         app.charSelectArt2 = cr::Texture();
+        app.charSelectArtHd = app.charSelectArt2Hd;
+        app.charSelectArt2Hd = {};
     }
     app.renderer.destroy(app.charSelectArt2);
+    for (cr::Texture& tex : app.charSelectArt2Hd) app.renderer.destroy(tex);
     app.renderer.destroy(app.startPage.serect);
     app.startPage = App::StartPage();
     app.charSelectPage = 0;
@@ -5445,8 +5484,14 @@ void drawFullPicture(App& app, const cr::Texture& tex, int pict, float x, float 
                           p[3] * k, alpha, grey, grey, grey);
 }
 
-void drawCharArt(App& app, float alpha, bool banner, float grey) {
-    const cr::Texture& tex = app.charSelectPage && app.charSelectArt2.id ? app.charSelectArt2 : app.charSelectArt;
+void drawCharArt(App& app, float alpha, bool banner, float grey, float top = 0) {
+    const bool secondPage = app.charSelectPage && app.charSelectArt2.id;
+    const auto& hdPair = secondPage ? app.charSelectArt2Hd : app.charSelectArtHd;
+    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && hdPair[banner ? 1 : 0].id) {
+        drawVitaHdLayer(app, hdPair[banner ? 1 : 0], alpha, top, grey);
+        return;
+    }
+    const cr::Texture& tex = secondPage ? app.charSelectArt2 : app.charSelectArt;
     if (!tex.id) return;
     cr::MenuPainter& m = app.menu;
     const bool phone = app.renderer.phoneLayout();
@@ -5476,15 +5521,19 @@ void drawCharSelect(App& app) {
         const int page = app.charSelectPage;
         app.charSelectPage = 0;
         const int keepLayer = r.layer();
-        r.setLayer(8); // fill Vita width while keeping the texture's title at its original vertical scale
+        r.setLayer(3);
         drawCharArt(app, t, false);
         r.setLayer(keepLayer);
         app.charSelectPage = page;
     }
     if (later && sp.shown) { // window 1: the second page's, falling (chara3 24 and 32 under it; iPhone 22 / 31)
         const int keepLayer = r.layer();
-        r.setLayer(8); // same horizontal-only Vita fit for the second character texture
-        if (r.androidScreen()) { // (22 fitted as the first page's; 31, its foot, + oy: _PictTexNoDrawFull2W)
+        r.setLayer(3);
+        if (r.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint &&
+            app.charSelectArt2Hd[0].id && app.charSelectArt2Hd[1].id) {
+            const float top = sp.y * 2.0f * r.layoutScale();
+            drawVitaHdLayer(app, app.charSelectArt2Hd[0], t, top);
+        } else if (r.androidScreen()) { // (22 fitted as the first page's; 31, its foot, + oy: _PictTexNoDrawFull2W)
             drawFullPicture(app, app.charSelectArt2, 22, 0, sp.y, t);
             outPicture(m, app.charSelectArt2, 31, 0, sp.y + 320 + androidEdgeY(app), t);
         } else if (phone) {
@@ -5519,8 +5568,10 @@ void drawCharSelect(App& app) {
         const int page = app.charSelectPage;
         app.charSelectPage = later ? 1 : 0;
         const int keepLayer = r.layer();
-        r.setLayer(8); // the banner/title is part of this texture: don't scale it vertically off-screen
-        drawCharArt(app, t, true);
+        r.setLayer(3);
+        const float top = later && sp.shown && app.charSelectArt2Hd[1].id
+            ? sp.y * 2.0f * r.layoutScale() : 0.0f;
+        drawCharArt(app, t, true, 1.0f, top);
         r.setLayer(keepLayer);
         app.charSelectPage = page;
     }
@@ -5600,6 +5651,10 @@ void drawTitleMenu(App& app) {
             if (loadImage(app, kTitleSheet[k], img)) app.titleArt[k] = app.renderer.upload(img);
             if (k == 0) app.titleArtIpad = app.ipadImages > ipadBefore;
         }
+    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && !app.titleArtHdTried) {
+        app.titleArtHdTried = true;
+        loadVitaHdLayers(app, "title1_hd", "title2_hd", app.titleArtHd);
+    }
     m.begin(app.renderer, app.windowTex, &app.font, app.cleanTextOutline);
     const PhoneMenu phoneMenu(app, m); // the iPhone layout: its screen's menu coordinates
     // TitlePrc: the title's art alone (windows 0 / 1: the logo and the name, the strip below) until
@@ -5612,10 +5667,14 @@ void drawTitleMenu(App& app) {
     // none, the Vita's, the iPad layout gets title1_hd, cut as the iPhone's 7 / 8 - the places by layout)
     const int name = app.titleArtIpad ? 9 : 7, strip = app.titleArtIpad ? 10 : 8;
     const bool vita = app.renderer.vitaScreen();
-    if (vita) {
-        // The Vita's __menuu_TitlePut (its table at 0x81123108): the name 7 at (184, 220), the chaos logo 6 at
-        // (0, 24), the strip 8 at (0, 264) - title1 / chaos read by _MuCom_MctTexRead, its pictures kind 3
-        // (FUN_81015be8: full size, the pictures' layer)
+    if (vita && app.video.hdTextures && app.video.vitaOutpaint && app.titleArtHd[0].id && app.titleArtHd[1].id) {
+        const int keep = app.renderer.layer();
+        app.renderer.setLayer(3);
+        drawVitaHdLayer(app, app.titleArtHd[0], logo);
+        drawVitaHdLayer(app, app.titleArtHd[1], logo);
+        app.renderer.setLayer(keep);
+    } else if (vita) {
+        // Original Vita texture behaviour: its own crop, scale and edge-filling title strip.
         const int keep = app.renderer.layer();
         app.renderer.setLayer(3);
         outPicture(m, app.titleArt[0], name, 184, 220, logo);
