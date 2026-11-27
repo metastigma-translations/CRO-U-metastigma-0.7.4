@@ -33,7 +33,7 @@ msgstr ""
 
 #: src/app/battle.cpp
 msgid "Lv"
-msgstr "Lv"
+msgstr ""
 
 #: src/app/battle.cpp src/app/menus.cpp
 msgid "HP"
