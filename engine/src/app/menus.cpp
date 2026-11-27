@@ -5653,7 +5653,8 @@ void drawTitleMenu(App& app) {
         }
     if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && !app.titleArtHdTried) {
         app.titleArtHdTried = true;
-        loadVitaHdLayers(app, "title1_hd", "title2_hd", app.titleArtHd);
+        loadVitaHdLayers(app, "title1_hd1", "title1_hd2", app.titleArtHd[0]);
+        loadVitaHdLayers(app, "title2_hd1", "title2_hd2", app.titleArtHd[1]);
     }
     m.begin(app.renderer, app.windowTex, &app.font, app.cleanTextOutline);
     const PhoneMenu phoneMenu(app, m); // the iPhone layout: its screen's menu coordinates
@@ -5667,11 +5668,15 @@ void drawTitleMenu(App& app) {
     // none, the Vita's, the iPad layout gets title1_hd, cut as the iPhone's 7 / 8 - the places by layout)
     const int name = app.titleArtIpad ? 9 : 7, strip = app.titleArtIpad ? 10 : 8;
     const bool vita = app.renderer.vitaScreen();
-    if (vita && app.video.hdTextures && app.video.vitaOutpaint && app.titleArtHd[0].id && app.titleArtHd[1].id) {
+    if (vita && app.video.hdTextures && app.video.vitaOutpaint &&
+        app.titleArtHd[0][0].id && app.titleArtHd[0][1].id &&
+        app.titleArtHd[1][0].id && app.titleArtHd[1][1].id) {
         const int keep = app.renderer.layer();
         app.renderer.setLayer(3);
-        drawVitaHdLayer(app, app.titleArtHd[0], logo);
-        drawVitaHdLayer(app, app.titleArtHd[1], logo);
+        drawVitaHdLayer(app, app.titleArtHd[0][0], logo);
+        drawVitaHdLayer(app, app.titleArtHd[0][1], logo);
+        drawVitaHdLayer(app, app.titleArtHd[1][0], logo);
+        drawVitaHdLayer(app, app.titleArtHd[1][1], logo);
         app.renderer.setLayer(keep);
     } else if (vita) {
         // Original Vita texture behaviour: its own crop, scale and edge-filling title strip.
