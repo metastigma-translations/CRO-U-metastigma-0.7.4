@@ -2238,6 +2238,7 @@ void answerResume(App& app, bool yes, bool cancelled = false);
 void resumeClick(App& app, float px, float py);
 void stepResume(App& app);
 int pictAnimFrame(int draws, int ticks, int frames);
+float pictAnimPosition(float draws, float ticks, float frames);
 void drawResumePrompt(App& app);
 void newPairParty(App& app, int pair, bool clearData);
 cr::GameState allPairsFlags(const App& app);

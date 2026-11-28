@@ -1,5 +1,7 @@
 #include "app/app.hpp"
 
+#include <cmath>
+
 namespace crapp {
 
 // The text-only entries from the selected window_hd area. Other atlas words deliberately remain raster.
@@ -4108,6 +4110,15 @@ int pictAnimFrame(int draws, int ticks, int frames) {
     return (k <= top ? k : 2 * top - k) / ticks;
 }
 
+// The same out-and-back animation with sub-frame precision for displays above the game's 20 Hz.
+float pictAnimPosition(float draws, float ticks, float frames) {
+    if (!std::isfinite(draws) || ticks <= 0.0f || frames <= 0.0f) return 0.0f;
+    const float top = ticks * frames, period = 2.0f * top;
+    float phase = std::fmod(draws, period);
+    if (phase < 0.0f) phase += period;
+    return std::clamp((phase <= top ? phase : period - phase) / ticks, 0.0f, frames);
+}
+
 // ComUty_MsgBoardDraw at (0, y): picture 12, the mark (picture 13, 20 px a frame) at (458, y + 78),
 // and its lines from (24, y + 14), 16 apart in the menu font (13: Part 8 4936.5 s, "You have save
 // data from your last session." 509 px wide of 1280) - those only while the window stands still
@@ -5653,14 +5664,17 @@ void outPicture(cr::MenuPainter& m, const cr::Texture& tex, int pict, float x, f
 void drawTitleMenu(App& app) {
     cr::MenuPainter& m = app.menu;
     static const char* const kTitleSheet[2] = {"title1.mct", "chaos.mct"};
+    const bool vitaHdTitle = app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint;
     for (int k = 0; k < 2; ++k)
-        if (!app.titleArt[k].id) {
+        if (!app.titleArt[k].id && !(k == 0 && vitaHdTitle)) {
+            // In Vita HD outpaint mode, do not load the low-resolution title1 source as a fallback.
+            // The split HD pair is the only title1 artwork drawn in this mode.
             cr::Image img;
             const int ipadBefore = app.ipadImages;
             if (loadImage(app, kTitleSheet[k], img)) app.titleArt[k] = app.renderer.upload(img);
             if (k == 0) app.titleArtIpad = app.ipadImages > ipadBefore;
         }
-    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && !app.titleArtHdTried) {
+    if (vitaHdTitle && !app.titleArtHdTried) {
         app.titleArtHdTried = true;
         loadVitaHdLayers(app, "title1_hd1", "title1_hd2", app.titleArtHd[0]);
         loadVitaHdLayers(app, "title2_hd1", "title2_hd2", app.titleArtHd[1]);
@@ -5686,9 +5700,8 @@ void drawTitleMenu(App& app) {
             drawVitaHdLayer(app, app.titleArtHd[0][0], logo);
             drawVitaHdLayer(app, app.titleArtHd[0][1], logo);
         } else {
-            // The title1 pair is optional when title2 is supplied: retain its original crop and strip.
-            outPicture(m, app.titleArt[0], name, 184, 220, logo);
-            outPicture(m, app.titleArt[0], strip, 0, 264, plates || board ? 1.0f : t);
+            // Never flash the low-resolution Vita title1 atlas while its two HD layers are unavailable.
+            // The original title1 remains available when Vita HD outpaint is disabled.
         }
         if (title2Hd) {
             drawVitaHdLayer(app, app.titleArtHd[1][0], logo);

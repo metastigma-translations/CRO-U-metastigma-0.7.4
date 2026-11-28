@@ -4021,7 +4021,10 @@ void drawBattleResults(App& app, cr::MenuPainter& m, float a) {
     // back) at (458, y + 78), the lines only while the window stands still (Part 3 979.59-979.70 s: the board
     // comes up empty; the line and the mark together)
     m.picture(12, 0, 220 + by, a);
-    m.scrollDownMarker(458, 298 + by, pictAnimFrame(rs.frames, 1, 4), a);
+    // Keep the five source poses, but stretch the out-and-back cycle to 0.8 s.
+    // b.clock is the remainder after fixed 20 Hz updates; use it for smooth 60/120 Hz rendering.
+    const float markerFrame = pictAnimPosition(float(rs.frames) + b.clock * float(kFramesPerSecond), 2.0f, 4.0f);
+    m.scrollDownMarker(458, 298 + by, markerFrame, a);
     std::vector<std::vector<std::string>> pages;
     const int value = rs.value;
     if (away <= 0.0f &&
