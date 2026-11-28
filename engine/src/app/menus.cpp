@@ -5693,22 +5693,21 @@ void drawTitleMenu(App& app) {
     const bool vita = app.renderer.vitaScreen();
     const bool title1Hd = app.titleArtHd[0][0].id && app.titleArtHd[0][1].id;
     const bool title2Hd = app.titleArtHd[1][0].id && app.titleArtHd[1][1].id;
-    if (vita && app.video.hdTextures && app.video.vitaOutpaint && (title1Hd || title2Hd)) {
+    if (vitaHdTitle) {
         const int keep = app.renderer.layer();
         app.renderer.setLayer(3);
+        // title1_hd1 is the outpainted base artwork. Keep it opaque while the menu
+        // changes to its plates; otherwise the original full-screen Tex2d card below it
+        // becomes visible again as the title's logo alpha reaches zero.
         if (title1Hd) {
-            drawVitaHdLayer(app, app.titleArtHd[0][0], logo);
-            drawVitaHdLayer(app, app.titleArtHd[0][1], logo);
-        } else {
-            // Never flash the low-resolution Vita title1 atlas while its two HD layers are unavailable.
-            // The original title1 remains available when Vita HD outpaint is disabled.
+            drawVitaHdLayer(app, app.titleArtHd[0][0], 1.0f);
+            drawVitaHdLayer(app, app.titleArtHd[0][1], 1.0f);
         }
+        // The separate Chaos logo follows the original title fade, but never falls back
+        // to the low-resolution chaos.mct sheet in Vita HD outpaint mode.
         if (title2Hd) {
             drawVitaHdLayer(app, app.titleArtHd[1][0], logo);
             drawVitaHdLayer(app, app.titleArtHd[1][1], logo);
-        } else {
-            // The title2 (chaos logo) pair also falls back independently of title1.
-            outPicture(m, app.titleArt[1], 6, 0, 24, logo);
         }
         app.renderer.setLayer(keep);
     } else if (vita) {
@@ -6203,6 +6202,13 @@ void bootTitle(App& app) {
     app.musicArea = -1;
     app.fieldHidden = false; // (the boot script toggles it on at its start and off before the warp out)
     app.msgWin = App::MsgWin();
+    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint) {
+        // Load both Vita title pairs before the boot script's full-screen Tex2d card is drawn.
+        // loadVitaHdLayers leaves already-uploaded pairs intact on a return to the title.
+        app.titleArtHdTried = true;
+        loadVitaHdLayers(app, "title1_hd1", "title1_hd2", app.titleArtHd[0]);
+        loadVitaHdLayers(app, "title2_hd1", "title2_hd2", app.titleArtHd[1]);
+    }
     playBgm(app, 1u << 29); // the script starts the title music
     std::string err;
     if (!app.events.load(app.dataDir, 0, &err)) {
