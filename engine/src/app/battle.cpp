@@ -3981,7 +3981,7 @@ void drawBattleResults(App& app, cr::MenuPainter& m, float a) {
             size *= maxWidth / labelWidth;
             labelWidth = m.textWidth(label, size);
         }
-        m.textCentred(label, x + (128.0f - labelWidth) * 0.5f, y + 10.0f,
+        m.textCentred(label, x + (128.0f - labelWidth) * 0.5f, y + 8.0f,
                       true, a, size, false, false, true);
     };
     // Pictures 68 and 70 contained the same connector; draw it once:
@@ -4021,8 +4021,7 @@ void drawBattleResults(App& app, cr::MenuPainter& m, float a) {
     // back) at (458, y + 78), the lines only while the window stands still (Part 3 979.59-979.70 s: the board
     // comes up empty; the line and the mark together)
     m.picture(12, 0, 220 + by, a);
-    const short* mk = cr::kMenuPicture[13];
-    m.piece(458, 298 + by, float(mk[0] + 20 * pictAnimFrame(rs.frames, 1, 4)), mk[1], mk[2], mk[3], a);
+    m.scrollDownMarker(458, 298 + by, pictAnimFrame(rs.frames, 1, 4), a);
     std::vector<std::vector<std::string>> pages;
     const int value = rs.value;
     if (away <= 0.0f &&

@@ -5285,11 +5285,13 @@ bool loadVitaHdLayers(App& app, const std::string& artName, const std::string& t
     cr::Image art, text;
     std::string why;
     if (!cr::loadNamedHdImage(app.hdDir, artName, art, &why)) {
-        if (!why.empty()) SDL_Log("Vita HD artwork %s: %s", artName.c_str(), why.c_str());
+        if (why.empty()) why = "not found in " + app.hdDir + " (expected .dds or .png)";
+        SDL_Log("Vita HD artwork %s: %s", artName.c_str(), why.c_str());
         return false;
     }
     if (!cr::loadNamedHdImage(app.hdDir, textName, text, &why)) {
-        if (!why.empty()) SDL_Log("Vita HD text layer %s: %s", textName.c_str(), why.c_str());
+        if (why.empty()) why = "not found in " + app.hdDir + " (expected .dds or .png)";
+        SDL_Log("Vita HD text layer %s: %s", textName.c_str(), why.c_str());
         return false;
     }
     layers[0] = app.renderer.upload(art);
@@ -5675,15 +5677,26 @@ void drawTitleMenu(App& app) {
     // none, the Vita's, the iPad layout gets title1_hd, cut as the iPhone's 7 / 8 - the places by layout)
     const int name = app.titleArtIpad ? 9 : 7, strip = app.titleArtIpad ? 10 : 8;
     const bool vita = app.renderer.vitaScreen();
-    if (vita && app.video.hdTextures && app.video.vitaOutpaint &&
-        app.titleArtHd[0][0].id && app.titleArtHd[0][1].id &&
-        app.titleArtHd[1][0].id && app.titleArtHd[1][1].id) {
+    const bool title1Hd = app.titleArtHd[0][0].id && app.titleArtHd[0][1].id;
+    const bool title2Hd = app.titleArtHd[1][0].id && app.titleArtHd[1][1].id;
+    if (vita && app.video.hdTextures && app.video.vitaOutpaint && (title1Hd || title2Hd)) {
         const int keep = app.renderer.layer();
         app.renderer.setLayer(3);
-        drawVitaHdLayer(app, app.titleArtHd[0][0], logo);
-        drawVitaHdLayer(app, app.titleArtHd[0][1], logo);
-        drawVitaHdLayer(app, app.titleArtHd[1][0], logo);
-        drawVitaHdLayer(app, app.titleArtHd[1][1], logo);
+        if (title1Hd) {
+            drawVitaHdLayer(app, app.titleArtHd[0][0], logo);
+            drawVitaHdLayer(app, app.titleArtHd[0][1], logo);
+        } else {
+            // The title1 pair is optional when title2 is supplied: retain its original crop and strip.
+            outPicture(m, app.titleArt[0], name, 184, 220, logo);
+            outPicture(m, app.titleArt[0], strip, 0, 264, plates || board ? 1.0f : t);
+        }
+        if (title2Hd) {
+            drawVitaHdLayer(app, app.titleArtHd[1][0], logo);
+            drawVitaHdLayer(app, app.titleArtHd[1][1], logo);
+        } else {
+            // The title2 (chaos logo) pair also falls back independently of title1.
+            outPicture(m, app.titleArt[1], 6, 0, 24, logo);
+        }
         app.renderer.setLayer(keep);
     } else if (vita) {
         // Original Vita texture behaviour: its own crop, scale and edge-filling title strip.

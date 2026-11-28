@@ -27,6 +27,9 @@ void MenuPainter::release(Renderer& r) {
     for (Texture& tex : promptButtonTex_) r.destroy(tex);
     r.destroy(resultDiscTex_);
     resultDiscCorePixels_ = 0;
+    for (Texture& tex : scrollMarkerTex_) r.destroy(tex);
+    scrollMarkerCoreW_.fill(0);
+    scrollMarkerCoreH_.fill(0);
     promptButtonTexCorePixels_.fill(0);
     promptButtonTexXbox_.fill(false);
 }
@@ -116,6 +119,135 @@ void MenuPainter::quad(float x, float y, float w, float h, const float* left, co
 
 // Recreate the source atlas's 144-unit black disc as a cached alpha texture.
 // Its interior is uniformly 0xB1 opaque and its edge is antialiased at the source's 288px density.
+// The original message-board marker is picture 13 (20x22), two frames:
+// the down triangle moves down one menu unit every four frames, while the small underline stays put.
+// Draw both parts from vector geometry at 8x density, then box-filter to the current framebuffer scale.
+void MenuPainter::scrollDownMarker(float x, float y, int frame, float alpha) {
+    if (!r_ || alpha <= 0.001f) return;
+    constexpr int kSupersample = 8;
+    constexpr int kPadPixels = 2;
+    constexpr int kSamplesPerPixel = kSupersample * kSupersample;
+    const int selectedFrame = std::clamp(frame, 0, 1);
+    const size_t variant = size_t(selectedFrame);
+    Texture& cached = scrollMarkerTex_[variant];
+    int& cachedW = scrollMarkerCoreW_[variant];
+    int& cachedH = scrollMarkerCoreH_[variant];
+    const float outputScale = r_->pixelScale() * K();
+    const int coreW = std::max(8, int(std::ceil(20.0f * kScale * outputScale)));
+    const int coreH = std::max(8, int(std::ceil(22.0f * kScale * outputScale)));
+
+    if (!cached.id || cachedW != coreW || cachedH != coreH) {
+        r_->destroy(cached);
+        cachedW = cachedH = 0;
+        Image high;
+        high.width = (coreW + 2 * kPadPixels) * kSupersample;
+        high.height = (coreH + 2 * kPadPixels) * kSupersample;
+        high.rgba.resize(size_t(high.width) * size_t(high.height) * 4, 0);
+        const float unitX = float(coreW) / 20.0f;
+        const float unitY = float(coreH) / 22.0f;
+        const float padX = float(kPadPixels) / unitX;
+        const float padY = float(kPadPixels) / unitY;
+        const float triangleY = float(selectedFrame);
+        const float ax = 0.0f, ay = triangleY;
+        const float bx = 18.0f, by = triangleY;
+        const float cx = 9.0f, cy = 10.5f + triangleY;
+
+        auto cross = [](float ax, float ay, float bx, float by, float px, float py) {
+            return (bx - ax) * (py - ay) - (by - ay) * (px - ax);
+        };
+        auto insideTriangle = [&](float px, float py) {
+            const float c0 = cross(ax, ay, bx, by, px, py);
+            const float c1 = cross(bx, by, cx, cy, px, py);
+            const float c2 = cross(cx, cy, ax, ay, px, py);
+            return (c0 >= 0 && c1 >= 0 && c2 >= 0) || (c0 <= 0 && c1 <= 0 && c2 <= 0);
+        };
+        auto distanceToSegment = [](float px, float py, float x0, float y0, float x1, float y1) {
+            const float dx = x1 - x0, dy = y1 - y0;
+            const float lengthSquared = dx * dx + dy * dy;
+            const float t = lengthSquared > 0.0f
+                ? std::clamp(((px - x0) * dx + (py - y0) * dy) / lengthSquared, 0.0f, 1.0f)
+                : 0.0f;
+            const float ex = px - (x0 + t * dx), ey = py - (y0 + t * dy);
+            return std::sqrt(ex * ex + ey * ey);
+        };
+
+        for (int sy = 0; sy < high.height; ++sy) {
+            const float py = (float(sy) + 0.5f) / (float(kSupersample) * unitY) - padY;
+            for (int sx = 0; sx < high.width; ++sx) {
+                const float px = (float(sx) + 0.5f) / (float(kSupersample) * unitX) - padX;
+                bool visible = false;
+                uint8_t red = 0, green = 0, blue = 0;
+                const float edgeDistance = std::min({
+                    distanceToSegment(px, py, ax, ay, bx, by),
+                    distanceToSegment(px, py, bx, by, cx, cy),
+                    distanceToSegment(px, py, cx, cy, ax, ay)
+                });
+                if (insideTriangle(px, py) || edgeDistance <= 0.6f) {
+                    visible = true;
+                    if (edgeDistance > 0.6f && insideTriangle(px, py))
+                        red = green = blue = 0xD9;
+                }
+                // The underline stays still in both frames: 14x4, black frame, dark-grey 12x2 inset.
+                if (px >= 2.0f && px <= 16.0f && py >= 13.0f && py <= 17.0f) {
+                    visible = true;
+                    if (px >= 3.0f && px <= 15.0f && py >= 14.0f && py <= 16.0f)
+                        red = green = blue = 0x85;
+                    else
+                        red = green = blue = 0;
+                }
+                if (visible) {
+                    uint8_t* pixel = high.rgba.data() +
+                        (size_t(sy) * size_t(high.width) + size_t(sx)) * 4;
+                    pixel[0] = red;
+                    pixel[1] = green;
+                    pixel[2] = blue;
+                    pixel[3] = 255;
+                }
+            }
+        }
+
+        Image icon;
+        icon.width = coreW + 2 * kPadPixels;
+        icon.height = coreH + 2 * kPadPixels;
+        icon.rgba.resize(size_t(icon.width) * size_t(icon.height) * 4, 0);
+        for (int oy = 0; oy < icon.height; ++oy) {
+            for (int ox = 0; ox < icon.width; ++ox) {
+                int covered = 0, red = 0, green = 0, blue = 0;
+                for (int yy = 0; yy < kSupersample; ++yy) {
+                    for (int xx = 0; xx < kSupersample; ++xx) {
+                        const int hx = ox * kSupersample + xx, hy = oy * kSupersample + yy;
+                        const uint8_t* sample = high.rgba.data() +
+                            (size_t(hy) * size_t(high.width) + size_t(hx)) * 4;
+                        if (sample[3]) {
+                            ++covered;
+                            red += sample[0];
+                            green += sample[1];
+                            blue += sample[2];
+                        }
+                    }
+                }
+                uint8_t* pixel = icon.rgba.data() +
+                    (size_t(oy) * size_t(icon.width) + size_t(ox)) * 4;
+                pixel[3] = uint8_t((covered * 255 + kSamplesPerPixel / 2) / kSamplesPerPixel);
+                if (covered) {
+                    pixel[0] = uint8_t((red + covered / 2) / covered);
+                    pixel[1] = uint8_t((green + covered / 2) / covered);
+                    pixel[2] = uint8_t((blue + covered / 2) / covered);
+                }
+            }
+        }
+        cached = r_->upload(icon);
+        if (!cached.id) return;
+        cachedW = coreW;
+        cachedH = coreH;
+    }
+
+    const float padMenu = float(kPadPixels) / (r_->pixelScale() * K() * kScale);
+    r_->drawQuad(cached, X(x - padMenu) * kScale, Y(y - padMenu) * kScale,
+                 (20.0f + 2.0f * padMenu) * K() * kScale,
+                 (22.0f + 2.0f * padMenu) * K() * kScale, 1, 1, 1, alpha);
+}
+
 void MenuPainter::disc(float x, float y, float diameter, float alpha) {
     if (!r_ || alpha <= 0.001f || diameter <= 0.0f) return;
     constexpr int kSupersample = 8;
