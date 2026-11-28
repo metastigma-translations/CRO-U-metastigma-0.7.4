@@ -49,6 +49,14 @@ msgid "Results"
 msgstr "Результаты"
 
 #: src/app/battle.cpp
+msgid "EXP Gained"
+msgstr "ОПЫТ повышен"
+
+#: src/app/battle.cpp
+msgid "OZ Earned"
+msgstr "OZ получено"
+
+#: src/app/battle.cpp
 msgid "Player"
 msgstr "Игрок"
 
@@ -258,7 +266,7 @@ msgstr "ВРЕМЯ"
 
 #: src/app/menus.cpp
 msgid "OZ"
-msgstr "ОЗ"
+msgstr "OZ"
 
 #: src/app/menus.cpp
 msgid "Skill"
