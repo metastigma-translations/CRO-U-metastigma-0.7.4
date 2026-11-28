@@ -4007,10 +4007,10 @@ void drawBattleResults(App& app, cr::MenuPainter& m, float a) {
     };
     resultNotice(tr("EXP Gained"), 288 + rx, 76, 16);
     resultConnector(288 + rx, 76);
-    resultNumber(rs.expTotal, 358 + rx, 107);
+    resultNumber(rs.expTotal, 358 + rx, 106);
     resultNotice(tr("OZ Earned"), 288 + rx, 132, 16);
     resultConnector(288 + rx, 132);
-    resultNumber(rs.ozTotal, 358 + rx, 161);
+    resultNumber(rs.ozTotal, 358 + rx, 162);
     const int keepOz = app.game.oz;
     app.game.oz = int(rs.shownPurse); // (ComUty_BattryAndRealTimeAndOzDraw: the purse as it counts)
     drawClockAndOz(app, m, a * in);

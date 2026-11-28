@@ -26,6 +26,7 @@ void MenuPainter::release(Renderer& r) {
     gradients_.clear();
     for (Texture& tex : promptButtonTex_) r.destroy(tex);
     r.destroy(resultDiscTex_);
+    resultDiscCorePixels_ = 0;
     promptButtonTexCorePixels_.fill(0);
     promptButtonTexXbox_.fill(false);
 }
@@ -117,36 +118,73 @@ void MenuPainter::quad(float x, float y, float w, float h, const float* left, co
 // Its interior is uniformly 0xB1 opaque and its edge is antialiased at the source's 288px density.
 void MenuPainter::disc(float x, float y, float diameter, float alpha) {
     if (!r_ || alpha <= 0.001f || diameter <= 0.0f) return;
-    if (!resultDiscTex_.id) {
-        constexpr int kPixels = 288; // window_hd's 2x menu-unit density
-        constexpr float kCentreX = 143.5f;
-        constexpr float kCentreY = 144.5f;
-        constexpr float kRadius = 143.5f;
-        constexpr float kAtlasAlpha = 177.0f / 255.0f;
-        Image img;
-        img.width = kPixels;
-        img.height = kPixels;
-        img.rgba.resize(size_t(kPixels) * kPixels * 4);
-        for (int py = 0; py < kPixels; ++py) {
-            for (int px = 0; px < kPixels; ++px) {
-                const float dx = float(px) + 0.5f - kCentreX;
-                const float dy = float(py) + 0.5f - kCentreY;
-                const float distance = std::sqrt(dx * dx + dy * dy);
-                const float coverage = std::clamp(kRadius + 0.5f - distance, 0.0f, 1.0f);
-                const size_t at = (size_t(py) * kPixels + size_t(px)) * 4;
-                img.rgba[at + 0] = 0;
-                img.rgba[at + 1] = 0;
-                img.rgba[at + 2] = 0;
-                img.rgba[at + 3] = uint8_t(std::lround(255.0f * kAtlasAlpha * coverage));
+    constexpr int kSupersample = 8;
+    constexpr int kPadPixels = 2;
+    constexpr int kSamplesPerPixel = kSupersample * kSupersample;
+    const float outputScale = r_->pixelScale() * K();
+    const int corePixels = std::max(8, int(std::ceil(diameter * kScale * outputScale)));
+    if (!resultDiscTex_.id || resultDiscCorePixels_ != corePixels) {
+        r_->destroy(resultDiscTex_);
+        resultDiscCorePixels_ = 0;
+
+        Image high;
+        high.width = (corePixels + 2 * kPadPixels) * kSupersample;
+        high.height = high.width;
+        high.rgba.resize(size_t(high.width) * size_t(high.height) * 4, 0);
+        const float centre = float(corePixels) * 0.5f + float(kPadPixels);
+        // Keep the source circle's 143.5/144 radius ratio and 0xB1 interior alpha.
+        const float radius = float(corePixels) * (143.5f / 288.0f);
+        constexpr uint8_t kAtlasAlpha = 0xB1;
+
+        for (int sy = 0; sy < high.height; ++sy) {
+            const float py = (float(sy) + 0.5f) / float(kSupersample);
+            for (int sx = 0; sx < high.width; ++sx) {
+                const float px = (float(sx) + 0.5f) / float(kSupersample);
+                const float dx = px - centre, dy = py - centre;
+                if (dx * dx + dy * dy > radius * radius) continue;
+                uint8_t* pixel = high.rgba.data() +
+                    (size_t(sy) * size_t(high.width) + size_t(sx)) * 4;
+                pixel[0] = 0;
+                pixel[1] = 0;
+                pixel[2] = 0;
+                pixel[3] = kAtlasAlpha;
             }
         }
-        resultDiscTex_ = r_->upload(img);
-    }
-    if (resultDiscTex_.id)
-        r_->drawQuad(resultDiscTex_, X(x) * kScale, Y(y) * kScale,
-                     diameter * K() * kScale, diameter * K() * kScale, 1, 1, 1, alpha);
-}
 
+        Image circle;
+        circle.width = corePixels + 2 * kPadPixels;
+        circle.height = circle.width;
+        circle.rgba.resize(size_t(circle.width) * size_t(circle.height) * 4, 0);
+        for (int oy = 0; oy < circle.height; ++oy) {
+            for (int ox = 0; ox < circle.width; ++ox) {
+                int alphaSum = 0;
+                for (int yy = 0; yy < kSupersample; ++yy) {
+                    for (int xx = 0; xx < kSupersample; ++xx) {
+                        const int hx = ox * kSupersample + xx;
+                        const int hy = oy * kSupersample + yy;
+                        const uint8_t* sample = high.rgba.data() +
+                            (size_t(hy) * size_t(high.width) + size_t(hx)) * 4;
+                        alphaSum += sample[3];
+                    }
+                }
+                uint8_t* pixel = circle.rgba.data() +
+                    (size_t(oy) * size_t(circle.width) + size_t(ox)) * 4;
+                pixel[0] = 0;
+                pixel[1] = 0;
+                pixel[2] = 0;
+                pixel[3] = uint8_t((alphaSum + kSamplesPerPixel / 2) / kSamplesPerPixel);
+            }
+        }
+        resultDiscTex_ = r_->upload(circle);
+        if (!resultDiscTex_.id) return;
+        resultDiscCorePixels_ = corePixels;
+    }
+
+    const float padMenu = float(kPadPixels) / (r_->pixelScale() * K() * kScale);
+    r_->drawQuad(resultDiscTex_, X(x - padMenu) * kScale, Y(y - padMenu) * kScale,
+                 (diameter + 2.0f * padMenu) * K() * kScale,
+                 (diameter + 2.0f * padMenu) * K() * kScale, 1, 1, 1, alpha);
+}
 void MenuPainter::slant(float x, float y, float w, float h, float lean, const float* left, const float* right) {
     if (!r_) return;
     const int strips = left[3] == right[3] && left[0] == right[0] && left[1] == right[1] && left[2] == right[2]

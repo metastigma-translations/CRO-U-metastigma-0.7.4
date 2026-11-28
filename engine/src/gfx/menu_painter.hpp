@@ -151,6 +151,7 @@ private:
     std::map<std::string, Cached> text_;
     std::map<std::array<uint8_t, 8>, Texture> gradients_;
     Texture resultDiscTex_;
+    int resultDiscCorePixels_ = 0;
     std::array<Texture, 2> promptButtonTex_{};
     std::array<int, 2> promptButtonTexCorePixels_{};
     std::array<bool, 2> promptButtonTexXbox_{};
