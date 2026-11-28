@@ -3702,16 +3702,52 @@ void placePopup(App::Battle& b, int slot, float& x, float& y, int shown) {
     if (slot == 2 && p.amount < 0 && y >= b.popups[0].y - 20 && y <= b.popups[0].y + 20) y -= 30;
 }
 
-// cmd_number: `digits` places 10 apart, right-aligned; the HP's red under a quarter, the
-// level's orange style (width 3)
-void drawBattleNumber(cr::MenuPainter& m, int value, float x, float y, int digits, bool low, float a, bool level = false) {
-    const std::string t = std::to_string(std::max(0, value));
-    const int n = int(t.size());
-    for (int k = 0; k < n; ++k) {
-        const int d = t[size_t(k)] - '0';
-        const float u = level ? 588 + 14.0f * d : 14.0f * d + (low ? 140 : 0);
-        m.piece(x + 10.0f * float(digits - n + k), y, u, 0, 14, 14, a);
+// Target level badge: yellow level digits and underline, orange "Lv" abbreviation.
+void drawBattleLevelBadge(cr::MenuPainter& m, int value, float x, float y, float a) {
+    const float yellow[3] = {1.0f, 0xf9 / 255.0f, 0x4d / 255.0f};
+    const float orange[3] = {1.0f, 0xc8 / 255.0f, 0x9d / 255.0f};
+
+    // Rebuild the original thin yellow rule independently of the text.
+    const float line[4] = {yellow[0], yellow[1], yellow[2], a};
+    m.quad(x, y + 26.0f, 38.0f, 1.2f, line, line);
+
+    const std::string digits = std::to_string(std::max(0, value));
+    float digitSize = 14.0f;
+    float digitWidth = m.textWidth(digits, digitSize);
+    if (digitWidth > 34.0f && digitWidth > 0.0f) {
+        digitSize *= 34.0f / digitWidth;
+        digitWidth = m.textWidth(digits, digitSize);
     }
+    const float digitX = x + 34.0f - digitWidth;
+    const float digitCentreY = y + 20.0f - m.glyphInkCentreFromCentre(digits, digitSize);
+    m.textTintCentred(digits, digitX, digitCentreY, yellow[0], yellow[1], yellow[2], a, digitSize, true);
+
+    const std::string levelLabel = tr("Lv");
+    float labelSize = 10.5f;
+    float labelWidth = m.textWidth(levelLabel, labelSize);
+    if (labelWidth > 17.0f && labelWidth > 0.0f) {
+        labelSize *= 17.0f / labelWidth;
+        labelWidth = m.textWidth(levelLabel, labelSize);
+    }
+    const float labelX = x + 38.0f - labelWidth;
+    const float labelCentreY = y + 32.0f - m.glyphInkCentreFromCentre(levelLabel, labelSize);
+    m.textTintCentred(levelLabel, labelX, labelCentreY, orange[0], orange[1], orange[2], a, labelSize, true);
+}
+
+// The live battle HUD's HP / MP values use the selected font. Keep the original
+// right-aligned digit slots and red warning state for low HP / empty MP.
+void drawBattleHudNumber(cr::MenuPainter& m, int value, float x, float y, int digits, float a) {
+    const std::string text = std::to_string(std::max(0, value));
+    float size = 14.0f;
+    const float slotWidth = float(digits) * 10.0f;
+    float width = m.textWidth(text, size);
+    if (width > slotWidth - 2.0f && width > 0.0f) {
+        size *= (slotWidth - 2.0f) / width;
+        width = m.textWidth(text, size);
+    }
+    const float textX = x + slotWidth - width;
+    // White digits, black outline: no status-dependent tint or vertical gradient.
+    m.textCentred(text, textX, y + 6.0f, false, a, size, false);
 }
 
 // cmd_bottom: a battle button (`x` and `y` its corner): base, face (lit when selected), icon, word
@@ -3782,14 +3818,16 @@ void drawBattlePlate(App& app, cr::MenuPainter& m, float x, float y, int fighter
     m.piece(x + 36, y, face, 184, 24, 40, a);
     m.pieceTo(x + 60, y, 180, 40, face + 24, 184, 4, 40, a);
     m.piece(x + 240, y, face + 28, 184, 16, 40, a);
-    m.piece(x + 6, y + 25, 116, 14, 38, 10, a); // "Lv"
-    drawBattleNumber(m, f.level, x + 6, y + 12, 3, false, a, true);
+    drawBattleLevelBadge(m, f.level, x + 6, y, a);
     drawBattleHpBar(m, x + 96, y + 25, 96, b.shownHp[fighter], f.hpMax, false, a); // (_cmd_bottom_teki: 0x60 wide)
     std::string name;
     for (const App::Battle::Actor& ac : b.actors)
         if (ac.fighter == fighter) name = ac.name;
-    // menub_mainPut: _drawfont_center(i, x + 0x92, y + 10) - the 16-pixel name btlord_make_select set, white
-    m.text(name, x + 146 - m.textWidth(name, 16) / 2, y + 10, false, a, 16, f.character < 0);
+    // Centre the visible first capital on the button's colour split; use the standard white-to-dark-grey gradient.
+    constexpr float nameSize = 16.0f;
+    const float nameCentreY = y + 20.0f - m.glyphInkCentreFromCentre(name, nameSize);
+    m.textCentred(name, x + 146 - m.textWidth(name, nameSize) / 2, nameCentreY, false, a, nameSize,
+                  true, false, false, 0, false);
     drawBattleStatus(m, f, x + 56, y - 8, a);
 }
 
@@ -3804,12 +3842,25 @@ void drawBattleRow(App& app, cr::MenuPainter& m, int k, bool dimmed, float a) {
     const float c = dimmed ? 0.25f : 1.0f;
     const int face = f.character == 0 && viegIsOlgar(app) ? 4 : f.character; // __menub_mainPut: record 0 as Olgar is face 4
     m.piece((k == 0 ? 52 : 0) + (phone ? 16 : 0), 328 + dy, float(face * 48), 440, 48, 48, a, c, c, c);
-    m.piece(2 + dx, 370 + dy, 0, 14, 22, 10, a); // "HP"
-    m.piece(86 + dx, 370 + dy, 22, 14, 22, 10, a); // "MP"
-    drawBattleNumber(m, b.rollHp[k], 24 + dx, 364 + dy, 5, b.rollHp[k] <= f.hpMax / 4, a);
-    drawBattleNumber(m, b.rollMp[k], 108 + dx, 364 + dy, 4, b.rollMp[k] <= 0, a); // (cmd_number(mp, mp, 4): red at 0)
+    // Draw the gauges first: labels and numbers are intentionally layered over the bars.
     drawBattleHpBar(m, 20 + dx, 376 + dy, 59, b.rollHp[k], f.hpMax, false, a);
     drawBattleHpBar(m, 100 + dx, 376 + dy, 49, b.rollMp[k], f.mpMax, true, a);
+    auto drawHudLabel = [&](const std::string& label, float x) {
+        float size = 11.0f;
+        float width = m.textWidth(label, size);
+        if (width > 22.0f && width > 0.0f) {
+            size *= 22.0f / width;
+            width = m.textWidth(label, size);
+        }
+        // Align the bottom of the one-unit black glyph outline with the black track's bottom.
+        const float glyphBaseline = 376.0f + 4.0f - 1.0f;
+        const float centreY = glyphBaseline - m.baselineFromCentre(size);
+        m.textCentred(label, x + (22.0f - width) * 0.5f, centreY + dy, false, a, size, true);
+    };
+    drawHudLabel(tr("HP"), 1.0f + dx);
+    drawHudLabel(tr("MP"), 82.0f + dx);
+    drawBattleHudNumber(m, b.rollHp[k], 24 + dx, 364 + dy, 5, a);
+    drawBattleHudNumber(m, b.rollMp[k], 108 + dx, 364 + dy, 4, a);
     drawBattleStatus(m, f, 152 + dx, 364 + dy, a);
 }
 
@@ -4040,8 +4091,22 @@ void drawBattleHud(App& app, float W, float H) {
     if (g != 0 && b.breakPop > 1.0f) { // the label pops in large: tex2d_add_sca at (32 (s - 1), 10 (s - 1)), x s about its centre, opaque
         const float s = b.breakPop, sz = 64 * s, cx = 32 + (s - 1) * 32, cy = 32 + (s - 1) * 10;
         m.pieceTo(cx - sz / 2, cy - sz / 2, sz, sz, g < 0 ? 512 : 384, 240, 128, 128, 1);
-    } else
-        m.piece(0, 0, g == 0 ? 320 : g < 0 ? 256 : 192, 120, 64, 64, a);
+    } else {
+        const std::string label = g > 0 ? tr("Player") : g < 0 ? tr("Enemy") : tr("Even");
+        float size = 18.0f;
+        float width = m.textWidth(label, size);
+        if (width > 52.0f && width > 0.0f) {
+            size *= 52.0f / width;
+            width = m.textWidth(label, size);
+        }
+        const float x = (64.0f - width) * 0.5f;
+        if (g > 0)
+            m.textTintCentred(label, x, 30.0f, 0x38 / 255.0f, 1.0f, 0xe3 / 255.0f, a, size);
+        else if (g < 0)
+            m.textTintCentred(label, x, 30.0f, 1.0f, 0x14 / 255.0f, 0x23 / 255.0f, a, size);
+        else
+            m.textCentred(label, x, 30.0f, false, a, size, true);
+    }
     m.setOffset(0, 0);
 
     r.setOrigin(r.uiX());

@@ -82,9 +82,14 @@ public:
     float textWidth(const std::string& s, float size = 14, float letterSpacing = 0);
     // Vertical offset from a centred line box to the actual font baseline, in menu units.
     float baselineFromCentre(float size = 14) const;
+    // First visible glyph's ink-centre offset from the line-box centre, in menu units.
+    float glyphInkCentreFromCentre(const std::string& sample, float size) const;
     // ... in a colour (MuComFontPlateDisp's colours: the plates' yellow, grey)
     void textTint(const std::string& s, float x, float y, float r, float g, float b, float alpha = 1, float size = 14,
                   bool verticalGradient = false);
+    // As above, with the glyph box centred vertically on y.
+    void textTintCentred(const std::string& s, float x, float y, float r, float g, float b, float alpha = 1, float size = 14,
+                         bool verticalGradient = false);
     // Text whose line box is centred on y (labels in bars and on buttons: this font's box is
     // taller than the iOS system font's, so a fixed top offset would sit low)
     void textCentred(const std::string& s, float x, float y, bool dark, float alpha = 1, float size = 14,

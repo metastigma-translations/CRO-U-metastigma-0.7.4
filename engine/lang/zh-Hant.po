@@ -33,8 +33,32 @@ msgid "Off"
 msgstr "關閉"
 
 #: src/app/battle.cpp
+msgid "Lv"
+msgstr "Lv"
+
+#: src/app/battle.cpp src/app/menus.cpp
+msgid "HP"
+msgstr "HP"
+
+#: src/app/battle.cpp src/app/menus.cpp
+msgid "MP"
+msgstr "MP"
+
+#: src/app/battle.cpp
 msgid "Results"
 msgstr ""
+
+#: src/app/battle.cpp
+msgid "Player"
+msgstr "Player"
+
+#: src/app/battle.cpp
+msgid "Enemy"
+msgstr "Enemy"
+
+#: src/app/battle.cpp
+msgid "Even"
+msgstr "Even"
 
 #: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
 msgid "Back"
@@ -190,14 +214,6 @@ msgstr ""
 
 #: src/app/menus.cpp
 msgid "LV"
-msgstr ""
-
-#: src/app/menus.cpp
-msgid "HP"
-msgstr ""
-
-#: src/app/menus.cpp
-msgid "MP"
 msgstr ""
 
 #: src/app/menus.cpp

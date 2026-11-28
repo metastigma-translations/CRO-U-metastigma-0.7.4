@@ -33,8 +33,32 @@ msgid "Off"
 msgstr "Выключить"
 
 #: src/app/battle.cpp
+msgid "Lv"
+msgstr "Ур"
+
+#: src/app/battle.cpp src/app/menus.cpp
+msgid "HP"
+msgstr "ОЗ"
+
+#: src/app/battle.cpp src/app/menus.cpp
+msgid "MP"
+msgstr "ОМ"
+
+#: src/app/battle.cpp
 msgid "Results"
 msgstr "Результаты"
+
+#: src/app/battle.cpp
+msgid "Player"
+msgstr "Игрок"
+
+#: src/app/battle.cpp
+msgid "Enemy"
+msgstr "Враг"
+
+#: src/app/battle.cpp
+msgid "Even"
+msgstr "Равны"
 
 #: src/app/battle.cpp src/app/menus.cpp src/app/scene_fx.cpp src/platform/setup.cpp
 msgid "Back"
@@ -191,14 +215,6 @@ msgstr "Вверх/Вниз  Enter  Esc: назад"
 #: src/app/menus.cpp
 msgid "LV"
 msgstr "УРОВЕНЬ"
-
-#: src/app/menus.cpp
-msgid "HP"
-msgstr "ОЗ"
-
-#: src/app/menus.cpp
-msgid "MP"
-msgstr "ОМ"
 
 #: src/app/menus.cpp
 msgid "NEXT"
