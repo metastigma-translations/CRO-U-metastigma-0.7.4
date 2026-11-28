@@ -3964,10 +3964,30 @@ void drawBattleResults(App& app, cr::MenuPainter& m, float a) {
     r.setOrigin(wideRight(app));
     const float rx = 320 * away;
     m.picture(67, 304 + rx, 48, a);
-    m.picture(68, 288 + rx, 76, a); // EXP Gained
+    // The atlas versions baked English text into the two white plates. Rebuild the plates
+    // and their divider rules, then draw the labels with the selected menu font.
+    // Picture 70 remains the separate connector to each number.
+    auto resultNotice = [&](const std::string& label, float x, float y, float width, float height, float textSize) {
+        const float white[4] = {1, 1, 1, a};
+        const float black[4] = {0, 0, 0, a};
+        m.quad(x, y, width, height, white, white);
+        m.quad(x, y, 1.0f, height, black, black);
+        m.quad(x + 8.0f, y, 1.0f, height, black, black);
+        m.quad(x + width - 1.0f, y, 1.0f, height, black, black);
+        float size = textSize;
+        const float maxWidth = width - 18.0f;
+        float labelWidth = m.textWidth(label, size);
+        if (labelWidth > maxWidth && labelWidth > 0.0f) {
+            size *= maxWidth / labelWidth;
+            labelWidth = m.textWidth(label, size);
+        }
+        m.textCentred(label, x + (width - labelWidth) * 0.5f, y + height * 0.5f,
+                      true, a, size, false, false, true);
+    };
+    resultNotice(tr("EXP Gained"), 288 + rx, 76, 144, 37, 16);
     m.picture(70, 340 + rx, 96, a);
     drawShopNumber(m, rs.expTotal, 358 + rx, 98, 6, 12, a); // (MbResultPut: the totals, DAT_ec498 / 49c - not the counters)
-    m.picture(69, 288 + rx, 132, a); // OZ Earned
+    resultNotice(tr("OZ Earned"), 288 + rx, 132, 128, 20, 16);
     m.picture(70, 340 + rx, 152, a);
     drawShopNumber(m, rs.ozTotal, 358 + rx, 154, 6, 12, a);
     const int keepOz = app.game.oz;

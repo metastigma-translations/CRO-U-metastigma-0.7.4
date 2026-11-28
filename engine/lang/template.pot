@@ -48,6 +48,14 @@ msgid "Results"
 msgstr ""
 
 #: src/app/battle.cpp
+msgid "EXP Gained"
+msgstr ""
+
+#: src/app/battle.cpp
+msgid "OZ Earned"
+msgstr ""
+
+#: src/app/battle.cpp
 msgid "Player"
 msgstr ""
 
