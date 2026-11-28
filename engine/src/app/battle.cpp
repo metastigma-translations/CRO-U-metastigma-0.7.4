@@ -3963,33 +3963,54 @@ void drawBattleResults(App& app, cr::MenuPainter& m, float a) {
     }
     r.setOrigin(wideRight(app));
     const float rx = 320 * away;
-    m.picture(67, 304 + rx, 48, a);
-    // The atlas versions baked English text into the two white plates. Rebuild the plates
-    // and their divider rules, then draw the labels with the selected menu font.
-    // Picture 70 remains the separate connector to each number.
-    auto resultNotice = [&](const std::string& label, float x, float y, float width, float height, float textSize) {
-        const float white[4] = {1, 1, 1, a};
-        const float black[4] = {0, 0, 0, a};
-        m.quad(x, y, width, height, white, white);
-        m.quad(x, y, 1.0f, height, black, black);
-        m.quad(x + 8.0f, y, 1.0f, height, black, black);
-        m.quad(x + width - 1.0f, y, 1.0f, height, black, black);
+    // window_hd picture 67: a 144-unit black disc, with 0xB1 alpha and a smooth edge.
+    m.disc(304 + rx, 48, 144, a);
+    // Pictures 68 and 69 share the same 128 x 20 white plate. Preserve the half-unit
+    // transparent vertical seams at x=1, 4, 123 and 126 rather than filling them in.
+    const float noticeWhite[4] = {1, 1, 1, a};
+    auto resultNotice = [&](const std::string& label, float x, float y, float textSize) {
+        m.quad(x, y, 1.0f, 20.0f, noticeWhite, noticeWhite);
+        m.quad(x + 1.5f, y, 2.5f, 20.0f, noticeWhite, noticeWhite);
+        m.quad(x + 4.5f, y, 118.5f, 20.0f, noticeWhite, noticeWhite);
+        m.quad(x + 123.5f, y, 2.5f, 20.0f, noticeWhite, noticeWhite);
+        m.quad(x + 126.5f, y, 1.5f, 20.0f, noticeWhite, noticeWhite);
         float size = textSize;
-        const float maxWidth = width - 18.0f;
+        const float maxWidth = 110.0f;
         float labelWidth = m.textWidth(label, size);
         if (labelWidth > maxWidth && labelWidth > 0.0f) {
             size *= maxWidth / labelWidth;
             labelWidth = m.textWidth(label, size);
         }
-        m.textCentred(label, x + (width - labelWidth) * 0.5f, y + height * 0.5f,
+        m.textCentred(label, x + (128.0f - labelWidth) * 0.5f, y + 10.0f,
                       true, a, size, false, false, true);
     };
-    resultNotice(tr("EXP Gained"), 288 + rx, 76, 144, 37, 16);
-    m.picture(70, 340 + rx, 96, a);
-    drawShopNumber(m, rs.expTotal, 358 + rx, 98, 6, 12, a); // (MbResultPut: the totals, DAT_ec498 / 49c - not the counters)
-    resultNotice(tr("OZ Earned"), 288 + rx, 132, 128, 20, 16);
-    m.picture(70, 340 + rx, 152, a);
-    drawShopNumber(m, rs.ozTotal, 358 + rx, 154, 6, 12, a);
+    // Pictures 68 and 70 contained the same connector; draw it once:
+    // a 0.5-unit diagonal followed by a horizontal 0.5-unit rule.
+    auto resultConnector = [&](float x, float y) {
+        m.slant(x + 68.0f, y + 20.0f, 0.5f, 16.0f, -16.0f, noticeWhite, noticeWhite);
+        m.quad(x + 68.0f, y + 35.5f, 76.0f, 0.5f, noticeWhite, noticeWhite);
+    };
+    // Values use the normal white font with its black outline. Align their visible glyph
+    // centres to the original number slots; the upper total is lowered slightly.
+    auto resultNumber = [&](int value, float x, float glyphCentreY) {
+        const std::string digits = std::to_string(std::abs(value));
+        float size = 14.0f;
+        float width = m.textWidth(digits, size);
+        constexpr float slotWidth = 72.0f; // six original 12-unit digit slots
+        if (width > slotWidth - 2.0f && width > 0.0f) {
+            size *= (slotWidth - 2.0f) / width;
+            width = m.textWidth(digits, size);
+        }
+        const float textX = x + slotWidth - width;
+        const float lineBoxCentre = glyphCentreY - m.glyphInkCentreFromCentre(digits, size);
+        m.textCentred(digits, textX, lineBoxCentre, false, a, size);
+    };
+    resultNotice(tr("EXP Gained"), 288 + rx, 76, 16);
+    resultConnector(288 + rx, 76);
+    resultNumber(rs.expTotal, 358 + rx, 107);
+    resultNotice(tr("OZ Earned"), 288 + rx, 132, 16);
+    resultConnector(288 + rx, 132);
+    resultNumber(rs.ozTotal, 358 + rx, 161);
     const int keepOz = app.game.oz;
     app.game.oz = int(rs.shownPurse); // (ComUty_BattryAndRealTimeAndOzDraw: the purse as it counts)
     drawClockAndOz(app, m, a * in);

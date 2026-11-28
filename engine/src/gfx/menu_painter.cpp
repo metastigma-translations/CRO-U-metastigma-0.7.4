@@ -25,6 +25,7 @@ void MenuPainter::release(Renderer& r) {
     for (auto& [key, tex] : gradients_) r.destroy(tex);
     gradients_.clear();
     for (Texture& tex : promptButtonTex_) r.destroy(tex);
+    r.destroy(resultDiscTex_);
     promptButtonTexCorePixels_.fill(0);
     promptButtonTexXbox_.fill(false);
 }
@@ -110,6 +111,40 @@ void MenuPainter::quad(float x, float y, float w, float h, const float* left, co
     }
     r_->drawQuad(it->second, X(x) * kScale, Y(y) * kScale, w * K() * kScale, h * K() * kScale,
                  1, 1, 1, opacity);
+}
+
+// Recreate the source atlas's 144-unit black disc as a cached alpha texture.
+// Its interior is uniformly 0xB1 opaque and its edge is antialiased at the source's 288px density.
+void MenuPainter::disc(float x, float y, float diameter, float alpha) {
+    if (!r_ || alpha <= 0.001f || diameter <= 0.0f) return;
+    if (!resultDiscTex_.id) {
+        constexpr int kPixels = 288; // window_hd's 2x menu-unit density
+        constexpr float kCentreX = 143.5f;
+        constexpr float kCentreY = 144.5f;
+        constexpr float kRadius = 143.5f;
+        constexpr float kAtlasAlpha = 177.0f / 255.0f;
+        Image img;
+        img.width = kPixels;
+        img.height = kPixels;
+        img.rgba.resize(size_t(kPixels) * kPixels * 4);
+        for (int py = 0; py < kPixels; ++py) {
+            for (int px = 0; px < kPixels; ++px) {
+                const float dx = float(px) + 0.5f - kCentreX;
+                const float dy = float(py) + 0.5f - kCentreY;
+                const float distance = std::sqrt(dx * dx + dy * dy);
+                const float coverage = std::clamp(kRadius + 0.5f - distance, 0.0f, 1.0f);
+                const size_t at = (size_t(py) * kPixels + size_t(px)) * 4;
+                img.rgba[at + 0] = 0;
+                img.rgba[at + 1] = 0;
+                img.rgba[at + 2] = 0;
+                img.rgba[at + 3] = uint8_t(std::lround(255.0f * kAtlasAlpha * coverage));
+            }
+        }
+        resultDiscTex_ = r_->upload(img);
+    }
+    if (resultDiscTex_.id)
+        r_->drawQuad(resultDiscTex_, X(x) * kScale, Y(y) * kScale,
+                     diameter * K() * kScale, diameter * K() * kScale, 1, 1, 1, alpha);
 }
 
 void MenuPainter::slant(float x, float y, float w, float h, float lean, const float* left, const float* right) {
