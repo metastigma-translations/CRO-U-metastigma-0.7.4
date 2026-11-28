@@ -3245,8 +3245,17 @@ void drawFrame(App& app, bool present) {
                     if (p.side) p.shade = (p.side < 0) == (app.dialogueInfo[pi].side == 1) ? 1.0f : 128.0f / 255.0f;
         }
         r.setLayer(3); // (the Vita's screen: a script's Tex2d images at full size)
+        // The title's full-screen Tex2d card is the low-resolution source underneath the
+        // outpainted title1 layers. Suppress that card only while the matching HD title menu
+        // is on screen; otherwise it reappears when the logo fades for the button stage.
+        const bool vitaHdTitleCardReplaced =
+            app.titleOpen && !app.optionsOpen && !app.saveScreen.open && !app.charSelectOpen &&
+            !app.scc.open && !app.collection.open && !app.manualOpen && !app.ach.listOpen &&
+            r.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint &&
+            app.titleArtHd[0][0].id && app.titleArtHd[0][1].id;
         for (const App::Portrait& p : app.portraits) // Tex2d: portraits and title cards (over a battle in its talks)
-            if (p.tex.id && p.alpha > 0.001f && (!app.battle.active || battletalk::on(app))) {
+            if (p.tex.id && p.alpha > 0.001f && (!app.battle.active || battletalk::on(app)) &&
+                !(vitaHdTitleCardReplaced && (p.flags & 0x8000))) {
                 if (p.flags & 0x8000) { // a full-screen card (tex2d_img_prc): the iPad's sheets hold a
                     // 1024 x 768 picture for the screen (tex2d (-32, -64)), 2.2.0's and the Vita's a 960 x
                     // 640 one for tex2d (0, 0) 480 x 320. Scaled to cover the screen - the whole width in

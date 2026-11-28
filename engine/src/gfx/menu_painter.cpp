@@ -25,6 +25,10 @@ void MenuPainter::release(Renderer& r) {
     for (auto& [key, tex] : gradients_) r.destroy(tex);
     gradients_.clear();
     for (Texture& tex : promptButtonTex_) r.destroy(tex);
+    r.destroy(resultDiscTex_);
+    resultDiscCorePixels_ = 0;
+    r.destroy(scrollMarkerTex_);
+    scrollMarkerCoreW_ = scrollMarkerCoreH_ = 0;
     promptButtonTexCorePixels_.fill(0);
     promptButtonTexXbox_.fill(false);
 }
@@ -112,6 +116,187 @@ void MenuPainter::quad(float x, float y, float w, float h, const float* left, co
                  1, 1, 1, opacity);
 }
 
+// Recreate the source atlas's 144-unit black disc as a cached alpha texture.
+// Its interior is uniformly 0xB1 opaque and its edge is antialiased at the source's 288px density.
+// The message-board marker is picture 13 (20x22). Its arrow has five atlas poses:
+// it moves down by one unit at a time, then returns. Keep one antialiased arrow texture and
+// translate it by a fractional frame so 60/120 Hz rendering is not limited to the five atlas poses.
+// The underline remains still; polygon insets give the arrow a sharp, pointed outline.
+void MenuPainter::scrollDownMarker(float x, float y, float frame, float alpha) {
+    if (!r_ || alpha <= 0.001f) return;
+    constexpr int kSupersample = 8;
+    constexpr int kPadPixels = 2;
+    constexpr int kSamplesPerPixel = kSupersample * kSupersample;
+    const float outputScale = r_->pixelScale() * K();
+    const int coreW = std::max(8, int(std::ceil(20.0f * kScale * outputScale)));
+    const int coreH = std::max(8, int(std::ceil(11.0f * kScale * outputScale)));
+
+    if (!scrollMarkerTex_.id || scrollMarkerCoreW_ != coreW || scrollMarkerCoreH_ != coreH) {
+        r_->destroy(scrollMarkerTex_);
+        scrollMarkerCoreW_ = scrollMarkerCoreH_ = 0;
+
+        Image high;
+        high.width = (coreW + 2 * kPadPixels) * kSupersample;
+        high.height = (coreH + 2 * kPadPixels) * kSupersample;
+        high.rgba.resize(size_t(high.width) * size_t(high.height) * 4, 0);
+        const float unitX = float(coreW) / 20.0f;
+        const float unitY = float(coreH) / 11.0f;
+        const float padX = float(kPadPixels) / unitX;
+        const float padY = float(kPadPixels) / unitY;
+
+        // Outer triangle and its inset: unlike a stroked line with round caps, both
+        // polygons retain the original's pointed base corners and tip.
+        const float ax = 0.0f, ay = 0.0f;
+        const float bx = 18.0f, by = 0.0f;
+        const float cx = 9.0f, cy = 10.5f;
+        const float iax = 0.8f, iay = 0.8f;
+        const float ibx = 17.2f, iby = 0.8f;
+        const float icx = 9.0f, icy = 9.2f;
+        auto cross = [](float x0, float y0, float x1, float y1, float px, float py) {
+            return (x1 - x0) * (py - y0) - (y1 - y0) * (px - x0);
+        };
+        auto insideTriangle = [&](float px, float py, float x0, float y0,
+                                  float x1, float y1, float x2, float y2) {
+            const float c0 = cross(x0, y0, x1, y1, px, py);
+            const float c1 = cross(x1, y1, x2, y2, px, py);
+            const float c2 = cross(x2, y2, x0, y0, px, py);
+            return (c0 >= 0.0f && c1 >= 0.0f && c2 >= 0.0f) ||
+                   (c0 <= 0.0f && c1 <= 0.0f && c2 <= 0.0f);
+        };
+
+        for (int sy = 0; sy < high.height; ++sy) {
+            const float py = (float(sy) + 0.5f) / (float(kSupersample) * unitY) - padY;
+            for (int sx = 0; sx < high.width; ++sx) {
+                const float px = (float(sx) + 0.5f) / (float(kSupersample) * unitX) - padX;
+                if (!insideTriangle(px, py, ax, ay, bx, by, cx, cy)) continue;
+                const bool fill = insideTriangle(px, py, iax, iay, ibx, iby, icx, icy);
+                uint8_t* pixel = high.rgba.data() +
+                    (size_t(sy) * size_t(high.width) + size_t(sx)) * 4;
+                pixel[0] = pixel[1] = pixel[2] = fill ? 0xD9 : 0;
+                pixel[3] = 255;
+            }
+        }
+
+        Image arrow;
+        arrow.width = coreW + 2 * kPadPixels;
+        arrow.height = coreH + 2 * kPadPixels;
+        arrow.rgba.resize(size_t(arrow.width) * size_t(arrow.height) * 4, 0);
+        for (int oy = 0; oy < arrow.height; ++oy) {
+            for (int ox = 0; ox < arrow.width; ++ox) {
+                int covered = 0, red = 0, green = 0, blue = 0;
+                for (int yy = 0; yy < kSupersample; ++yy) {
+                    for (int xx = 0; xx < kSupersample; ++xx) {
+                        const int hx = ox * kSupersample + xx;
+                        const int hy = oy * kSupersample + yy;
+                        const uint8_t* sample = high.rgba.data() +
+                            (size_t(hy) * size_t(high.width) + size_t(hx)) * 4;
+                        if (!sample[3]) continue;
+                        ++covered;
+                        red += sample[0];
+                        green += sample[1];
+                        blue += sample[2];
+                    }
+                }
+                uint8_t* pixel = arrow.rgba.data() +
+                    (size_t(oy) * size_t(arrow.width) + size_t(ox)) * 4;
+                pixel[3] = uint8_t((covered * 255 + kSamplesPerPixel / 2) / kSamplesPerPixel);
+                if (covered) {
+                    pixel[0] = uint8_t((red + covered / 2) / covered);
+                    pixel[1] = uint8_t((green + covered / 2) / covered);
+                    pixel[2] = uint8_t((blue + covered / 2) / covered);
+                }
+            }
+        }
+        scrollMarkerTex_ = r_->upload(arrow);
+        if (!scrollMarkerTex_.id) return;
+        scrollMarkerCoreW_ = coreW;
+        scrollMarkerCoreH_ = coreH;
+    }
+
+    const float arrowFrame = std::clamp(frame, 0.0f, 4.0f);
+    const float padMenu = float(kPadPixels) / (r_->pixelScale() * K() * kScale);
+    r_->drawQuad(scrollMarkerTex_, X(x - padMenu) * kScale,
+                 Y(y + arrowFrame - padMenu) * kScale,
+                 (20.0f + 2.0f * padMenu) * K() * kScale,
+                 (11.0f + 2.0f * padMenu) * K() * kScale, 1, 1, 1, alpha);
+
+    // The 14x4 underline stays fixed while the arrow moves: black frame, dark-grey inset.
+    r_->fillRect(X(x + 2.0f) * kScale, Y(y + 13.0f) * kScale,
+                 14.0f * K() * kScale, 4.0f * K() * kScale, 0, 0, 0, alpha);
+    constexpr float inset = 0x85 / 255.0f;
+    r_->fillRect(X(x + 3.0f) * kScale, Y(y + 14.0f) * kScale,
+                 12.0f * K() * kScale, 2.0f * K() * kScale, inset, inset, inset, alpha);
+}
+
+void MenuPainter::disc(float x, float y, float diameter, float alpha) {
+    if (!r_ || alpha <= 0.001f || diameter <= 0.0f) return;
+    constexpr int kSupersample = 8;
+    constexpr int kPadPixels = 2;
+    constexpr int kSamplesPerPixel = kSupersample * kSupersample;
+    const float outputScale = r_->pixelScale() * K();
+    const int corePixels = std::max(8, int(std::ceil(diameter * kScale * outputScale)));
+    if (!resultDiscTex_.id || resultDiscCorePixels_ != corePixels) {
+        r_->destroy(resultDiscTex_);
+        resultDiscCorePixels_ = 0;
+
+        Image high;
+        high.width = (corePixels + 2 * kPadPixels) * kSupersample;
+        high.height = high.width;
+        high.rgba.resize(size_t(high.width) * size_t(high.height) * 4, 0);
+        const float centre = float(corePixels) * 0.5f + float(kPadPixels);
+        // Keep the source circle's 143.5/144 radius ratio and 0xB1 interior alpha.
+        const float radius = float(corePixels) * (143.5f / 288.0f);
+        constexpr uint8_t kAtlasAlpha = 0xB1;
+
+        for (int sy = 0; sy < high.height; ++sy) {
+            const float py = (float(sy) + 0.5f) / float(kSupersample);
+            for (int sx = 0; sx < high.width; ++sx) {
+                const float px = (float(sx) + 0.5f) / float(kSupersample);
+                const float dx = px - centre, dy = py - centre;
+                if (dx * dx + dy * dy > radius * radius) continue;
+                uint8_t* pixel = high.rgba.data() +
+                    (size_t(sy) * size_t(high.width) + size_t(sx)) * 4;
+                pixel[0] = 0;
+                pixel[1] = 0;
+                pixel[2] = 0;
+                pixel[3] = kAtlasAlpha;
+            }
+        }
+
+        Image circle;
+        circle.width = corePixels + 2 * kPadPixels;
+        circle.height = circle.width;
+        circle.rgba.resize(size_t(circle.width) * size_t(circle.height) * 4, 0);
+        for (int oy = 0; oy < circle.height; ++oy) {
+            for (int ox = 0; ox < circle.width; ++ox) {
+                int alphaSum = 0;
+                for (int yy = 0; yy < kSupersample; ++yy) {
+                    for (int xx = 0; xx < kSupersample; ++xx) {
+                        const int hx = ox * kSupersample + xx;
+                        const int hy = oy * kSupersample + yy;
+                        const uint8_t* sample = high.rgba.data() +
+                            (size_t(hy) * size_t(high.width) + size_t(hx)) * 4;
+                        alphaSum += sample[3];
+                    }
+                }
+                uint8_t* pixel = circle.rgba.data() +
+                    (size_t(oy) * size_t(circle.width) + size_t(ox)) * 4;
+                pixel[0] = 0;
+                pixel[1] = 0;
+                pixel[2] = 0;
+                pixel[3] = uint8_t((alphaSum + kSamplesPerPixel / 2) / kSamplesPerPixel);
+            }
+        }
+        resultDiscTex_ = r_->upload(circle);
+        if (!resultDiscTex_.id) return;
+        resultDiscCorePixels_ = corePixels;
+    }
+
+    const float padMenu = float(kPadPixels) / (r_->pixelScale() * K() * kScale);
+    r_->drawQuad(resultDiscTex_, X(x - padMenu) * kScale, Y(y - padMenu) * kScale,
+                 (diameter + 2.0f * padMenu) * K() * kScale,
+                 (diameter + 2.0f * padMenu) * K() * kScale, 1, 1, 1, alpha);
+}
 void MenuPainter::slant(float x, float y, float w, float h, float lean, const float* left, const float* right) {
     if (!r_) return;
     const int strips = left[3] == right[3] && left[0] == right[0] && left[1] == right[1] && left[2] == right[2]

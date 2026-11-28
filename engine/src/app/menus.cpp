@@ -1,5 +1,7 @@
 #include "app/app.hpp"
 
+#include <cmath>
+
 namespace crapp {
 
 // The text-only entries from the selected window_hd area. Other atlas words deliberately remain raster.
@@ -4108,6 +4110,15 @@ int pictAnimFrame(int draws, int ticks, int frames) {
     return (k <= top ? k : 2 * top - k) / ticks;
 }
 
+// The same out-and-back animation with sub-frame precision for displays above the game's 20 Hz.
+float pictAnimPosition(float draws, float ticks, float frames) {
+    if (!std::isfinite(draws) || ticks <= 0.0f || frames <= 0.0f) return 0.0f;
+    const float top = ticks * frames, period = 2.0f * top;
+    float phase = std::fmod(draws, period);
+    if (phase < 0.0f) phase += period;
+    return std::clamp((phase <= top ? phase : period - phase) / ticks, 0.0f, frames);
+}
+
 // ComUty_MsgBoardDraw at (0, y): picture 12, the mark (picture 13, 20 px a frame) at (458, y + 78),
 // and its lines from (24, y + 14), 16 apart in the menu font (13: Part 8 4936.5 s, "You have save
 // data from your last session." 509 px wide of 1280) - those only while the window stands still
@@ -5285,11 +5296,13 @@ bool loadVitaHdLayers(App& app, const std::string& artName, const std::string& t
     cr::Image art, text;
     std::string why;
     if (!cr::loadNamedHdImage(app.hdDir, artName, art, &why)) {
-        if (!why.empty()) SDL_Log("Vita HD artwork %s: %s", artName.c_str(), why.c_str());
+        if (why.empty()) why = "not found in " + app.hdDir + " (expected .dds or .png)";
+        SDL_Log("Vita HD artwork %s: %s", artName.c_str(), why.c_str());
         return false;
     }
     if (!cr::loadNamedHdImage(app.hdDir, textName, text, &why)) {
-        if (!why.empty()) SDL_Log("Vita HD text layer %s: %s", textName.c_str(), why.c_str());
+        if (why.empty()) why = "not found in " + app.hdDir + " (expected .dds or .png)";
+        SDL_Log("Vita HD text layer %s: %s", textName.c_str(), why.c_str());
         return false;
     }
     layers[0] = app.renderer.upload(art);
@@ -5651,14 +5664,17 @@ void outPicture(cr::MenuPainter& m, const cr::Texture& tex, int pict, float x, f
 void drawTitleMenu(App& app) {
     cr::MenuPainter& m = app.menu;
     static const char* const kTitleSheet[2] = {"title1.mct", "chaos.mct"};
+    const bool vitaHdTitle = app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint;
     for (int k = 0; k < 2; ++k)
-        if (!app.titleArt[k].id) {
+        if (!app.titleArt[k].id && !(k == 0 && vitaHdTitle)) {
+            // In Vita HD outpaint mode, do not load the low-resolution title1 source as a fallback.
+            // The split HD pair is the only title1 artwork drawn in this mode.
             cr::Image img;
             const int ipadBefore = app.ipadImages;
             if (loadImage(app, kTitleSheet[k], img)) app.titleArt[k] = app.renderer.upload(img);
             if (k == 0) app.titleArtIpad = app.ipadImages > ipadBefore;
         }
-    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint && !app.titleArtHdTried) {
+    if (vitaHdTitle && !app.titleArtHdTried) {
         app.titleArtHdTried = true;
         loadVitaHdLayers(app, "title1_hd1", "title1_hd2", app.titleArtHd[0]);
         loadVitaHdLayers(app, "title2_hd1", "title2_hd2", app.titleArtHd[1]);
@@ -5675,15 +5691,24 @@ void drawTitleMenu(App& app) {
     // none, the Vita's, the iPad layout gets title1_hd, cut as the iPhone's 7 / 8 - the places by layout)
     const int name = app.titleArtIpad ? 9 : 7, strip = app.titleArtIpad ? 10 : 8;
     const bool vita = app.renderer.vitaScreen();
-    if (vita && app.video.hdTextures && app.video.vitaOutpaint &&
-        app.titleArtHd[0][0].id && app.titleArtHd[0][1].id &&
-        app.titleArtHd[1][0].id && app.titleArtHd[1][1].id) {
+    const bool title1Hd = app.titleArtHd[0][0].id && app.titleArtHd[0][1].id;
+    const bool title2Hd = app.titleArtHd[1][0].id && app.titleArtHd[1][1].id;
+    if (vitaHdTitle) {
         const int keep = app.renderer.layer();
         app.renderer.setLayer(3);
-        drawVitaHdLayer(app, app.titleArtHd[0][0], logo);
-        drawVitaHdLayer(app, app.titleArtHd[0][1], logo);
-        drawVitaHdLayer(app, app.titleArtHd[1][0], logo);
-        drawVitaHdLayer(app, app.titleArtHd[1][1], logo);
+        // title1_hd1 is the outpainted base artwork. Keep it opaque while the menu
+        // changes to its plates; otherwise the original full-screen Tex2d card below it
+        // becomes visible again as the title's logo alpha reaches zero.
+        if (title1Hd) {
+            drawVitaHdLayer(app, app.titleArtHd[0][0], 1.0f);
+            drawVitaHdLayer(app, app.titleArtHd[0][1], 1.0f);
+        }
+        // The separate Chaos logo follows the original title fade, but never falls back
+        // to the low-resolution chaos.mct sheet in Vita HD outpaint mode.
+        if (title2Hd) {
+            drawVitaHdLayer(app, app.titleArtHd[1][0], logo);
+            drawVitaHdLayer(app, app.titleArtHd[1][1], logo);
+        }
         app.renderer.setLayer(keep);
     } else if (vita) {
         // Original Vita texture behaviour: its own crop, scale and edge-filling title strip.
@@ -6177,6 +6202,13 @@ void bootTitle(App& app) {
     app.musicArea = -1;
     app.fieldHidden = false; // (the boot script toggles it on at its start and off before the warp out)
     app.msgWin = App::MsgWin();
+    if (app.renderer.vitaScreen() && app.video.hdTextures && app.video.vitaOutpaint) {
+        // Load both Vita title pairs before the boot script's full-screen Tex2d card is drawn.
+        // loadVitaHdLayers leaves already-uploaded pairs intact on a return to the title.
+        app.titleArtHdTried = true;
+        loadVitaHdLayers(app, "title1_hd1", "title1_hd2", app.titleArtHd[0]);
+        loadVitaHdLayers(app, "title2_hd1", "title2_hd2", app.titleArtHd[1]);
+    }
     playBgm(app, 1u << 29); // the script starts the title music
     std::string err;
     if (!app.events.load(app.dataDir, 0, &err)) {

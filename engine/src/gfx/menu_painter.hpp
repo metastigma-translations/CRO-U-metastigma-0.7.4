@@ -62,6 +62,10 @@ public:
     void stretch(int pict, float x, float y, float w, float h, float alpha = 1);
     // Plain colour quad, colours per left / right edge (tex2d_add4 on slot 45)
     void quad(float x, float y, float w, float h, const float* left, const float* right);
+    // Cached, antialiased translucent black circle used by the battle results overlay.
+    void disc(float x, float y, float diameter, float alpha = 1);
+    // Antialiased, sharp-corner down-arrow and underline; fractional position spans five source poses (0..4).
+    void scrollDownMarker(float x, float y, float frame, float alpha = 1);
     // ... a parallelogram: the bottom edge (x, y + h)..(x + w, y + h), the top `lean` to the right
     // (tex2d_add4's four corners: the battle's HP / MP bars)
     void slant(float x, float y, float w, float h, float lean, const float* left, const float* right);
@@ -148,6 +152,11 @@ private:
     };
     std::map<std::string, Cached> text_;
     std::map<std::array<uint8_t, 8>, Texture> gradients_;
+    Texture resultDiscTex_;
+    int resultDiscCorePixels_ = 0;
+    Texture scrollMarkerTex_;
+    int scrollMarkerCoreW_ = 0;
+    int scrollMarkerCoreH_ = 0;
     std::array<Texture, 2> promptButtonTex_{};
     std::array<int, 2> promptButtonTexCorePixels_{};
     std::array<bool, 2> promptButtonTexXbox_{};
